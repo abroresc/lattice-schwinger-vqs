@@ -1,0 +1,292 @@
+% ============================================================================
+%  PHY 420 capstone thesis
+%  Compile:  latexmk -pdf main.tex        (or just press Recompile in Overleaf)
+% ============================================================================
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage[colorlinks=true,allcolors=blue!60!black]{hyperref}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+
+% Figures live one directory up, already exported as vector PDF by the scripts.
+\graphicspath{{../figures/}}
+
+% Shorthands for the operators used throughout, so a convention change is one edit.
+\newcommand{\Zop}[1]{\hat{Z}_{#1}}
+\newcommand{\Xop}[1]{\hat{X}_{#1}}
+\newcommand{\Yop}[1]{\hat{Y}_{#1}}
+\newcommand{\sigp}[1]{\hat{\sigma}^{+}_{#1}}
+\newcommand{\sigm}[1]{\hat{\sigma}^{-}_{#1}}
+\newcommand{\Lop}[1]{\hat{L}_{#1}}
+\newcommand{\Hop}{\hat{H}}
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}
+\usepackage{xcolor}
+
+\title{\bf A quantified error budget for quantum simulation of the lattice
+Schwinger model}
+\author{Abror Niyazmetov\\[2pt]
+\small Department of Physics, Gettysburg College\\
+\small Advisor: Dr.\ Kurt Andresen}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\todo{Write last. One paragraph: the system, the two numbers you measured, and
+the honest limitation.}
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\todo{Motivation. Three beats: (1) real-time dynamics of gauge theories is where
+classical Monte Carlo fails, because continuing to real time makes the sampling
+weights complex and the statistical error grows exponentially, the sign problem;
+(2) a quantum processor evolves in real time natively, so the case for quantum
+simulation here is a physics argument rather than a promotional one; (3) present
+devices are noisy, so the interesting question is not whether the simulation runs
+but how much of the physics survives, quantified.}
+
+\subsection{What this thesis contributes}
+
+\todo{State the two numbers up front. The crossover step size where Trotter error
+falls below shot noise, and the gate error rate at which the pair-production
+signal becomes indistinguishable from the noise floor.}
+
+% ============================================================================
+\section{The lattice Schwinger model}
+% ============================================================================
+
+\subsection{The continuum theory}
+
+The Schwinger model is quantum electrodynamics in one space and one time
+dimension,
+\begin{equation}
+  \mathcal{L} = \bar\psi\left(i\gamma^\mu D_\mu - m\right)\psi
+              - \tfrac14 F_{\mu\nu}F^{\mu\nu},
+  \qquad D_\mu = \partial_\mu + i g A_\mu .
+\end{equation}
+With only one spatial direction there is no magnetic field, so the gauge field
+carries a single scalar electric component. Field lines between two opposite
+charges have nowhere to spread, the field is independent of separation, and the
+potential rises linearly, $V(r) = \tfrac12 g^2 r$. Charges are therefore
+confined. When the stored field energy exceeds $2m$ the vacuum produces a fresh
+pair, the new charges screen the original ones, and the flux string breaks.
+
+\todo{Expand to roughly a page. Add the sign-problem paragraph here or in the
+introduction, not both.}
+
+\subsection{Staggered fermions}
+
+A naive symmetric difference for the Dirac derivative has momentum-space form
+$(i/a)\sin(pa)$, which vanishes at $p = 0$ and again at $p = \pi/a$. The
+discretisation has produced a second fermion species that is not in the
+continuum theory. Kogut and Susskind's construction distributes the two spinor
+components across alternating sites~\cite{kogut1975}, so even physical sites
+carry particles and odd sites carry antiparticles as \emph{holes}. The vacuum is
+then the filled Dirac sea rather than an empty lattice, and the charge density
+carries a staggered reference occupation,
+\begin{equation}
+  \hat\rho_n = \hat c^\dagger_n \hat c_n - \frac{1 - (-1)^n}{2}.
+\end{equation}
+
+\subsection{Solving Gauss's law}
+
+On the lattice Gauss's law reads $\hat E_n - \hat E_{n-1} = \hat\rho_n$. In one
+spatial dimension with open boundaries and no background field, $\hat E_0 = 0$,
+this does not merely constrain the electric field: it determines it,
+\begin{equation}
+  \label{eq:gauss}
+  \hat E_n = \Lop{n} = \sum_{k \le n} \hat\rho_k .
+\end{equation}
+The gauge field can therefore be substituted away rather than stored, and $N$
+lattice sites require $N$ qubits with no link register and no field truncation.
+The cost is that the electric energy $\sum_n \Lop{n}^2$ becomes long-ranged in
+the spins. That long-range coupling is where confinement resides, as
+Section~\ref{sec:hamiltonian} makes explicit.
+
+\subsection{The spin Hamiltonian}
+\label{sec:hamiltonian}
+
+Applying the Jordan--Wigner transformation
+$\hat c_j = \left(\prod_{i<j}\Zop{i}\right)\sigm{j}$ to the remaining fermionic
+Hamiltonian gives a pure spin chain,
+\begin{equation}
+  \label{eq:H}
+  \Hop = \frac{m}{2}\sum_{n=1}^{N}(-1)^n \Zop{n}
+       + w\sum_{n=1}^{N-1}\left(\sigp{n}\sigm{n+1} + \mathrm{h.c.}\right)
+       + J\sum_{n=1}^{N-1}\Lop{n}^2,
+\end{equation}
+with $\Lop{n} = \tfrac12\sum_{m\le n}\left(\Zop{m} + (-1)^m\right)$,
+$w = 1/2a$ and $J = g^2 a/2$. This is the Hamiltonian realised experimentally at
+$N=4$ by Martinez \emph{et al.}~\cite{martinez2016}, whose published form the
+derivation here was checked against term by term.
+
+Expanding the squared partial charge in Eq.~\eqref{eq:H} gives a
+$\Zop{m}\Zop{m'}$ coupling of strength $\tfrac12 J (N - m')$ for $m < m' \le N-1$.
+The coefficient grows linearly with distance from the boundary because the flux
+between a separated pair is stored on every intervening link. Confinement is
+therefore visible directly in the coefficient table, Table~\ref{tab:pauli}.
+
+\begin{table}[t]
+  \centering
+  \caption{The $N=4$ Hamiltonian as Pauli strings. Site 1 is the leftmost
+  character. \todo{regenerate from scripts/03 if parameters change}}
+  \label{tab:pauli}
+  \small
+  \begin{tabular}{llll}
+    \toprule
+    String & Coefficient & String & Coefficient \\
+    \midrule
+    \texttt{IIII} & $+2J$              & \texttt{IIXX} & $+\tfrac12 w$ \\
+    \texttt{IIIZ} & $+\tfrac12 m$      & \texttt{IIYY} & $+\tfrac12 w$ \\
+    \texttt{IIZI} & $-\tfrac12 m - \tfrac12 J$ & \texttt{IXXI} & $+\tfrac12 w$ \\
+    \texttt{IZII} & $+\tfrac12 m - \tfrac12 J$ & \texttt{IYYI} & $+\tfrac12 w$ \\
+    \texttt{ZIII} & $-\tfrac12 m - J$  & \texttt{XXII} & $+\tfrac12 w$ \\
+    \texttt{IZZI} & $+\tfrac12 J$      & \texttt{YYII} & $+\tfrac12 w$ \\
+    \texttt{ZIZI} & $+\tfrac12 J$      & \texttt{ZZII} & $+J$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ============================================================================
+\section{Method and verification}
+% ============================================================================
+
+The design principle of this project is that every stage has a known answer
+attached, so an incorrect result is detected within hours rather than weeks.
+
+\subsection{Three independent constructions}
+
+The Hamiltonian is built three ways: as an expanded list of Pauli strings, as a
+direct matrix construction that squares $\Lop{n}$ without algebra, and from the
+fermionic Kogut--Susskind form routed through Jordan--Wigner. The three agree to
+$\SI{9e-16}{}$.
+
+\subsection{Analytic limits}
+
+\begin{table}[t]
+  \centering
+  \caption{Verification residuals at $N=4$. These are residuals, not
+  pass/fail flags.}
+  \label{tab:checks}
+  \small
+  \begin{tabular}{lll}
+    \toprule
+    Check & Residual & What it tests \\
+    \midrule
+    Pauli expansion vs.\ direct build      & \num{9e-16} & the algebra \\
+    Fermion form vs.\ spin form            & \num{9e-16} & Jordan--Wigner \\
+    Strong coupling $E_0 = -mN/2$          & $0$         & mass, electric terms \\
+    Free fermions, all 16 levels           & \num{9e-16} & hopping, JW string \\
+    Hellmann--Feynman on the condensate    & \num{3e-11} & $\Hop$ and observable together \\
+    Gauss's law is an identity             & $0$         & the elimination \\
+    $[\Hop, \hat Q] = 0$                   & $0$         & charge bookkeeping \\
+    CP inside the neutral sector           & \num{4e-16} & structure of the electric term \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\todo{One paragraph per row of Table~\ref{tab:checks} explaining what each check
+would fail to catch on its own. The Hellmann--Feynman one is the strongest: it
+catches a wrong Hamiltonian paired with a matching wrong observable.}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{03_schwinger_spectrum.pdf}
+  \caption{All 16 levels against fermion mass, and the chiral condensate
+  computed two independent ways. The condensate from the ground-state vector and
+  from $N^{-1}\,dE_0/dm$ agree to \num{3e-11}.}
+  \label{fig:spectrum}
+\end{figure}
+
+\subsection{Symmetries as diagnostics}
+
+Because Gauss's law is solved and substituted rather than imposed, it holds
+identically on every state in the Hilbert space and offers no diagnostic. Two
+symmetries survive and do: total charge, since $[\Hop,\hat Q] = 0$ exactly, and
+a CP symmetry $\mathrm{CP} = R\,\hat X^{\otimes N}$ that commutes with $\Hop$
+only within the neutral sector, because $\Lop{n} \to \hat Q - \Lop{N-n}$ under
+reflection. Both are broken by noise, and both are measured in
+Section~\ref{sec:budget}.
+
+% ============================================================================
+\section{Results}
+% ============================================================================
+
+\subsection{Pair production from the bare vacuum}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{04_pair_production.pdf}
+  \caption{Particle density against time, starting from the bare vacuum. Energy
+  is conserved to \num{4e-15} throughout: nothing is injected, and the pairs
+  appear because the prepared state is not the ground state.}
+  \label{fig:pairs}
+\end{figure}
+
+\todo{Add the table of bare-vacuum energy, true ground energy, gap, and peak
+density. The monotone relationship between gap and peak density is the point.}
+
+\subsection{Trotterised evolution}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{05_qiskit_trotter.pdf}
+  \caption{Left: Trotter error against step size, with the scaling exponent
+  fitted rather than assumed. Centre: particle density measured from finite
+  shots. Right: the crossover between systematic and statistical error.}
+  \label{fig:trotter}
+\end{figure}
+
+Fitting $\log(\text{error})$ against $\log(\delta t)$ gives exponents of
+\num{1.036} and \num{2.003} for the first- and second-order product formulas,
+against predicted values of 1 and 2.
+
+% ============================================================================
+\section{The error budget}
+\label{sec:budget}
+% ============================================================================
+
+\todo{The core of the thesis. Separate Trotter error, shot noise, and gate error
+onto each observable, and propagate uncertainties onto every plotted point.}
+
+\subsection{Systematic against statistical}
+
+At $N=4$, $m/w = 0.5$, $t = 3$, second-order Trotter, the shot-noise standard
+error on particle density is \num{0.0176} at 256 shots and \num{0.0047} at 4096.
+Trotter error falls below those floors at $\delta t \approx 0.19$ and
+$\delta t \approx 0.094$ respectively. Below the crossover, reducing $\delta t$
+buys no accuracy the statistics can resolve while the two-qubit gate count rises
+from 320 at $\delta t = 0.3$ to 6400 at $\delta t = 0.015$.
+
+\subsection{Gate and readout error}
+
+\todo{Not yet done. Inject a noise model, quantify the failure threshold, and
+test whether the measured charge-sector leakage predicts it independently.}
+
+% ============================================================================
+\section{Conclusion}
+% ============================================================================
+
+\todo{What was achieved, what was not, and what the honest limitations are.}
+
+\section*{Statement on AI assistance}
+
+\todo{Carry over the disclosure from the repository README, unchanged.}
+
+\bibliographystyle{unsrtnat}
+\bibliography{refs}
+
+\end{document}
