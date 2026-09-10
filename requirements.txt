@@ -1,0 +1,15 @@
+# Gate 2 needs only these two. Everything runs on a laptop: N = 4 is a
+# 16-dimensional Hilbert space.
+numpy>=1.24
+scipy>=1.10
+
+# Figures.
+matplotlib>=3.7
+
+# Tests.
+pytest>=7.0
+
+# Optional, and only used as an INDEPENDENT CROSS-CHECK on the Hamiltonian in
+# tests/test_paulis.py. Nothing in Gate 2 depends on it. It becomes load-bearing
+# at M7 (state preparation) and M8 (Trotterised evolution).
+qiskit>=1.0

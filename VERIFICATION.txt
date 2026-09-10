@@ -1,0 +1,117 @@
+VERIFICATION LOG
+schwinger-n4  |  generated 2026-09-10 16:46 UTC
+python 3.11.15  numpy 2.4.4  scipy 1.17.1  qiskit 2.5.2
+
+############ TEST SUITE ############
+........................................................................ [ 99%]
+...                                                                      [100%]
+363 passed in 2.17s
+
+############ scripts/01_tfim_phase_transition.py ############
+wrote /home/claude/schwinger-n4/figures/01_tfim.png
+worst residual across all N and h/J: 3.197e-14
+
+############ scripts/02_jw_verification.py ############
+==================================================================
+FERMIONIC ALGEBRA, checked as matrices on the full Hilbert space
+==================================================================
+  N = 2:  worst anticommutator residual = 0.000e+00   c^dag c^dag = 0.000e+00
+  N = 3:  worst anticommutator residual = 0.000e+00   c^dag c^dag = 0.000e+00
+  N = 4:  worst anticommutator residual = 0.000e+00   c^dag c^dag = 0.000e+00
+  N = 5:  worst anticommutator residual = 0.000e+00   c^dag c^dag = 0.000e+00
+  N = 6:  worst anticommutator residual = 0.000e+00   c^dag c^dag = 0.000e+00
+
+==================================================================
+HOPPING SIGN, settled numerically instead of argued about
+==================================================================
+  plain string gives minus sign            residual 0.000e+00
+  alternating string gives plus sign       residual 0.000e+00
+  spectra agree                            residual 0.000e+00
+  Reading: the plain Z string really does produce a minus sign; the
+  alternating (-Z) string removes it; the two give identical spectra,
+  so the sign is a relabelling and not physics.
+
+wrote /home/claude/schwinger-n4/figures/02_jordan_wigner.png
+
+############ scripts/03_schwinger_spectrum.py ############
+============================================================
+GATE 2 ARTIFACT: N = 4 SCHWINGER HAMILTONIAN
+============================================================
+string     coefficient                origin
+------------------------------------------------------------
+IIII       +2 J                       electric
+IIIZ       +0.5 m                     mass
+IIZI       -0.5 m -0.5 J              mass, electric
+IZII       +0.5 m -0.5 J              mass, electric
+ZIII       -0.5 m -1 J                mass, electric
+IIXX       +0.5 w                     hopping
+IIYY       +0.5 w                     hopping
+IXXI       +0.5 w                     hopping
+IYYI       +0.5 w                     hopping
+IZZI       +0.5 J                     electric
+XXII       +0.5 w                     hopping
+YYII       +0.5 w                     hopping
+ZIZI       +0.5 J                     electric
+ZZII       +1 J                       electric
+------------------------------------------------------------
+14 terms on 4 qubits, Hilbert space dimension 16
+
+Numerical values at m = w = J = 1:
+Pauli string      coefficient
+------------------------------
+IIII                 2.000000
+IIIZ                 0.500000
+IIZI                -1.000000
+ZIII                -1.500000
+IIXX                 0.500000
+IIYY                 0.500000
+IXXI                 0.500000
+IYYI                 0.500000
+IZZI                 0.500000
+XXII                 0.500000
+YYII                 0.500000
+ZIZI                 0.500000
+ZZII                 1.000000
+------------------------------
+13 terms
+
+============================================================
+VERIFICATION (residuals, not pass/fail flags)
+============================================================
+  Pauli expansion vs direct construction : 8.882e-16
+  fermion construction vs spin form      : 8.882e-16
+  Gauss's law is an identity             : 0.000e+00
+  [H, Q] = 0                             : 0.000e+00
+  strong coupling E0 = -mN/2 (w = 0)     : 0.000e+00
+  free fermion limit, all 16 levels      : 8.882e-16
+  Hellmann-Feynman on the condensate     : 3.219e-11
+
+  charge sectors present: [-2, -1, 0, 1, 2]
+
+wrote /home/claude/schwinger-n4/figures/03_schwinger_spectrum.png
+
+############ scripts/04_pair_production_preview.py ############
+==============================================================
+CONSERVATION CHECKS during evolution (these must not drift)
+==============================================================
+  m/w = 0.0:  energy drift 1.83e-15   |Q| max 0.00e+00   Var(Q) max 0.00e+00   norm drift 1.55e-15
+  m/w = 0.5:  energy drift 2.11e-15   |Q| max 0.00e+00   Var(Q) max 0.00e+00   norm drift 1.33e-15
+  m/w = 1.0:  energy drift 2.44e-15   |Q| max 0.00e+00   Var(Q) max 0.00e+00   norm drift 9.99e-16
+  m/w = 2.0:  energy drift 4.00e-15   |Q| max 0.00e+00   Var(Q) max 0.00e+00   norm drift 9.99e-16
+
+  CP check: max |<L_1> - <L_3>| over the evolution = 6.106e-16
+
+wrote /home/claude/schwinger-n4/figures/04_pair_production.png
+
+==============================================================
+WHY PAIRS APPEAR AT ALL: bare vacuum is not the ground state
+==============================================================
+  m/w   E(bare vacuum)    E0 (true)        gap   peak density
+  0.0         0.000000    -1.477352   1.477352       0.612095
+  0.5        -1.000000    -2.075478   1.075478       0.462907
+  1.0        -2.000000    -2.828162   0.828162       0.334990
+  2.0        -4.000000    -4.553129   0.553129       0.175162
+
+  The gap column is the whole story. A larger mismatch between the state
+  you prepare and the state the Hamiltonian wants gives more pair production.
+
