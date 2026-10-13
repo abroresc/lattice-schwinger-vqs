@@ -334,7 +334,8 @@ eliminated, and everything collapses to a spin chain:
 
 with `w = 1/(2a)` and `J = g^2 a / 2`.
 
-**This is equation (2) of Martinez et al., Nature 534, 516 (2016)**, who run
+**This is the spin Hamiltonian of Martinez et al., Nature 534, 516 (2016)**
+(Methods Eq. (3) in arXiv:1605.04570v1; Eq. (2) there is Gauss's law), who run
 exactly this system at N = 4 with four qubits on a trapped-ion device, open
 boundaries, zero background field. It is the reference to check your
 derivation against, and it is a printed peer-reviewed equation for precisely
@@ -565,7 +566,7 @@ ground state energy, which
 Martinez, E. A. et al., *Real-time dynamics of lattice gauge theories with a
 few-qubit quantum computer*, Nature **534**, 516 (2016).
 **Primary encoding reference.** N = 4, four qubits, open boundaries, gauge
-field eliminated. Their equation (2) is the Hamiltonian in section 5.
+field eliminated. Their Methods Eq. (3) (arXiv v1 numbering) is the Hamiltonian in section 5.
 
 Kogut, J. and Susskind, L., *Hamiltonian formulation of Wilson's lattice gauge
 theories*, Phys. Rev. D **11**, 395 (1975). Staggered fermions and the

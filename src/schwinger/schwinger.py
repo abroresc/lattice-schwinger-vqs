@@ -14,7 +14,8 @@ becomes a pure spin chain on N qubits with no gauge register at all:
 
     L_n = (1/2) sum_{m=1..n} ( Z_m + (-1)^m )
 
-This is equation (2) of Martinez et al., Nature 534, 516 (2016), which runs
+This is the spin Hamiltonian of Martinez et al., Nature 534, 516 (2016)
+(Methods Eq. (3) in arXiv:1605.04570v1; Eq. (2) there is Gauss's law), which runs
 exactly this system at N = 4 on a trapped-ion device. That paper is the
 reference to check the derivation against. Klco et al. (2018) is NOT: they
 keep explicit flux-link registers with an energy cutoff and reduce with
