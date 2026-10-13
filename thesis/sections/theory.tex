@@ -1,0 +1,243 @@
+% ============================================================================
+\section{Theory: the lattice Schwinger model on four qubits}
+\label{sec:theory}
+% ============================================================================
+
+This section carries the Schwinger model from its continuum Lagrangian to a
+Hamiltonian on four qubits. Each step is standard; what matters for the rest of
+the thesis is which approximations are made, which are not, and which
+symmetries survive. The derivation follows Kogut and Susskind~\cite{kogut1975}
+and Banks, Susskind and Kogut~\cite{banks1976} for the lattice formulation,
+Hamer \emph{et al.}~\cite{hamer1997} for the elimination of the gauge field, and
+Martinez \emph{et al.}~\cite{martinez2016} for the final spin Hamiltonian, whose
+printed form the result here was checked against term by term.
+
+\subsection{The continuum theory}
+
+The Schwinger model is quantum electrodynamics in one space and one time
+dimension~\cite{schwinger1962},
+\begin{equation}
+  \label{eq:lagrangian}
+  \mathcal{L} = \bar\psi\left(i\gamma^\mu D_\mu - m\right)\psi
+              - \tfrac14 F_{\mu\nu}F^{\mu\nu},
+  \qquad D_\mu = \partial_\mu + i g A_\mu .
+\end{equation}
+Here $\psi$ is a two-component Dirac field of mass $m$, $A_\mu$ is the gauge
+field, $g$ is the charge and $F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu
+A_\mu$. In one spatial dimension the two components of $\psi$ describe a
+particle and its antiparticle; there is no spin. A magnetic field needs two
+spatial directions to circulate in, so here there is none, and the
+electromagnetic field reduces to a single electric component $E = F_{01}$ with
+no propagating photon.
+
+The consequence is confinement. Gauss's law, $\partial_x E = g\,\bar\psi
+\gamma^0\psi$, says that the field between two opposite charges cannot spread
+out, so it is constant and the potential energy grows linearly with separation,
+$V(r) = \tfrac12 g^2 r$~\cite{coleman1975}. Separating the charges costs energy
+without limit. Once the stored energy exceeds the rest energy of a new pair, the
+vacuum produces one, the new charges screen the old ones, and the flux string
+breaks. When the theory is quenched, meaning started in a state that is not its
+ground state, pairs are produced and annihilated in real time. This is the
+Schwinger mechanism Martinez \emph{et al.}\ observed~\cite{martinez2016}, and it
+is the signal whose survival under noise this thesis measures.
+
+\subsection{Staggered fermions}
+
+Putting the theory on a lattice of spacing $a$ introduces a defect. The naive
+symmetric difference for the derivative in the Dirac equation has momentum-space
+form $(i/a)\sin(pa)$, which vanishes at $p = 0$ and again at $p = \pi/a$. The
+lattice theory therefore contains a second fermion species, a ``doubler'', that
+is not in the continuum theory. Nielsen and Ninomiya proved that doublers cannot
+be removed while keeping locality, chiral symmetry and the correct continuum
+limit all at once~\cite{nielsen1981}. Kogut and Susskind's staggered fermions
+give up part of the chiral symmetry: the two spinor components are placed on
+alternating sites, so a single-component field $\hat c_n$ on $N$ sites
+describes both particle and antiparticle~\cite{kogut1975}. Even sites carry
+particles. Odd sites carry antiparticles as \emph{holes}, so in the vacuum every
+odd site is occupied and every even site is empty: the lattice version of the
+filled Dirac sea. The charge density measures departures from that reference,
+\begin{equation}
+  \label{eq:charge}
+  \hat\rho_n = \hat c^\dagger_n \hat c_n - \frac{1 - (-1)^n}{2},
+\end{equation}
+which is zero on every site of the vacuum. The two components enter the mass
+term with opposite sign, which is why the lattice mass term in
+Eq.~\eqref{eq:H_fermion} below carries a factor $(-1)^n$.
+
+\subsection{Solving Gauss's law}
+
+The gauge field lives on the links between sites, as a phase $\hat U_n$ on the
+link from site $n$ to $n+1$ together with its conjugate electric field $\hat
+E_n$. On the lattice Gauss's law reads $\hat E_n - \hat E_{n-1} = \hat\rho_n$.
+In three dimensions this is a constraint: the field can circulate, so the
+equation restricts the allowed states without determining $\hat E$. In one
+dimension there is nowhere to circulate. With open boundaries and no background
+field, $\hat E_0 = 0$, and the equation can be solved,
+\begin{equation}
+  \label{eq:gauss}
+  \hat E_n = \Lop{n} = \sum_{k \le n} \hat\rho_k .
+\end{equation}
+The field on every link is fixed by the charge to its left. The phases $\hat U_n$
+can be removed by a gauge transformation of the fermion fields, and
+Eq.~\eqref{eq:gauss} then removes $\hat E_n$~\cite{hamer1997,martinez2016}.
+What remains is a Hamiltonian of fermions alone,
+\begin{equation}
+  \label{eq:H_fermion}
+  \Hop = w\sum_{n=1}^{N-1}\left(\hat c^\dagger_n \hat c_{n+1} + \mathrm{h.c.}\right)
+       + m\sum_{n=1}^{N}(-1)^n \hat c^\dagger_n \hat c_n
+       + J\sum_{n=1}^{N-1}\Lop{n}^2,
+  \qquad w = \frac{1}{2a},\quad J = \frac{g^2 a}{2}.
+\end{equation}
+The hopping term moves a fermion between neighbouring sites. Acting between an
+occupied odd site and an empty even site, it empties one and fills the other,
+which creates a particle and an antiparticle at once: the hopping term is the
+pair-creation operator. Martinez \emph{et al.}\ write it as
+$-iw(\hat c^\dagger_n \hat c_{n+1} - \mathrm{h.c.})$; the redefinition
+$\hat c_n \to i^n \hat c_n$ turns that form into the real form used here without
+changing any observable.
+
+This step buys $N$ qubits for $N$ sites, with no register for the gauge field
+and no truncation of it. The price is visible in the last term. Each $\Lop{n}$
+is a sum over every site to its left, so $\Lop{n}^2$ couples distant sites:
+locality has been traded for qubits. That long-range coupling is where
+confinement now lives, as the coefficients below make explicit.
+
+\subsection{Jordan--Wigner and the spin Hamiltonian}
+
+A qubit and a lattice site are both two-state systems, but fermion operators on
+different sites anticommute while spin operators on different sites commute.
+The Jordan--Wigner transformation~\cite{jordan1928} supplies the missing signs
+with a string of Pauli $\Zop{}$ operators on every site to the left,
+\begin{equation}
+  \label{eq:jw}
+  \hat c_n = \Bigl(\prod_{k<n}\Zop{k}\Bigr)\sigm{n},
+  \qquad \hat c^\dagger_n \hat c_n = \tfrac12\left(1 + \Zop{n}\right),
+\end{equation}
+with $\sigp{} = |0\rangle\langle 1|$, so that $|0\rangle$, the $\Zop{}=+1$
+state, is an occupied site. On nearest neighbours the strings almost cancel and
+leave one $\Zop{}$, which gives $\hat c^\dagger_n \hat c_{n+1} =
+-\sigp{n}\sigm{n+1}$. The minus sign is real. It is removed by the relabelling
+$\hat c_n \to (-1)^n \hat c_n$, which leaves the spectrum unchanged, and the code
+checks this numerically before any coefficient is trusted. With the charge
+density now $\hat\rho_n = \tfrac12[\Zop{n} + (-1)^n]$, the Hamiltonian becomes a
+pure spin chain,
+\begin{equation}
+  \label{eq:H}
+  \Hop = \frac{m}{2}\sum_{n=1}^{N}(-1)^n \Zop{n}
+       + w\sum_{n=1}^{N-1}\left(\sigp{n}\sigm{n+1} + \mathrm{h.c.}\right)
+       + J\sum_{n=1}^{N-1}\Lop{n}^2,
+  \qquad
+  \Lop{n} = \frac12\sum_{k\le n}\left[\Zop{k} + (-1)^k\right],
+\end{equation}
+which is the Hamiltonian Martinez \emph{et al.}\ realised on four trapped
+ions~\cite{martinez2016}. The constant $\tfrac{m}{2}\sum_n(-1)^n$ dropped from
+the mass term vanishes for even $N$.
+
+Expanding the electric term gives a $\Zop{k}\Zop{k'}$ coupling of strength
+$\tfrac12 J (N - k')$ for every pair $k < k' \le N-1$. The count $N - k'$ is the
+number of links at or to the right of site $k'$. A charge produces field on
+every link to its right, so those are the links where the fields of both
+charges overlap, and the cross term in $\Lop{n}^2$ collects one contribution
+from each. For a neutral pair the overlapping fields cancel, and what remains is
+an energy $J$ for every link strictly between the two charges: the linear
+potential of the continuum theory, now in lattice form. The hopping term becomes
+$\tfrac12 w(\Xop{n}\Xop{n+1} + \Yop{n}\Yop{n+1})$. At $N = 4$ the result is the
+fourteen Pauli strings of Table~\ref{tab:pauli}. Two entries are worth
+explaining without notes. Site 4 has no $\Zop{}\Zop{}$ coupling, because with
+four sites there are three links and $\Lop{3}$ involves only sites 1 to 3. And
+\texttt{ZZII} carries twice the coefficient of \texttt{ZIZI} and \texttt{IZZI},
+because two links (2 and 3) lie at or to the right of site 2, but only one
+(link 3) at or to the right of site 3.
+
+\begin{table}[t]
+  \centering
+  \caption{The $N=4$ Hamiltonian, Eq.~\eqref{eq:H}, as Pauli strings. The
+  leftmost character acts on site~1. Printed by
+  \texttt{scripts/03\_schwinger\_spectrum.py}; two independent constructions of
+  the same matrix agree to $\num{9e-16}$ (Section~\ref{sec:verification}).}
+  \label{tab:pauli}
+  \small
+  \begin{tabular}{llll}
+    \toprule
+    String & Coefficient & String & Coefficient \\
+    \midrule
+    \texttt{IIII} & $+2J$                      & \texttt{IIXX}, \texttt{IIYY} & $+\tfrac12 w$ \\
+    \texttt{IIIZ} & $+\tfrac12 m$              & \texttt{IXXI}, \texttt{IYYI} & $+\tfrac12 w$ \\
+    \texttt{IIZI} & $-\tfrac12 m - \tfrac12 J$ & \texttt{XXII}, \texttt{YYII} & $+\tfrac12 w$ \\
+    \texttt{IZII} & $+\tfrac12 m - \tfrac12 J$ & \texttt{ZZII}                & $+J$ \\
+    \texttt{ZIII} & $-\tfrac12 m - J$          & \texttt{ZIZI}, \texttt{IZZI} & $+\tfrac12 J$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Parameters}
+
+All results use $N = 4$, $J = w$ and $m = 0.5\,w$, the parameters of the
+headline data of Martinez \emph{et al.}~\cite{martinez2016}, and time is
+measured in units of $1/w$. In lattice units $J/w = (ag)^2$, so $J = w$ means
+$ag = 1$ and $m/g = 0.25$: a coarse lattice, far from the continuum limit. No
+claim is made here about continuum physics. The four-site model is used as a
+fully checkable quantum system with the structure of a gauge theory, not as an
+approximation to the continuum Schwinger model.
+
+\subsection{Symmetries and what survives as a diagnostic}
+\label{sec:symmetries}
+
+Because Gauss's law was solved and substituted rather than imposed, it holds on
+every state of the four qubits, physical or not. The operator identity
+$\Lop{n} - \Lop{n-1} - \hat\rho_n = 0$ is satisfied exactly on the whole
+sixteen-dimensional space, so there is no Gauss's-law violation to measure. This
+corrects the original project proposal, which planned to use one. Two exact
+symmetries survive, and both are broken by noise.
+
+\emph{Total charge.} $\hat Q = \sum_n \hat\rho_n$ commutes with $\Hop$, so the
+evolution never leaves the charge sector it starts in. The bare vacuum has
+$Q = 0$, and the neutral sector at $N = 4$ contains six of the sixteen
+bitstrings, the same six ``physical states'' Martinez \emph{et al.}\
+list~\cite{martinez2016}.
+
+\emph{CP inside the neutral sector.} Let $R$ reflect the chain, $n \to N+1-n$,
+and let $\hat X^{\otimes N}$ flip every qubit, which exchanges occupied and empty
+sites and so acts as charge conjugation. Neither commutes with $\Hop$, but the
+product $\mathrm{CP} = R\,\hat X^{\otimes N}$ does, and only inside the neutral
+sector. The reason is the same asymmetry that made the electric term long-ranged:
+$\Lop{n}$ counts charge to the left only, so under reflection $\Lop{n} \to \hat Q
+- \Lop{N-n}$. When $Q = 0$ this is $-\Lop{N-n}$, the sum $\sum_n \Lop{n}^2$ is
+unchanged, and the symmetry holds; when $Q \ne 0$ a cross term survives and it
+does not. On any neutral state CP forces
+\begin{equation}
+  \label{eq:cp}
+  \langle \Lop{n} \rangle = \langle \Lop{N-n} \rangle,
+\end{equation}
+so at $N = 4$ the two outer links always carry equal flux. Each factor of the
+Trotter step used later maps the neutral sector to itself and commutes with CP
+there, so the noiseless circuit preserves Eq.~\eqref{eq:cp} exactly, at any step
+size. A measured violation is therefore hardware error and never Trotter error.
+
+\subsection{Observables}
+
+The physics observable is the particle density, the mean number of particles
+plus antiparticles per site,
+\begin{equation}
+  \label{eq:nu}
+  \nu(t) = \frac{1}{2N}\sum_{n=1}^{N}\left[1 + (-1)^n\langle\Zop{n}(t)\rangle\right],
+\end{equation}
+as defined by Martinez \emph{et al.}~\cite{martinez2016}. It is zero on the bare
+vacuum and $\nu = 1/2$ corresponds to one pair on average. The electric field
+profile $\langle\Lop{n}\rangle$ follows from Eq.~\eqref{eq:gauss}. For the
+ground state, the observable is the chiral condensate
+$\langle\bar\psi\psi\rangle = (2N)^{-1}\sum_n (-1)^n\langle\Zop{n}\rangle$, an
+order parameter for the vacuum. Two facts about these definitions are used
+repeatedly. First, every one of them is diagonal in the computational basis, so
+a single measurement in the $\Zop{}$ basis gives all of them at once, together
+with $\hat Q$. Second, $\nu = \tfrac12 + \langle\bar\psi\psi\rangle$: the density
+and the condensate are the same operator up to a constant, and the staggered
+mass term is $mN\bar\psi\psi$, so the Hellmann--Feynman theorem gives
+$\langle\bar\psi\psi\rangle = N^{-1}\,dE_0/dm$ for the ground state.
+
+The simulation starts in the bare vacuum, $|0101\rangle$ in the site order used
+here, where every odd site is occupied and every even site empty. It is the
+ground state of the mass and electric terms but not of the full Hamiltonian once
+$w \ne 0$. Nothing is injected during the evolution and the energy is conserved
+exactly; pairs appear because the initial state is not an eigenstate, and the
+energy moves between the electric field and the rest mass of the pairs.

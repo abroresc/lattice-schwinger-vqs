@@ -1,0 +1,32 @@
+% ============================================================================
+%  Shared preamble: packages and notation for main.tex and every partial build
+%  (intro_methods.tex). One file, so a notation change is one edit.
+% ============================================================================
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, calc}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+\usepackage[colorlinks=true,allcolors=blue!60!black]{hyperref}
+
+% Figures live one directory up, already exported as vector PDF by the scripts.
+\graphicspath{{../figures/}}
+
+% Operators used throughout, so a convention change is one edit.
+\newcommand{\Zop}[1]{\hat{Z}_{#1}}
+\newcommand{\Xop}[1]{\hat{X}_{#1}}
+\newcommand{\Yop}[1]{\hat{Y}_{#1}}
+\newcommand{\sigp}[1]{\hat{\sigma}^{+}_{#1}}
+\newcommand{\sigm}[1]{\hat{\sigma}^{-}_{#1}}
+\newcommand{\Lop}[1]{\hat{L}_{#1}}
+\newcommand{\Hop}{\hat{H}}
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}

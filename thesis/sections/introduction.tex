@@ -1,0 +1,203 @@
+% ============================================================================
+\section{Introduction}
+\label{sec:intro}
+% ============================================================================
+
+Gauge theories describe three of the four known forces of nature. The gauge
+theory of quarks and gluons, quantum chromodynamics (QCD), cannot be solved by
+expanding in a small coupling at the energies where protons and neutrons form.
+Its predictions there come from lattice gauge theory: space and time are
+replaced by a finite grid of points, the theory becomes a very large but finite
+statistical problem, and that problem is solved by Monte Carlo
+sampling~\cite{wilson1974,kogut1975}. The approach now computes hadron masses
+and other static properties from first principles.
+
+It does not compute what happens in time. Monte Carlo lattice calculations work
+in imaginary, or Euclidean, time, where the weight of each field configuration
+is a positive number and can be treated as a probability. Continuing to real
+time turns those weights into complex phases. Contributions of opposite sign
+cancel, the average becomes a small difference of large numbers, and the
+statistical error grows exponentially with the simulated time and the size of
+the system. This is the sign problem. Troyer and Wiese showed that a general
+solution to its fermionic form is almost certainly out of reach, because such a
+solution would solve every problem in the complexity class NP in polynomial
+time~\cite{troyer2005}. Processes that need real time, such as the breaking of
+the flux string between separating charges~\cite{hebenstreit2013}, particle
+production in strong fields, and the approach to equilibrium after a heavy-ion
+collision, therefore remain largely out of reach of first-principles
+calculation~\cite{banuls2020,bauer2023}.
+
+A quantum computer does not have this problem. Feynman argued that a quantum
+system can be simulated efficiently only by another quantum
+system~\cite{feynman1982}. Lloyd made the argument constructive: a sequence of
+quantum gates approximates the time-evolution operator $e^{-i\Hop t}$ of any
+Hamiltonian built from local terms, with an error that can be made as small as
+desired by shortening the time step~\cite{lloyd1996}. Jordan, Lee and Preskill
+later gave quantum algorithms for scattering in an interacting quantum field
+theory~\cite{jordan2012}. A quantum processor applies $e^{-i\Hop t}$ directly
+and never forms the complex weights that defeat Monte Carlo sampling. For
+real-time gauge dynamics, then, the case for quantum simulation rests on a
+physics argument rather than on promotion~\cite{georgescu2014,dalmonte2016}.
+
+\subsection{The Schwinger model as a test bed}
+
+The usual first target is the Schwinger model, quantum electrodynamics (QED) in
+one space and one time dimension~\cite{schwinger1962}. It is the simplest gauge
+theory that shares the features of QCD that matter here. Its charges are
+confined: on a line the electric field between two opposite charges has nowhere
+to spread, so the energy needed to separate them grows linearly without
+bound~\cite{coleman1975}. When the stored energy exceeds the cost of a new
+particle--antiparticle pair, the vacuum produces one and the flux string breaks.
+The model also breaks chiral symmetry and has a vacuum angle
+$\theta$~\cite{coleman1976}. Schwinger solved the massless case exactly and
+found that the photon acquires a mass $g/\sqrt{\pi}$, where $g$ is the
+charge~\cite{schwinger1962}. The Hamiltonian lattice formulation of Kogut and
+Susskind~\cite{kogut1975,banks1976} has since been studied with strong-coupling
+series~\cite{hamer1997}, the density matrix renormalisation
+group~\cite{byrnes2002} and matrix product states~\cite{banuls2013}. A system
+with this many independent answers is a good place to test a method.
+
+Quantum simulations of the lattice Schwinger model now span a decade. After
+proposals for trapped ions and cold atoms~\cite{banerjee2012,hauke2013},
+Martinez \emph{et al.}\ carried out the first digital quantum simulation of a
+lattice gauge theory in 2016, on four trapped-ion qubits~\cite{martinez2016}.
+They eliminated the electric field by solving Gauss's law, so that four lattice
+sites needed only four qubits, and they watched electron--positron pairs appear
+out of the bare vacuum over evolutions of more than 200 gates. Klco
+\emph{et al.}\ ran one- and two-site versions on IBM superconducting processors,
+keeping the electric field as explicit qubits and reducing their number with
+symmetry projections~\cite{klco2018}. Kokail \emph{et al.}\ prepared ground
+states variationally on up to 20 qubits and estimated their own error from the
+measured variance of the energy, without reference to a known
+answer~\cite{kokail2019}. Nguyen \emph{et al.}\ reached longer evolution times
+on up to six trapped-ion qubits and used the symmetries of the model to protect
+the simulation against coherent errors~\cite{nguyen2022}. The largest
+simulations so far prepared the vacuum on 100 superconducting qubits and then
+propagated hadron wave packets on 112, the second using 13,858 two-qubit
+gates~\cite{farrell2024,farrell2024b}. Most recently, Rosanowski \emph{et al.}\
+computed the ground-state energy and particle number for 4 to 30 qubits by
+sampling bitstrings from time-evolved states and diagonalising the Hamiltonian
+classically in the subspace those bitstrings span~\cite{rosanowski2025}.
+
+\subsection{Three kinds of error}
+
+Every one of these results is shaped by errors of three different kinds, and
+the three behave differently.
+
+The first is algorithmic. The Hamiltonian is a sum of terms that do not
+commute, so $e^{-i\Hop t}$ cannot be built exactly from simple gates. Product
+formulas, introduced by Trotter and extended by Suzuki~\cite{trotter1959,suzuki1976},
+split the evolution into short steps of length $\delta t$ and alternate between
+the pieces. The resulting Trotter error is a property of the algorithm and would
+persist on a perfect machine. It falls as a power of $\delta t$ set by the order
+of the formula, and Childs \emph{et al.}\ showed how to bound it using the
+commutators between the pieces~\cite{childs2021}. Shaw \emph{et al.}\ carried
+out this analysis for the lattice Schwinger model and bounded the error on a
+measured observable in terms of how far the device's two-qubit gates are from
+ideal~\cite{shaw2020}.
+
+The second is statistical. A measurement returns one random outcome, so every
+expectation value is an average over a finite number of repetitions, called
+shots, and its uncertainty falls only as one over the square root of their
+number~\cite{taylor1997}.
+
+The third is the hardware. Gates are imperfect, qubits lose coherence, and
+readout sometimes reports the wrong bit. Present devices run without error
+correction, in what Preskill named the noisy intermediate-scale quantum (NISQ)
+regime~\cite{preskill2018}. Error mitigation can reduce the bias this causes,
+but it pays for that with a larger statistical variance~\cite{cai2023}, which
+ties the third kind of error back to the second.
+
+The three pull against each other. A smaller time step reduces Trotter error,
+but covering the same evolution time then needs more steps, hence more gates,
+hence more accumulated hardware error. There is an optimal step size, it depends
+on the error rate of the machine, and refining the algorithm past that point
+makes the final answer worse. Shot noise sets a floor beneath which no
+improvement in either systematic error can be seen. The published simulations
+treat this trade-off in different ways. Martinez \emph{et al.}\ compared their
+data with a dephasing model whose single error probability was fitted to the
+data afterwards~\cite{martinez2016}. Nguyen \emph{et al.}\ weighed Trotter
+ordering, step size and experimental imperfection against one
+another~\cite{nguyen2022}. Shaw \emph{et al.}\ derived the bounds described
+above~\cite{shaw2020}. What these do not provide is a complete account on one
+system, with every source of error computed separately, propagated onto every
+physical observable, and checked at each stage against an exact answer.
+
+\subsection{Telling when the answer has gone bad}
+
+A complete account also needs a way to tell that a result has become unreliable
+without already knowing the right answer. Gauge theories offer one. Their
+dynamics conserve quantities that noise does not, so a measured violation flags
+a corrupted state. Checking conserved quantities, and discarding or correcting
+shots that violate them, is an established error-mitigation strategy, both for
+quantum chemistry~\cite{bonetmonroig2018,mcardle2019} and for Abelian lattice
+gauge theories~\cite{stryker2019,halimeh2020,ballini2025}. Martinez
+\emph{et al.}\ used the population that leaked out of the physically allowed
+subspace as a measure of the fidelity of their simulation~\cite{martinez2016}.
+
+In the encoding used here Gauss's law cannot play this role. It has been solved
+and substituted into the Hamiltonian, so it holds identically on every state of
+the qubits, physical or not. This is the trade Stryker describes: an encoding
+with only physical degrees of freedom has no unphysical sector for Gauss's law
+to flag, at the price of nonlocal interactions~\cite{stryker2019}. Two exact
+symmetries survive. Total electric charge is conserved by the Hamiltonian, and a
+combined charge-conjugation and reflection symmetry, CP, holds inside the
+neutral sector (Section~\ref{sec:symmetries}). Both break under noise. The open
+question is quantitative: does the size of the measured violation predict the
+point at which the physics is lost?
+
+\subsection{Ground-state preparation}
+
+The proposal for this project planned to prepare the ground state with the
+variational quantum eigensolver (VQE)~\cite{peruzzo2014,kandala2017}, which
+tunes the parameters of a circuit to minimise its measured energy. That plan has
+changed. VQE has to optimise against noisy energy estimates, and noise can
+flatten the cost landscape until its gradients
+vanish~\cite{wang2021}. Sample-based methods avoid the optimiser altogether:
+the quantum processor supplies only bitstrings, the Hamiltonian is diagonalised
+classically in the subspace those bitstrings span, and the energy obeys the
+variational bound even when the samples are noisy~\cite{kanno2023,robledo2025}.
+Sample-based Krylov quantum diagonalisation (SKQD) draws its samples from
+time-evolved states~\cite{yu2025}, so it reuses the same Trotter circuits the
+dynamics already need, and Rosanowski \emph{et al.}\ have demonstrated it on a
+four-site Schwinger model~\cite{rosanowski2025}. Its error has its own
+structure: a bitstring that is never sampled cannot enter the subspace, so a
+finite number of shots biases the energy rather than merely
+blurring it~\cite{miura2026}.
+
+\subsection{What this thesis contributes}
+\label{sec:contribution}
+
+This thesis builds the four-site lattice Schwinger model with the gauge field
+eliminated, following the encoding of Martinez \emph{et al.}~\cite{martinez2016},
+validates each stage of the construction against exact diagonalisation, and
+uses it to answer three questions.
+\begin{enumerate}
+  \item \textbf{The crossover.} At what Trotter step does the discretisation
+  error on the particle density fall below the shot-noise uncertainty at a
+  realistic number of shots? Below that step size a more accurate algorithm buys
+  nothing the statistics can resolve, while the circuit keeps growing.
+  \item \textbf{The failure threshold.} How large can the two-qubit gate error
+  become before the pair-production signal, the rise and fall of the particle
+  density that marks the coherent creation and annihilation of pairs, can no
+  longer be distinguished from noise?
+  \item \textbf{The diagnostic.} Does the measured violation of charge
+  conservation, taken from the same measurements and without knowledge of the
+  exact answer, predict that threshold?
+\end{enumerate}
+The ground state needed for static observables is prepared with SKQD, and its
+finite-shot bias is computed exactly and included in the same account.
+
+The scope is deliberately small. At four sites the state space has sixteen
+dimensions, a laptop outperforms any quantum processor, and exact
+diagonalisation is the reference throughout. That is the point. The methods are
+the ones that would be used at sizes where classical simulation fails, and at
+four sites every intermediate result can be checked. The Schwinger model shares
+confinement and string breaking with QCD, but it is a far simpler theory, and
+nothing here is a claim about QCD.
+
+Section~\ref{sec:theory} derives the four-qubit spin Hamiltonian from the
+continuum theory and identifies its symmetries and observables.
+Section~\ref{sec:methods} describes the numerical methods, the quantum
+circuits, the noise models, the ground-state method and the error-budget
+protocol, together with the independent check attached to each.

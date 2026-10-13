@@ -1,0 +1,467 @@
+% ============================================================================
+\section{Materials and methods}
+\label{sec:methods}
+% ============================================================================
+
+Every calculation in this thesis runs on a laptop. The quantum processor is
+simulated, so every intermediate quantity, including the full noisy density
+matrix, is available for inspection. That is deliberate. The design rule is that
+each stage of the pipeline has an answer known by independent means attached to
+it, and the number reported for each check is a residual rather than a pass or
+fail flag. Figure~\ref{fig:pipeline} shows the chain from the Hamiltonian to a
+measured number, with the check attached at each link, and
+Table~\ref{tab:checks} collects the residuals. This section describes each link
+in turn.
+
+% ---------------------------------------------------------------- pipeline
+\begin{figure}[t]
+  \centering
+  \begin{tikzpicture}[
+      font=\small,
+      box/.style={draw=black!70, rounded corners=2pt, fill=blue!4, align=center,
+                  text width=5.6cm, minimum height=0.85cm, inner sep=3pt},
+      chk/.style={draw=black!45, rounded corners=2pt, fill=black!3, align=left,
+                  text width=6.2cm, minimum height=0.85cm, inner sep=3pt, font=\footnotesize},
+      result/.style={draw=black!70, rounded corners=2pt, fill=orange!8, align=center,
+                  text width=5.0cm, minimum height=0.85cm, inner sep=3pt},
+      flow/.style={-{Stealth[length=2mm]}, thick, black!70},
+      link/.style={densely dotted, black!50},
+      node distance=0.32cm]
+    \node[box] (a) {Continuum Schwinger model, Eq.~\eqref{eq:lagrangian}};
+    \node[box, below=of a] (b) {Staggered fermions on $N=4$ sites, open boundaries};
+    \node[box, below=of b] (c) {Gauss's law solved; gauge field eliminated};
+    \node[box, below=of c] (d) {Jordan--Wigner: 14 Pauli strings on 4 qubits};
+    \node[box, below=of d] (e) {Second-order Trotter circuit, compiled to
+                                $\{$RZ, SX, X, CX$\}$, 32 CX per step};
+    \node[box, below=of e] (f) {Gate error (exact density matrix), then readout error};
+    \node[box, below=of f] (g) {One $\Zop{}$-basis distribution gives
+                                $\nu$, $\langle\Lop{n}\rangle$, $\hat Q$ and CP};
+    \node[result, below=0.55cm of g, xshift=-1.6cm] (h) {Error budget: Trotter, gate,
+                                readout and shot noise, separately};
+    \node[result, right=0.4cm of h] (i) {SKQD ground state: sampled bitstrings,
+                                classical diagonalisation};
+    \foreach \u/\v in {a/b, b/c, c/d, d/e, e/f, f/g} \draw[flow] (\u) -- (\v);
+    \draw[flow] (g.south -| h.north) -- (h.north);
+    \draw[flow] (g.south -| i.north) -- (i.north);
+
+    \node[chk, right=0.55cm of b] (cb) {Strong-coupling limit $E_0=-mN/2$: 0\\
+                                       Free fermions, all 16 levels: \num{9e-16}};
+    \node[chk, right=0.55cm of c] (cc) {Gauss's law an identity: 0;\quad $[\Hop,\hat Q]$: 0};
+    \node[chk, right=0.55cm of d] (cd) {Three independent constructions: \num{9e-16}\\
+                                       Hellmann--Feynman: \num{3e-11}};
+    \node[chk, right=0.55cm of e] (ce) {Exponents 1.036, 2.003 (predicted 1, 2)\\
+                                       CP preserved without noise: \num{5e-16}};
+    \node[chk, right=0.55cm of f] (cf) {Noise-free limit: \num{1.5e-14}; closed forms
+                                       for readout and global channel};
+    \node[chk, right=0.55cm of g] (cg) {Quoted standard errors match the scatter of
+                                       repeated runs to 3\,\%};
+    \foreach \u in {b, c, d, e, f, g} \draw[link] (\u) -- (c\u);
+  \end{tikzpicture}
+  \caption{The computational pipeline (left) and the independent check attached
+  to each stage (right, residuals from Table~\ref{tab:checks}). The two outputs
+  at the bottom are the dynamics error budget (Section~\ref{sec:budget-method})
+  and the ground state prepared by sample-based Krylov diagonalisation
+  (Section~\ref{sec:skqd}), which reuses the same Trotter circuits.}
+  \label{fig:pipeline}
+\end{figure}
+
+\subsection{Software}
+
+The code is a Python 3.11 package, \texttt{schwinger}, with exact linear algebra
+in NumPy~2.4 and SciPy~1.17~\cite{harris2020,virtanen2020}, circuits in
+Qiskit~2.5~\cite{javadi2024}, noisy simulation in Qiskit Aer~0.17, and figures
+in Matplotlib~\cite{hunter2007}. Each figure in this thesis is produced by one
+script that also prints the residuals it relies on, and all random sampling uses
+fixed seeds, so rerunning a script reproduces its output exactly. A suite of 473
+tests compares every module against independently known answers. The code,
+tests and scripts are in a public repository.
+
+Two conventions cause silent errors if confused, and both are fixed in one
+place in the code. A Pauli string such as \texttt{ZIZI} is read left to right as
+site~1 to site~$N$, with site~1 the most significant tensor factor. Qiskit uses
+the same label order but numbers its qubits in reverse, so lattice site $n$ is
+Qiskit qubit $N-n$. Every gate index passes through a single conversion
+function, and a test confirms that Qiskit's own operator, built from the labels
+of Table~\ref{tab:pauli}, equals the NumPy matrix entry by entry.
+
+\subsection{Exact reference and verification}
+\label{sec:verification}
+
+At $N = 4$ the Hamiltonian is a $16\times 16$ Hermitian matrix, diagonalised
+exactly. Exact time evolution uses its spectral decomposition,
+$|\psi(t)\rangle = \sum_k e^{-iE_k t}|k\rangle\langle k|\psi(0)\rangle$, so one
+diagonalisation serves every time. These exact results are the reference for
+every approximate result in the thesis, so the Hamiltonian itself is checked
+first, in ways that fail for different reasons.
+
+The matrix is built three ways that share no code: from the expanded Pauli list
+of Table~\ref{tab:pauli}; directly, by squaring each $\Lop{n}$ as a matrix
+without any algebra; and from the fermionic form Eq.~\eqref{eq:H_fermion}, with
+fermion operators built through the Jordan--Wigner transformation. The three
+agree to \num{9e-16}. This catches errors in the hand expansion of
+$\Lop{n}^2$ and in the Jordan--Wigner signs, but not an error shared by all
+three, such as a wrong starting Hamiltonian. Analytic limits test the physics
+instead. With no hopping ($w = 0$) the Hamiltonian is diagonal and the bare
+vacuum minimises both remaining terms, so $E_0 = -mN/2$ exactly; this tests the
+mass and electric terms and is blind to the hopping. With no mass or field
+($m = J = 0$) only the hopping survives, a tight-binding chain with
+single-particle energies $2w\cos[k\pi/(N+1)]$, $k = 1,\dots,N$, whose subset sums
+must reproduce all sixteen levels; this tests the hopping and the Jordan--Wigner
+string and is blind to the electric term. The strongest single check is the
+Hellmann--Feynman theorem. The condensate computed from the ground-state vector
+and the condensate computed as $N^{-1}dE_0/dm$ from a finite difference of
+eigenvalues are unrelated calculations, so their agreement to \num{3e-11}
+catches a wrong Hamiltonian paired with a matching wrong observable, which no
+check on the spectrum alone can. Before any of this, the Jordan--Wigner
+machinery was learned on the transverse-field Ising model, whose full spectrum
+is known in closed form~\cite{sachdev2011}, and reproduced all $2^N$ levels to
+\num{1e-14}. The Gauss's-law identity, $[\Hop,\hat Q] = 0$ and the CP symmetry
+of Section~\ref{sec:symmetries} are verified as operator statements on the full
+space.
+
+\begin{table}[t]
+  \centering
+  \caption{Verification residuals. Each entry compares a computed quantity with
+  an independently known answer and reports the size of the disagreement.
+  Statistical checks are reported as the ratio of the measured spread to the
+  predicted one, which should be 1.}
+  \label{tab:checks}
+  \small
+  \begin{tabular}{p{9.6cm}l}
+    \toprule
+    Check & Residual \\
+    \midrule
+    \multicolumn{2}{l}{\emph{Hamiltonian}} \\
+    Pauli expansion vs.\ direct matrix construction & \num{9e-16} \\
+    Fermionic form through Jordan--Wigner vs.\ spin form & \num{9e-16} \\
+    Strong coupling, $E_0 = -mN/2$ at $w = 0$ & $0$ \\
+    Free fermions, all 16 levels at $m = J = 0$ & \num{9e-16} \\
+    Hellmann--Feynman on the chiral condensate & \num{3e-11} \\
+    Gauss's law as an operator identity; $[\Hop,\hat Q]$ & $0$; $0$ \\
+    CP commutes with $\Hop$ inside $Q = 0$ (on the full space: 6.5) & \num{4e-16} \\
+    Transverse-field Ising warm-up, full $2^N$ spectrum & \num{1e-14} \\
+    \midrule
+    \multicolumn{2}{l}{\emph{Circuits}} \\
+    Qiskit operator from Pauli labels vs.\ NumPy matrix & $0$ \\
+    Circuit state vs.\ $e^{-i\Hop t}$ after 4000 second-order steps & \num{1e-5} \\
+    Fitted Trotter exponent, first / second order (predicted 1 / 2) & 1.036 / 2.003 \\
+    Fitted exponent of the density bias, second order (predicted 2) & 2.002 \\
+    CP asymmetry of the noiseless circuit, all $\delta t \le 0.5$ & \num{5e-16} \\
+    \midrule
+    \multicolumn{2}{l}{\emph{Noise}} \\
+    Density-matrix simulation vs.\ statevector, no noise & \num{1.5e-14} \\
+    NumPy step-channel route vs.\ Aer route, no noise & \num{2.9e-15} \\
+    Infidelity convention vs.\ Qiskit's average gate fidelity (relative) & \num{4e-12} \\
+    Readout error: closed form $\tfrac12 + (1-2q)(\nu - \tfrac12)$ & \num{6e-17} \\
+    Readout error: classical model vs.\ Aer, $2\times10^5$ shots (worst bin) & $1.9\,\sigma$ \\
+    Global channel: $F_Q$ vs.\ $(1-p)^{18}$ & \num{7e-16} \\
+    Logical-frame dephasing: $\mathrm{Var}(Q)$, which must vanish & \num{1e-33} \\
+    Fully depolarising CX: $\mathrm{Var}(Q)$ vs.\ $N/4$ & $0$ \\
+    \midrule
+    \multicolumn{2}{l}{\emph{Statistics and ground state}} \\
+    Scatter of 400 simulated runs / quoted standard error, $\nu$ and $\mathrm{Var}(Q)$ & 0.97 to 1.01 \\
+    Mean squared error of 600 runs / $(b^2 + \sigma^2)$ & 0.999 \\
+    SKQD on the full neutral sector vs.\ exact ground energy & \num{4e-16} \\
+    SKQD expected bias: exact formula vs.\ 20\,000 Monte Carlo runs
+      & \num{1.020e-3} vs.\ \num{1.002(40)e-3} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Trotterised time evolution}
+
+The Hamiltonian is split into three groups whose members commute among
+themselves,
+\begin{equation}
+  \Hop = \Hop_Z + \Hop_{\mathrm{e}} + \Hop_{\mathrm{o}},
+\end{equation}
+where $\Hop_Z$ contains every $\Zop{}$ and $\Zop{}\Zop{}$ term (the mass and
+electric energy, all diagonal), $\Hop_{\mathrm{e}}$ the hopping on bonds (1,2)
+and (3,4), and $\Hop_{\mathrm{o}}$ the hopping on bond (2,3). Adjacent bonds
+share a site and do not commute, which is why the hopping is split into even and
+odd bonds. Each group exponentiates exactly, so the only error comes from the
+splitting. The first-order step is
+$U_1(\delta t) = e^{-i\Hop_Z\delta t}e^{-i\Hop_{\mathrm{e}}\delta t}e^{-i\Hop_{\mathrm{o}}\delta t}$,
+and the second-order, symmetric step used throughout is
+\begin{equation}
+  \label{eq:strang}
+  U_2(\delta t) = e^{-i\Hop_Z\delta t/2}\,e^{-i\Hop_{\mathrm{e}}\delta t/2}\,
+                  e^{-i\Hop_{\mathrm{o}}\delta t}\,
+                  e^{-i\Hop_{\mathrm{e}}\delta t/2}\,e^{-i\Hop_Z\delta t/2},
+\end{equation}
+applied $t/\delta t$ times. The error at fixed $t$ then scales as
+$\delta t^{\,p}$, with $p$ the order of the formula~\cite{suzuki1976,childs2021}.
+The scaling, not the size, is the test: an implementation can be accurate at one
+step size and still scale wrongly. Fitting $\log(\text{error})$ against
+$\log\delta t$ gives exponents of 1.036 and 2.003 for the state, and 2.002 for
+the bias in the particle density itself.
+
+Each exponential becomes gates directly. A term $c\,\Zop{n}$ is an
+$\mathrm{RZ}(2c\,\delta t)$ rotation and a term $c\,\Zop{n}\Zop{n'}$ an
+$\mathrm{RZZ}(2c\,\delta t)$. On one bond, $\tfrac12 w(\Xop{}\Xop{} +
+\Yop{}\Yop{})$ becomes $\mathrm{RXX}(w\,\delta t)$ followed by
+$\mathrm{RYY}(w\,\delta t)$; the two commute on the same bond, so the pair is
+exact. For noise simulation the circuit is compiled to the gate set of a
+superconducting device, $\{\mathrm{RZ}, \mathrm{SX}, \mathrm{X}, \mathrm{CX}\}$,
+in which every RZZ, RXX and RYY costs two CX gates. One second-order step then
+contains 32 CX, 24 SX and 53 RZ gates (Figure~\ref{fig:trotterstep}). The RZ
+gates are implemented in software on such hardware and carry no error. The
+circuit whose gates are counted and the circuit whose gates carry noise are the
+same compiled object.
+
+\begin{figure}[t]
+  \centering
+  \begin{tikzpicture}[font=\small, x=1cm, y=0.62cm,
+      gate/.style={draw=black!70, fill=white, rounded corners=1.5pt, align=center,
+                   minimum width=1.55cm, inner sep=2pt},
+      diag/.style={gate, fill=blue!6},
+      hop/.style={gate, fill=orange!10}]
+    \foreach \q in {1,...,4} {
+      \draw[black!60] (0,-\q) -- (12.6,-\q);
+      \node[left] at (0,-\q) {site \q};
+    }
+    \node[diag, minimum height=2.6cm] at (1.3,-2.5)
+      {$e^{-i\Hop_Z\delta t/2}$\\[2pt]\footnotesize 3 RZZ, 4 RZ\\\footnotesize 6 CX};
+    \node[hop, minimum height=1.05cm] at (3.7,-1.5) {RXX\,RYY\\\footnotesize $\delta t/2$};
+    \node[hop, minimum height=1.05cm] at (3.7,-3.5) {RXX\,RYY\\\footnotesize $\delta t/2$};
+    \node[hop, minimum height=1.05cm] at (6.3,-2.5) {RXX\,RYY\\\footnotesize $\delta t$};
+    \node[hop, minimum height=1.05cm] at (8.9,-1.5) {RXX\,RYY\\\footnotesize $\delta t/2$};
+    \node[hop, minimum height=1.05cm] at (8.9,-3.5) {RXX\,RYY\\\footnotesize $\delta t/2$};
+    \node[diag, minimum height=2.6cm] at (11.3,-2.5)
+      {$e^{-i\Hop_Z\delta t/2}$\\[2pt]\footnotesize 3 RZZ, 4 RZ\\\footnotesize 6 CX};
+    \node[font=\footnotesize, black!70] at (3.7,-4.6) {$\Hop_{\mathrm{e}}$: 8 CX};
+    \node[font=\footnotesize, black!70] at (6.3,-4.6) {$\Hop_{\mathrm{o}}$: 4 CX};
+    \node[font=\footnotesize, black!70] at (8.9,-4.6) {$\Hop_{\mathrm{e}}$: 8 CX};
+  \end{tikzpicture}
+  \caption{One second-order Trotter step, Eq.~\eqref{eq:strang}, on four
+  qubits. Diagonal layers (blue) apply the mass and electric terms. Hopping
+  layers (orange) apply $\tfrac12 w(\Xop{}\Xop{}+\Yop{}\Yop{})$ to the even bonds
+  for half a step, the odd bond for a full step, and the even bonds again.
+  Compiled to $\{\mathrm{RZ},\mathrm{SX},\mathrm{X},\mathrm{CX}\}$ the step costs
+  32 CX gates, the number that sets how fast gate error accumulates.}
+  \label{fig:trotterstep}
+\end{figure}
+
+\subsection{Measurement and shot noise}
+
+Every observable in Section~\ref{sec:theory}, together with $\hat Q$, is
+diagonal in the computational basis, so each is a function $x_b$ of the measured
+bitstring $b$ alone. One circuit measured once in the $\Zop{}$ basis therefore
+gives the physics and the diagnostics together, with no extra circuits. An
+$M$-shot estimate of $\langle x\rangle$ is the sample mean, and its standard
+error is
+\begin{equation}
+  \label{eq:sigma}
+  \sigma_x = \sqrt{\frac{1}{M}\sum_b p_b\,(x_b - \bar x)^2},
+\end{equation}
+where $p_b$ is the probability of outcome $b$ and $\bar x = \sum_b p_b x_b$~\cite{taylor1997}.
+The particle number of a single shot takes the values 0, 1, 2, 3 or 4, not just
+0 and 1, so the binomial formula $\sqrt{p(1-p)/M}$ does not apply and
+Eq.~\eqref{eq:sigma} is the general form. For $\mathrm{Var}(Q)$ the standard
+error of a sample variance is used, $\sqrt{(\mu_4 - \sigma^4)/M}$ with $\mu_4$
+the fourth central moment.
+
+The distribution $p_b$ is known exactly in simulation, so Eq.~\eqref{eq:sigma} is
+evaluated exactly rather than estimated from one noisy sample. This keeps the
+error budget clean: shot noise becomes a computed number, not a fluctuation to
+be averaged away. When a realistic data set is needed, $M$ outcomes are drawn
+from $p_b$ by multinomial sampling, which is statistically identical to running
+the circuit $M$ times. Over 400 independent simulated data sets, the actual
+scatter of the estimates is between 0.97 and 1.01 times the quoted standard
+error, for both $\nu$ and $\mathrm{Var}(Q)$.
+
+\subsection{Hardware noise models}
+
+Gate errors are modelled as depolarising channels attached to the physical
+gates of the compiled circuit,
+\begin{equation}
+  \mathcal{E}(\rho) = (1-\lambda)\,\rho + \lambda\,\frac{I}{d},
+\end{equation}
+with $d = 4$ for a CX gate and $d = 2$ for SX and X. The strength is quoted as
+the average gate infidelity $\epsilon$, the number obtained from randomized
+benchmarking and reported on hardware data sheets, which is related to
+$\lambda$ by $\epsilon = \lambda(d-1)/d$~\cite{nielsen2010}. Confusing the two
+would misstate every threshold by a factor $4/3$, so the conversion is checked
+against Qiskit's own average-gate-fidelity routine. The two-qubit error
+$\epsilon_2$ is swept from $10^{-5}$ to $3\times 10^{-2}$, a range that brackets
+the two-qubit error of $4\times10^{-3}$ reported for the trapped-ion processor
+used by Rosanowski \emph{et al.}~\cite{rosanowski2025}. The single-qubit error
+is set to $\epsilon_1 = \epsilon_2/10$. This ratio is an assumption. With it,
+the 24 SX gates of each step add less than a tenth of the error that its 32 CX
+gates do, and changing the ratio to 0 or to 0.3 moves the failure threshold
+defined below by $+8\,\%$ and $-13\,\%$.
+
+Readout error is modelled as an independent bit flip with probability $q$ on
+each qubit, applied as a $2\times 2$ confusion matrix to each qubit's axis of the
+outcome distribution. It acts only on the classical record, after the state has
+been measured, so it is applied to the exact distribution afterwards and its
+bias stays separate from the gate error. A symmetric flip maps every
+$\langle\Zop{n}\rangle$ to $(1-2q)\langle\Zop{n}\rangle$, so the particle density
+becomes $\tfrac12 + (1-2q)(\nu - \tfrac12)$; the code reproduces this closed form
+to \num{6e-17}, and over $2\times 10^5$ sampled shots it agrees with Aer's own
+readout-error model to within $1.9$ standard deviations in every outcome bin.
+Readout error can be corrected by inverting the confusion
+matrix~\cite{bravyi2021}, so it is reported as its own term in the budget rather
+than folded into the gate error.
+
+The noisy state is computed exactly. Aer's density-matrix simulator carries the
+full $16\times 16$ density matrix through every noisy gate and returns the exact
+outcome probabilities, with no sampling. The gate-error bias of any observable is
+then an exact number, and shot noise is added afterwards through
+Eq.~\eqref{eq:sigma}.
+
+A second, independent route applies noise to the logical state once per
+Trotter step, using NumPy matrix products only. It implements the
+phenomenological model Martinez \emph{et al.}\ fitted to their data, a phase
+flip with probability $p$ on each qubit per step~\cite{martinez2016}, and a
+global depolarising channel $\rho \to (1-p)\rho + pI/16$ per step. At zero noise
+it agrees with the Aer route to \num{2.9e-15}. It exists as a control for the
+diagnostics, for a reason given next.
+
+\subsection{Symmetry diagnostics}
+
+From the same $\Zop{}$-basis data, three diagnostics are computed: the charge
+variance $\mathrm{Var}(Q) = \langle\hat Q^2\rangle - \langle\hat Q\rangle^2$,
+the leakage $1 - P(Q = 0)$ out of the six-state neutral sector, and the CP
+asymmetry $A_{\mathrm{CP}} = \langle\Lop{1}\rangle - \langle\Lop{3}\rangle$.
+Without noise all three vanish exactly, and the CP asymmetry vanishes even in
+the presence of Trotter error (Section~\ref{sec:symmetries}).
+
+Turning a violation into a prediction needs a model of the noise. The simplest
+is a global depolarising channel, $\rho \to F\rho + (1-F)I/16$, under which every
+diagonal observable moves linearly toward its maximally mixed value with the
+same weight $F$~\cite{vovrosh2021,urbanek2021}. The ideal state has
+$\mathrm{Var}(Q) = 0$ and the maximally mixed state has $\mathrm{Var}(Q) = N/4$,
+so the model gives
+\begin{equation}
+  \label{eq:FQ}
+  F_Q = 1 - \frac{\mathrm{Var}(Q)}{N/4},
+\end{equation}
+and an analogous estimate from the leakage. Both are exact for a global channel.
+Real gate noise is local, not global, so Eq.~\eqref{eq:FQ} is a model whose
+accuracy is one of the things this thesis measures.
+
+The diagnostics have a blind spot, and the logical-frame route exposes it. A
+$\Zop{}$ error on the logical state commutes with $\hat Q$, so dephasing between
+Trotter steps leaves $\mathrm{Var}(Q)$ exactly zero while the particle density
+drifts far from its noiseless value. Dephasing on the CX gates of the compiled
+circuit, by contrast, does break charge conservation: between the two CX gates
+of a compiled RXX or RYY the qubits sit in a rotated basis, and a $\Zop{}$ error
+there acts as an $\Xop{}$ or $\Yop{}$ error on the logical state. Whether an
+error is visible to the diagnostic depends on where in the compiled circuit it
+occurs, not only on its type. This was found by simulation, after a first draft
+of the code had assumed the opposite.
+
+\subsection{The error budget}
+\label{sec:budget-method}
+
+For a diagonal observable at time $t$ and step size $\delta t$, four outcome
+distributions are computed exactly, each differing from the last by one source of
+error: $p^{\mathrm{exact}}$ from $e^{-i\Hop t}$, $p^{\mathrm{Trot}}$ from the
+noiseless circuit, $p^{\mathrm{gate}}$ from the same circuit with gate noise, and
+$p^{\mathrm{meas}}$ after readout error. The biases telescope,
+\begin{equation}
+  \label{eq:budget}
+  \langle x\rangle^{\mathrm{meas}} - \langle x\rangle^{\mathrm{exact}}
+  = b_{\mathrm{Trot}} + b_{\mathrm{gate}} + b_{\mathrm{read}},
+\end{equation}
+with $b_{\mathrm{Trot}} = \langle x\rangle^{\mathrm{Trot}} - \langle x\rangle^{\mathrm{exact}}$,
+$b_{\mathrm{gate}} = \langle x\rangle^{\mathrm{gate}} - \langle x\rangle^{\mathrm{Trot}}$
+and $b_{\mathrm{read}} = \langle x\rangle^{\mathrm{meas}} - \langle x\rangle^{\mathrm{gate}}$,
+so they add exactly with no cross terms. The shot noise $\sigma$ follows from
+$p^{\mathrm{meas}}$ through Eq.~\eqref{eq:sigma}, and the root-mean-square
+error of a single $M$-shot measurement is $\sqrt{b^2 + \sigma^2}$, with $b$ the
+total bias: the mean squared error of an estimator is its squared bias plus its
+variance~\cite{cai2023}. The gate bias is defined on the Trotterised circuit, so it is the
+extra error noise adds to a circuit already chosen, which is how an experiment
+is designed. The account is complete if nothing is left over, and this was tested
+directly: the mean squared deviation of 600 simulated 500-shot experiments from
+the exact answer is 0.999 times $b^2 + \sigma^2$.
+
+\emph{The crossover.} The step size $\delta t_\times$ at which the Trotter bias
+in $\nu(t)$ falls below the shot-noise uncertainty $\sigma(M)$, evaluated at
+$t = 3$ for $M = 256$ and $4096$ shots.
+
+\emph{The failure threshold.} Starting from the bare vacuum, the exact particle
+density rises to a maximum $\nu = 0.463$ at $t_{\mathrm{p}} = 0.89$ and falls to
+a minimum $\nu = 0.133$ at $t_{\mathrm{t}} = 1.76$ as pairs recombine. The noise
+channels considered here, acting alone on the bare vacuum, can only push $\nu$
+toward the maximally mixed value $\tfrac12$; they cannot make it fall. The fall
+is therefore the part of the signal that noise cannot fake, and the signal is
+defined as the recombination dip
+\begin{equation}
+  \label{eq:dip}
+  D = \nu(t_{\mathrm{p}}) - \nu(t_{\mathrm{t}}),
+  \qquad
+  \sigma_D = \sqrt{\sigma_{\mathrm{p}}^2 + \sigma_{\mathrm{t}}^2}.
+\end{equation}
+The failure threshold $\epsilon^\ast$ is the smallest two-qubit error at which
+$D \le 2\sigma_D$, found by interpolation in $\log\epsilon_2$ on a 36-point grid
+from $10^{-5}$ to $3\times10^{-2}$, for step sizes $\delta t = 0.1$, $0.2$ and
+$0.3$ and for $M = 10^3$ and $10^4$ shots. The measurement times are fixed at the
+extrema of the exact evolution, as an experiment would choose them from theory.
+
+\emph{Predicting the threshold.} An experiment has data at one noise level
+$\epsilon_0$ only. From those data alone, Eq.~\eqref{eq:FQ} gives $F$ at each of
+the two times. Assuming the global model and $F(\epsilon) = e^{-\kappa\epsilon}$,
+the measured distribution is inverted to an estimate of the ideal one,
+$p^{\mathrm{ideal}} = [p - (1-F)/16]/F$ with $\kappa = -\ln F/\epsilon_0$, and
+re-noised at every other $\epsilon$ to predict $D$ and $\sigma_D$ there. The
+crossing of the predicted $D$ with $2\sigma_D$ is the predicted threshold.
+Nothing in this procedure uses the exact answer, and on synthetic data that obey
+the global model it reproduces the true dip to \num{1e-12}. Comparing the
+prediction with the threshold found by sweeping $\epsilon_2$ directly, for
+$\epsilon_0$ between $\epsilon^\ast/10$ and $\epsilon^\ast/3$, is the test of
+the third question in Section~\ref{sec:contribution}.
+
+\subsection{Ground state by sample-based Krylov diagonalisation}
+\label{sec:skqd}
+
+The ground state is prepared with SKQD, following Yu
+\emph{et al.}~\cite{yu2025} and its application to the Schwinger model by
+Rosanowski \emph{et al.}~\cite{rosanowski2025}. The reference state is the bare
+vacuum, the ground state of the mass and electric terms, which Rosanowski
+\emph{et al.}\ also use as the initial state for their larger lattices. The
+circuits prepare $U(\delta t)^k|\mathrm{vac}\rangle$ for $k = 1,\dots,K$, with
+$U(\delta t)$ either one second-order Trotter step of the full Hamiltonian,
+Eq.~\eqref{eq:strang}, which reuses the dynamics circuits directly, or a step of
+the hopping terms alone, as Rosanowski \emph{et al.}\ use. Each circuit is
+measured $M$ times. Bitstrings with nonzero total charge are discarded, which
+costs nothing because $\hat Q$ is diagonal, and the distinct neutral bitstrings
+from all $K$ steps, together with the reference, form a set $S$. The
+Hamiltonian restricted to the span of $S$ is diagonalised classically, and its
+lowest eigenvalue and eigenvector give the energy and the chiral condensate.
+Because this is an exact diagonalisation inside a subspace, the estimate
+satisfies $E_{\mathrm{SKQD}} \ge E_0$ for every possible $S$, however noisy the
+sampling~\cite{kanno2023}. The bound was confirmed on all 63 nonempty subsets of
+the neutral sector.
+
+Noise therefore cannot push the energy below the truth, but a finite number of
+shots can miss an important bitstring and push it above~\cite{miura2026}. At
+$N = 4$ this bias can be computed exactly. Let $p_k(b)$ be the outcome
+distribution of the $k$-th circuit. For the sampled set to lie inside a set $T$
+of neutral bitstrings, every one of the $M$ shots at every step must avoid the
+neutral bitstrings outside $T$, so
+\begin{equation}
+  \label{eq:skqd}
+  P(S \subseteq T) = \prod_{k=1}^{K}\Bigl(1 - \sum_{b \notin T} p_k(b)\Bigr)^{M},
+\end{equation}
+where the sum runs over neutral bitstrings only; shots on charged bitstrings are
+discarded and do no harm. Inclusion and exclusion over the $2^6 = 64$ subsets of
+the neutral sector convert Eq.~\eqref{eq:skqd} into the probability that the
+sampled set is exactly $S$, and the expected SKQD energy is the
+probability-weighted average of the subspace energies. This exact result agrees
+with 20\,000 simulated SKQD runs (Table~\ref{tab:checks}) and replaces Monte
+Carlo averaging in everything that follows.
+
+\subsection{Parameters}
+
+All simulations use $N = 4$, $m = 0.5\,w$, $J = w$, and the bare vacuum as the
+initial state, with time in units of $1/w$. Trotter steps are second order unless
+stated otherwise. Dynamics are evaluated with step sizes from $\delta t = 0.015$
+to $0.3$, shot counts from 256 to $10^4$, two-qubit gate errors from $10^{-5}$ to
+$3\times10^{-2}$ with $\epsilon_1 = \epsilon_2/10$, and readout error up to
+$q = 0.03$. SKQD uses $K = 4$ Krylov steps of $\delta t = 0.3$ with the full
+Trotter step and, for comparison, a single hopping-only step of
+$\delta t = 0.77$, the value Rosanowski \emph{et al.}\ chose for their
+four-qubit run~\cite{rosanowski2025}.
