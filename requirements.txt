@@ -13,3 +13,7 @@ pytest>=7.0
 # tests/test_paulis.py. Nothing in Gate 2 depends on it. It becomes load-bearing
 # at M7 (state preparation) and M8 (Trotterised evolution).
 qiskit>=1.0
+
+# Needed by run_with_shots (src/schwinger/circuits.py) for shot-sampled circuit
+# execution, i.e. the shot-noise half of the M10 error budget.
+qiskit-aer>=0.14

@@ -78,3 +78,20 @@ Gauss's law solvable rather than merely a constraint, and it is what lets N
 sites fit in N qubits. Periodic boundaries would reintroduce a global
 constraint and are out of scope; the periodic TFIM in `ising.py` exists only
 as a Jordan-Wigner exercise.
+
+## 8. Noise conventions (fixed 2026-10-12)
+
+- **Gate error is quoted as average gate infidelity** epsilon, the number from
+  randomized benchmarking. Aer's depolarizing parameter is
+  `lambda = epsilon d / (d - 1)`, so `lambda = 4 epsilon / 3` for a CX. Always
+  go through `noise.depolarizing_lambda`; never pass epsilon to Aer directly.
+- **Noise attaches to the compiled circuit.** Compile with
+  `circuits.to_hardware_basis` to {RZ, SX, X, CX} first. RZ carries no error.
+  The same compiled circuit is used for `circuit_metrics`.
+- **Default single-qubit error** is `epsilon_1 = epsilon_2 / 10`. It is an
+  assumption; state it whenever a threshold is quoted.
+- **Readout error** is applied classically with `noise.apply_readout_error`,
+  never inside the density-matrix run, so its bias stays separable.
+- **Probabilities from Aer** are indexed like our basis (site N-1 least
+  significant), the same coincidence `circuits.statevector` relies on. Checked
+  in `tests/test_noise.py`.

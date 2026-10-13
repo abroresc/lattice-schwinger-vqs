@@ -242,7 +242,28 @@ def run_with_shots(qc: QuantumCircuit, shots: int, seed: int | None = None,
     return result.get_counts()
 
 
-def circuit_metrics(qc: QuantumCircuit, basis: tuple[str, ...] = ("rz", "sx", "x", "cx")
+# The gate set of an IBM-style superconducting device. RZ is implemented in
+# software (a frame change) and is error-free on such hardware; SX and X are
+# physical single-qubit pulses; CX is the only entangling gate. Noise models in
+# noise.py attach errors to exactly these gates, so the circuit has to be
+# compiled into this basis BEFORE noise is applied. Otherwise Aer would run
+# RXX/RYY/RZZ natively and the noise model would never fire.
+HARDWARE_BASIS: tuple[str, ...] = ("rz", "sx", "x", "cx")
+
+
+def to_hardware_basis(qc: QuantumCircuit, basis: tuple[str, ...] = HARDWARE_BASIS
+                      ) -> QuantumCircuit:
+    """
+    Compile to the hardware basis. One function, so that the circuit whose gates
+    are COUNTED (circuit_metrics) is the same circuit whose gates carry NOISE
+    (noise.py). A fixed seed makes the compilation reproducible.
+    """
+    from qiskit import transpile
+
+    return transpile(qc, basis_gates=list(basis), optimization_level=1, seed_transpiler=0)
+
+
+def circuit_metrics(qc: QuantumCircuit, basis: tuple[str, ...] = HARDWARE_BASIS
                     ) -> dict[str, int]:
     """
     Depth and two-qubit gate count after transpiling to a hardware-like basis.
@@ -252,9 +273,7 @@ def circuit_metrics(qc: QuantumCircuit, basis: tuple[str, ...] = ("rz", "sx", "x
     and increases hardware error at the same time. That tension is one of the
     two headline results of the thesis.
     """
-    from qiskit import transpile
-
-    t = transpile(qc, basis_gates=list(basis), optimization_level=1)
+    t = to_hardware_basis(qc, basis)
     ops = t.count_ops()
     return {
         "depth": t.depth(),
