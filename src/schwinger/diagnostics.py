@@ -25,16 +25,19 @@ THE DIAGNOSTICS
 ---------------
 Gauss's law cannot be a diagnostic here: it was solved and substituted, so it
 holds on every bitstring (see analytics.gauss_law_residual). Two exact
-symmetries remain, and noise breaks both.
+symmetries remain. Most noise breaks both, but not all noise does: see the
+blind spot below.
 
 1. Total charge. [H, Q] = 0 and the evolution starts in Q = 0, so ideally every
    shot has Q = 0. Two equivalent readings of a violation:
      - Var(Q), the spread of the measured charge;
      - 1 - P(Q = 0), the "leakage" Martinez et al. reported as a fidelity proxy.
-2. CP. Inside the neutral sector, CP forces <L_n> = <L_{N-n}>. The noiseless
-   Trotter circuit preserves this EXACTLY (each Trotter factor maps the neutral
-   sector to itself and commutes with CP there), so any measured asymmetry is
-   hardware error, not Trotter error.
+2. CP. On a neutral state that CP leaves unchanged, <L_n> = <L_{N-n}>; the
+   bare vacuum is such a state (see schwinger.cp_operator for why neutrality
+   alone is not enough). The noiseless Trotter circuit keeps the state
+   CP-symmetric EXACTLY (each Trotter factor maps the neutral sector to itself
+   and commutes with CP there), so any measured <L_1> - <L_3> is hardware
+   error, not Trotter error.
 
 THE GLOBAL-DEPOLARIZING READING
 -------------------------------

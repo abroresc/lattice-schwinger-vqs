@@ -30,7 +30,8 @@ Last updated: 2026-10-13.
   decomposition, failure threshold, diagnostic prediction). 473 tests.
   Scripts 06-08 and figures 06-08. Headline numbers: failure threshold
   eps* x n_CX ~ 2 at 1000 shots; charge diagnostic predicts eps* to within
-  10-17 % (always optimistic) but is blind to logical-frame dephasing; optimal
+  10-17 % (optimistic on exact data; a single 1000-shot run scatters by more
+  than that) but is blind to logical-frame dephasing; optimal
   dt grows from 0.35 to 0.59 as eps_2 goes from 3e-4 to 3e-3. See
   `docs/error-budget.md`.
 - **Writing:** Introduction (2nd draft), Theory, and Materials and Methods

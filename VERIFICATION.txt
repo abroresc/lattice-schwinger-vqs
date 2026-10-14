@@ -1,15 +1,15 @@
 VERIFICATION LOG
-schwinger-n4  |  generated 2026-09-10 16:46 UTC
-python 3.11.15  numpy 2.4.4  scipy 1.17.1  qiskit 2.5.2
+schwinger-n4  |  generated 2026-10-14 08:46 UTC  |  commit 3a5cbd3-dirty
+python 3.11.7  numpy 2.4.6  scipy 1.17.1  qiskit 2.5.2  qiskit-aer 0.17.2  matplotlib 3.11.1
 
 ############ TEST SUITE ############
-........................................................................ [ 99%]
-...                                                                      [100%]
-363 passed in 2.17s
+........................................................................ [ 90%]
+............................................                             [100%]
+476 passed in 12.31s
 
 ############ scripts/01_tfim_phase_transition.py ############
-wrote /home/claude/schwinger-n4/figures/01_tfim.png
-worst residual across all N and h/J: 3.197e-14
+wrote figures/01_tfim.png
+worst residual across all N and h/J: 2.665e-14
 
 ############ scripts/02_jw_verification.py ############
 ==================================================================
@@ -26,12 +26,14 @@ HOPPING SIGN, settled numerically instead of argued about
 ==================================================================
   plain string gives minus sign            residual 0.000e+00
   alternating string gives plus sign       residual 0.000e+00
-  spectra agree                            residual 0.000e+00
+  spectra agree                            residual 1.110e-15
   Reading: the plain Z string really does produce a minus sign; the
   alternating (-Z) string removes it; the two give identical spectra,
   so the sign is a relabelling and not physics.
 
-wrote /home/claude/schwinger-n4/figures/02_jordan_wigner.png
+  periodic TFIM, N = 6, full spectrum: parity-sector formula residual 1.8e-14; naive formula 1.90
+
+wrote figures/02_jordan_wigner.png
 
 ############ scripts/03_schwinger_spectrum.py ############
 ============================================================
@@ -84,24 +86,24 @@ VERIFICATION (residuals, not pass/fail flags)
   [H, Q] = 0                             : 0.000e+00
   strong coupling E0 = -mN/2 (w = 0)     : 0.000e+00
   free fermion limit, all 16 levels      : 8.882e-16
-  Hellmann-Feynman on the condensate     : 3.219e-11
+  Hellmann-Feynman on the condensate     : 3.150e-11
 
   charge sectors present: [-2, -1, 0, 1, 2]
 
-wrote /home/claude/schwinger-n4/figures/03_schwinger_spectrum.png
+wrote figures/03_schwinger_spectrum.png
 
 ############ scripts/04_pair_production_preview.py ############
 ==============================================================
 CONSERVATION CHECKS during evolution (these must not drift)
 ==============================================================
-  m/w = 0.0:  energy drift 1.83e-15   |Q| max 0.00e+00   Var(Q) max 0.00e+00   norm drift 1.55e-15
-  m/w = 0.5:  energy drift 2.11e-15   |Q| max 0.00e+00   Var(Q) max 0.00e+00   norm drift 1.33e-15
-  m/w = 1.0:  energy drift 2.44e-15   |Q| max 0.00e+00   Var(Q) max 0.00e+00   norm drift 9.99e-16
-  m/w = 2.0:  energy drift 4.00e-15   |Q| max 0.00e+00   Var(Q) max 0.00e+00   norm drift 9.99e-16
+  m/w = 0.0:  energy drift 1.25e-15   |Q| max 7.17e-34   Var(Q) max 7.17e-34   norm drift 1.11e-15
+  m/w = 0.5:  energy drift 1.78e-15   |Q| max 2.95e-34   Var(Q) max 2.95e-34   norm drift 8.88e-16
+  m/w = 1.0:  energy drift 2.66e-15   |Q| max 1.57e-35   Var(Q) max 1.57e-35   norm drift 8.88e-16
+  m/w = 2.0:  energy drift 5.33e-15   |Q| max 3.84e-35   Var(Q) max 3.84e-35   norm drift 1.11e-15
 
-  CP check: max |<L_1> - <L_3>| over the evolution = 6.106e-16
+  CP check: max |<L_1> - <L_3>| over the evolution = 7.216e-16
 
-wrote /home/claude/schwinger-n4/figures/04_pair_production.png
+wrote figures/04_pair_production.png
 
 ==============================================================
 WHY PAIRS APPEAR AT ALL: bare vacuum is not the ground state
@@ -115,3 +117,198 @@ WHY PAIRS APPEAR AT ALL: bare vacuum is not the ground state
   The gap column is the whole story. A larger mismatch between the state
   you prepare and the state the Hamiltonian wants gives more pair production.
 
+############ scripts/05_qiskit_trotter.py ############
+==================================================================
+A. TROTTER ERROR SCALING (the slope is the test)
+==================================================================
+  metric: max |psi_trotter - psi_exact| after phase alignment, t = 3.0, dt from 0.3000 to 0.0094
+  order 1: fitted slope 1.0359   (predicted 1.0)   error at dt=0.0094 is 6.23e-03
+  order 2: fitted slope 2.0031   (predicted 2.0)   error at dt=0.0094 is 3.59e-05
+
+==================================================================
+B. PARTICLE DENSITY FROM FINITE SHOTS
+==================================================================
+    256 shots: typical uncertainty 0.0159
+   4096 shots: typical uncertainty 0.0043
+
+==================================================================
+C. CROSSOVER: WHERE DOES TROTTER ERROR FALL BELOW SHOT NOISE?
+==================================================================
+    256 shots: exact sigma = 0.01895;  Trotter bias falls below it at dt = 0.254 (interpolated between steps 11 and 12)
+   1000 shots: exact sigma = 0.00959;  Trotter bias falls below it at dt = 0.182 (interpolated between steps 16 and 17)
+   4096 shots: exact sigma = 0.00474;  Trotter bias falls below it at dt = 0.128 (interpolated between steps 23 and 24)
+
+wrote figures/05_qiskit_trotter.png
+
+==================================================================
+CIRCUIT COST (what a real device would have to run)
+==================================================================
+  steps       dt    depth   2q gates    total
+     10   0.3000      541        320     1082
+     50   0.0600     2701       1600     5402
+    200   0.0150    10801       6400    21602
+
+############ scripts/06_noise_threshold.py ############
+======================================================================
+A. NOISE-LAYER VALIDATION (residuals, not pass/fail flags)
+======================================================================
+  density matrix vs statevector, no noise      : 1.5e-14
+  NumPy step route vs Aer route, no noise       : 2.9e-15
+  global channel: F_Q - (1-p)^18                : 6.7e-16
+  logical dephasing: Var(Q)                     : 9.7e-34
+  logical dephasing: CP asymmetry               : 2.2e-16
+  noiseless Trotter circuit: worst CP asymmetry : 5.3e-16
+  fully depolarizing CX: Var(Q) - N/4           : 0.0e+00
+
+======================================================================
+B. FAILURE THRESHOLD   C. PREDICTION FROM THE CHARGE DIAGNOSTIC
+======================================================================
+  dt=0.1  CX(peak,trough)=(288,576)  M= 1000:  D(0)=0.3294  eps*=3.33e-03  eps*xCX=1.92  eps*(M=inf)=4.55e-03
+        dip kept: 0.51 of D(0) at eps2 = 1e-3 (F_Q trough 0.54), -0.06 at eps2 = 1e-2; at eps*: F_Q trough 0.13; eps*(M=inf)/eps* = 1.37
+        predicted eps*/true eps* from data at eps0 = 0.10 eps*: 1.153, 0.30 eps*: 1.115
+  dt=0.1  CX(peak,trough)=(288,576)  M=10000:  D(0)=0.3294  eps*=4.04e-03  eps*xCX=2.33  eps*(M=inf)=4.55e-03
+        predicted eps*/true eps* from data at eps0 = 0.10 eps*: 1.303, 0.31 eps*: 1.215
+  dt=0.2  CX(peak,trough)=(128,288)  M= 1000:  D(0)=0.3384  eps*=6.88e-03  eps*xCX=1.98  eps*(M=inf)=9.36e-03
+        dip kept: 0.72 of D(0) at eps2 = 1e-3 (F_Q trough 0.74), -0.01 at eps2 = 1e-2; at eps*: F_Q trough 0.12; eps*(M=inf)/eps* = 1.36
+        predicted eps*/true eps* from data at eps0 = 0.09 eps*: 1.137, 0.29 eps*: 1.102
+  dt=0.2  CX(peak,trough)=(128,288)  M=10000:  D(0)=0.3384  eps*=8.37e-03  eps*xCX=2.41  eps*(M=inf)=9.36e-03
+        predicted eps*/true eps* from data at eps0 = 0.09 eps*: 1.289, 0.30 eps*: 1.192
+  dt=0.3  CX(peak,trough)=( 96,192)  M= 1000:  D(0)=0.3452  eps*=1.06e-02  eps*xCX=2.03  eps*(M=inf)=1.45e-02
+        dip kept: 0.81 of D(0) at eps2 = 1e-3 (F_Q trough 0.82), +0.08 at eps2 = 1e-2; at eps*: F_Q trough 0.11; eps*(M=inf)/eps* = 1.37
+        predicted eps*/true eps* from data at eps0 = 0.09 eps*: 1.168, 0.30 eps*: 1.129
+  dt=0.3  CX(peak,trough)=( 96,192)  M=10000:  D(0)=0.3452  eps*=1.29e-02  eps*xCX=2.47  eps*(M=inf)=1.45e-02
+        predicted eps*/true eps* from data at eps0 = 0.10 eps*: 1.356, 0.31 eps*: 1.248
+
+======================================================================
+D. THE BLIND SPOT: logical-frame dephasing, once per Trotter step
+======================================================================
+  dip vanishes at p = 3.63e-02 per qubit per step of dt = 0.1 (9 steps to t_p, 18 to t_t); largest Var(Q) seen = 9.8e-34
+  The charge diagnostic reads exactly zero while the signal disappears.
+
+======================================================================
+E. PREDICTION WITH SHOT NOISE ON THE DIAGNOSTIC (200 data sets of 1000 shots)
+======================================================================
+  dt=0.1 eps0=0.10 eps*: unsampled-data ratio 1.153; shot-sampled median 1.145, 16-84% [1.014, 1.311] (half-width 0.148), pessimistic (ratio < 1) 12%, undefined 0
+  dt=0.1 eps0=0.30 eps*: unsampled-data ratio 1.115; shot-sampled median 1.115, 16-84% [1.011, 1.234] (half-width 0.111), pessimistic (ratio < 1) 15%, undefined 0
+  dt=0.2 eps0=0.09 eps*: unsampled-data ratio 1.137; shot-sampled median 1.128, 16-84% [0.997, 1.310] (half-width 0.157), pessimistic (ratio < 1) 16%, undefined 0
+  dt=0.2 eps0=0.29 eps*: unsampled-data ratio 1.102; shot-sampled median 1.093, 16-84% [0.987, 1.224] (half-width 0.119), pessimistic (ratio < 1) 20%, undefined 0
+  dt=0.3 eps0=0.09 eps*: unsampled-data ratio 1.168; shot-sampled median 1.179, 16-84% [1.045, 1.339] (half-width 0.147), pessimistic (ratio < 1) 8%, undefined 0
+  dt=0.3 eps0=0.30 eps*: unsampled-data ratio 1.129; shot-sampled median 1.130, 16-84% [1.031, 1.258] (half-width 0.113), pessimistic (ratio < 1) 11%, undefined 0
+
+======================================================================
+F. SENSITIVITY OF eps* TO THE SINGLE-QUBIT ERROR RATIO (1000 shots)
+======================================================================
+  dt=0.1: eps* = 3.594e-03 (eps1=0, +8.0%), 3.328e-03 (eps1=eps2/10), 2.913e-03 (eps1=0.3 eps2, -12.5%)
+  dt=0.2: eps* = 7.410e-03 (eps1=0, +7.7%), 6.881e-03 (eps1=eps2/10), 6.001e-03 (eps1=0.3 eps2, -12.8%)
+  dt=0.3: eps* = 1.143e-02 (eps1=0, +8.0%), 1.058e-02 (eps1=eps2/10), 9.246e-03 (eps1=0.3 eps2, -12.6%)
+
+======================================================================
+G. PREDICTION UNDER DEPHASING ON THE CX GATES (1000 shots)
+======================================================================
+  dt=0.1: eps* (flip probability) = 2.29e-03; predicted eps*/true eps* from data at eps0 = 0.11 eps*: 1.410, 0.28 eps*: 1.323
+  dt=0.2: eps* (flip probability) = 4.76e-03; predicted eps*/true eps* from data at eps0 = 0.11 eps*: 1.391, 0.33 eps*: 1.270
+  dt=0.3: eps* (flip probability) = 7.35e-03; predicted eps*/true eps* from data at eps0 = 0.11 eps*: 1.423, 0.27 eps*: 1.329
+
+wrote figures/06_noise_threshold.png
+
+############ scripts/07_skqd_ground_state.py ############
+======================================================================
+A. SKQD VALIDATION (residuals)
+======================================================================
+  full neutral sector vs exact diagonalisation, energy    : 4.4e-16
+  full neutral sector vs exact, 1 - |overlap|              : 2.2e-16
+  smallest E(S) - E0 over the 62 proper subspaces (> 0)    : 3.2e-03
+  exact expected bias at 15 shots                          : 1.0202e-03
+  Monte Carlo (20000 runs)                                 : 1.0023e-03 +/- 4.0e-05
+
+======================================================================
+B. GROUND-STATE WEIGHT OF EACH NEUTRAL BITSTRING (m/w = 0.5, J = w)
+======================================================================
+  |0101>   0.70832
+  |1001>   0.09969
+  |0110>   0.09969
+  |0011>   0.07489
+  |1010>   0.01676
+  |1100>   0.00065
+
+======================================================================
+C. EXPECTED BIAS AGAINST SHOTS PER KRYLOV STEP (exact, no sampling)
+======================================================================
+  full step, dt=0.3, K=4              : bias at 5/50/500 shots = 4.67e-02 / 3.41e-05 / 0.00e+00;  shots for 1e-3 relative: 12
+                                        condensate bias at 5/50 shots = -8.31e-03 / -2.16e-05
+  full step, dt=0.3, K=4, eps2=3e-3   : bias at 5/50/500 shots = 7.43e-02 / 7.05e-05 / 0.00e+00;  shots for 1e-3 relative: 15
+                                        condensate bias at 5/50 shots = -1.24e-02 / -4.47e-05
+  hopping-only step, w dt=0.77, K=1   : bias at 5/50/500 shots = 3.22e-01 / 3.74e-04 / 0.00e+00;  shots for 1e-3 relative: 38
+                                        condensate bias at 5/50 shots = -3.95e-02 / -5.56e-05
+  hopping-only step, w dt=0.385, K=1  : bias at 5/50/500 shots = 5.55e-01 / 3.55e-02 / 7.91e-04;  shots for 1e-3 relative: 278
+                                        condensate bias at 5/50 shots = -7.34e-02 / -1.35e-02
+
+wrote figures/07_skqd.png
+
+############ scripts/08_error_budget.py ############
+========================================================================
+A. CROSSOVER at t = 1.76: Trotter bias vs shot noise, no hardware error
+========================================================================
+  M =   256: exact sigma = 0.0145; Trotter bias falls below it at dt = 0.473 (interpolated)
+  M =  1000: exact sigma = 0.0073; Trotter bias falls below it at dt = 0.358 (interpolated)
+  M =  4096: exact sigma = 0.0036; Trotter bias falls below it at dt = 0.253 (interpolated)
+
+========================================================================
+B. TOTAL RMS ERROR of nu(t=1.76) with 1000 shots, readout q = 0.01
+========================================================================
+  eps2 = 0      : optimum dt = 0.028 (2048 CX)  rms = 0.0104  [Trotter +0.0000, gate +0.0000, readout +0.0073, shot 0.0073]
+  eps2 = 0.0003 : optimum dt = 0.352 ( 160 CX)  rms = 0.0324  [Trotter +0.0070, gate +0.0176, readout +0.0068, shot 0.0079]
+  eps2 = 0.001  : optimum dt = 0.440 ( 128 CX)  rms = 0.0630  [Trotter +0.0115, gate +0.0447, readout +0.0062, shot 0.0084]
+  eps2 = 0.003  : optimum dt = 0.587 (  96 CX)  rms = 0.1193  [Trotter +0.0234, gate +0.0905, readout +0.0051, shot 0.0090]
+
+========================================================================
+C. DECOMPOSITION AT THE OPTIMUM, eps2 = 1e-3 (shares of the summed squares)
+========================================================================
+  particle density  : total rms 0.0630; shares Trotter/gate/readout/shot = 6% / 89% / 2% / 3%
+  outer link field  : total rms 0.0672; shares Trotter/gate/readout/shot = 31% / 59% / 2% / 8%
+  middle link field : total rms 0.0154; shares Trotter/gate/readout/shot = 57% / 29% / 0% / 14%
+
+wrote figures/08_error_budget.png
+
+############ scripts/09_verification_table.py ############
+HAMILTONIAN
+  three constructions: Pauli expansion vs direct matrix                          0.0e+00
+  three constructions: fermionic form through Jordan-Wigner vs spin form         0.0e+00
+  strong coupling, w = 0: E0 vs -mN/2                                            0.0e+00
+  free fermions, m = J = 0: all 16 levels vs subset sums of 2w cos(k pi/5)       8.9e-16
+  Hellmann-Feynman: condensate from the state vs N^-1 dE0/dm (dm = 1e-5)         4.4e-12
+  Gauss's law as an operator identity                                            0.0e+00
+  [H, Q], largest element                                                        0.0e+00
+  [CP, H] inside Q = 0 (largest element on the full space, which must not vanish) 0.0e+00 (5)
+  CP maps as operators: rho_n -> -rho_(N+1-n); L_n -> L_(N-n) - Q                0.0e+00; 0.0e+00
+  transverse-field Ising warm-up: full 2^N spectrum, N = 2, 4, 6, 8, 51 field values 2.7e-14
+CIRCUITS
+  Qiskit SparsePauliOp from the Pauli labels vs NumPy matrix                     0.0e+00
+  circuit state vs exp(-iHt)|vac>, t = 2, 4000 second-order steps                7.3e-08
+  fitted exponent of the state error, first / second order, t = 3, dt 0.3 to 0.0094 1.036 / 2.003
+  fitted exponent of the second-order bias on nu, t = 1.76, dt 0.088 to 0.011    2.002
+  CP asymmetry of the noiseless circuit, dt = 0.5, 0.25, 0.1 at t = 0.89, 1.76, 3 5.3e-16
+NOISE
+  density-matrix simulation vs statevector, no noise                             1.5e-14
+  NumPy step-matrix route vs Aer route, no noise                                 2.9e-15
+  eps vs 1 - (Qiskit average gate fidelity), relative, 1 and 2 qubits            4.3e-12
+  readout: nu vs closed form 1/2 + (1-2q)(nu - 1/2), q = 0.01, 0.05, 0.2         5.6e-17
+  readout: classical confusion matrix vs Aer, q = 0.08, 2e5 shots, worst of 16 bins 1.9 sigma
+  global channel per step, p = 0.005, 0.02, 0.1, 18 steps: F_Q vs (1-p)^18       6.7e-16
+  logical-frame dephasing, p = 0.01, 0.05: Var(Q); A_CP (smallest shift of nu it causes) 9.3e-34; 6.7e-16 (0.120)
+  fully depolarising CX (eps2 = 3/4): max |p_b - 1/16|, |Var(Q) - N/4|           0.0e+00, 0.0e+00
+STATISTICS, BUDGET AND GROUND STATE
+  scatter of 400 runs / quoted standard error, nu and Var(Q), 256 and 2048 shots 0.97 to 1.01
+  budget closes: mean squared error of 600 runs / (b^2 + sigma^2), 500 shots     0.999
+  threshold prediction on data that obey the global model: max |D_pred - D_true| 1.7e-16
+  SKQD on the whole neutral sector vs exact ground energy                        4.4e-16
+  smallest E(S) - E0 over the 62 proper neutral subspaces (must be positive)     3.2e-03
+  SKQD mean bias, 15 shots per step: exact formula vs 20000 simulated runs       1.0202e-03 vs 1.0023e-03 +/- 4.0e-05
+THRESHOLD SIGNAL
+  largest D - D(noiseless), 4 channels, dt = 0.1, 0.2, 0.3 (must be < 0); lowest D -2.1e-04; -0.12
+ENERGY AFTER THE QUENCH FROM THE BARE VACUUM
+  |H_mass + H_hop + H_el - H|                                                    0.0e+00
+  t = 0.0 : <H_mass>, <H_hop>, <H_el>, <H>                                       -1.000, +0.000, +0.000, -1.000
+  t = 0.89: <H_mass>, <H_hop>, <H_el>, <H>                                       -0.074, -1.896, +0.970, -1.000
+  t = 1.76: <H_mass>, <H_hop>, <H_el>, <H>                                       -0.733, -0.707, +0.440, -1.000
+  largest drift of <H> over t in [0, 12], m/w = 0, 0.5, 1, 2                     5.3e-15

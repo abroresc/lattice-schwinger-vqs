@@ -21,10 +21,12 @@ import numpy as np
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
 
+from schwinger.budget import first_crossing
 from schwinger.circuits import (
     circuit_metrics, particle_density_from_counts, run_with_shots, statevector,
     trotter_circuit,
 )
+from schwinger.diagnostics import shot_noise_sigma
 from schwinger.observables import evolve, particle_density
 from schwinger.plotstyle import MARKERS, PALETTE, annotate, save, use_report_style
 from schwinger.schwinger import bare_vacuum, hamiltonian
@@ -57,7 +59,11 @@ def main() -> None:
     print("=" * 66)
     print("A. TROTTER ERROR SCALING (the slope is the test)")
     print("=" * 66)
+    # Error metric: the largest amplitude difference from exp(-iHt)|vac> after the
+    # global phase is removed, at t = 3, for dt = 3/10 down to 3/320.
     steps_list = np.array([10, 20, 40, 80, 160, 320])
+    print(f"  metric: max |psi_trotter - psi_exact| after phase alignment, t = {T}, "
+          f"dt from {T / steps_list[0]:.4f} to {T / steps_list[-1]:.4f}")
     dts = T / steps_list
     for i, order in enumerate((1, 2)):
         errs = []
@@ -119,7 +125,12 @@ def main() -> None:
     print("=" * 66)
     print("C. CROSSOVER: WHERE DOES TROTTER ERROR FALL BELOW SHOT NOISE?")
     print("=" * 66)
-    steps_c = np.array([2, 4, 8, 16, 32, 64, 128, 256])
+    # The noise floor is the EXACT standard error of Eq. (sigma), computed from the
+    # exact outcome distribution at t = 3, not estimated from one sampled run (an
+    # earlier version did that, and its single-sample sigma was 7 % low at 256
+    # shots). The step grid is dense and the crossing is interpolated in log dt,
+    # so the quoted crossover is not just the nearest point of a coarse grid.
+    steps_c = np.array(list(range(2, 33)) + [40, 48, 64, 96, 128, 192, 256])
     dts_c = T / steps_c
     systematic, twoq = [], []
     for s in steps_c:
@@ -129,20 +140,24 @@ def main() -> None:
     systematic = np.array(systematic)
 
     ax3.loglog(dts_c, np.maximum(systematic, 1e-12), color=PALETTE[2], marker=MARKERS[2],
-               label="Trotter error (systematic)")
-    for i, shots in enumerate((256, 4096)):
-        qc = trotter_circuit(N, M, W, J, T, 200, order=2)
-        _, sigma = particle_density_from_counts(run_with_shots(qc, shots, seed=SEED), N)
-        ax3.axhline(sigma, color=PALETTE[i], linewidth=1.4, linestyle=(0, (4, 3)))
-        ax3.text(dts_c.min() * 1.15, sigma * 1.25, f"shot noise, {shots} shots",
-                 fontsize=7.5, color=PALETTE[i])
-        cross = dts_c[np.argmax(systematic < sigma)] if np.any(systematic < sigma) else None
-        print(f"  {shots:>5} shots: sigma = {sigma:.5f};  "
-              f"Trotter error drops below it at dt ~ {cross:.4f}"
-              if cross is not None else f"  {shots} shots: no crossover in range")
+               markersize=3, label="Trotter error (systematic)")
+    exact_probs = np.abs(exact_state) ** 2
+    for shots in (256, 1000, 4096):
+        sigma = shot_noise_sigma(exact_probs, N, shots)
+        cross = first_crossing(dts_c, systematic - sigma)
+        k = int(np.argmax(systematic - sigma <= 0))
+        print(f"  {shots:>5} shots: exact sigma = {sigma:.5f};  Trotter bias falls below it at "
+              f"dt = {cross:.3f} (interpolated between steps {T / dts_c[k - 1]:.0f} and "
+              f"{T / dts_c[k]:.0f})")
+        if shots in (256, 4096):
+            i = 0 if shots == 256 else 1
+            ax3.axhline(sigma, color=PALETTE[i], linewidth=1.4, linestyle=(0, (4, 3)))
+            ax3.text(dts_c.min() * 1.15, sigma * 1.25, f"shot noise, {shots} shots",
+                     fontsize=7.5, color=PALETTE[i])
 
     ax3.set_xlim(dts_c.min() * 0.55, dts_c.max() * 2.2)
-    for k, off in ((0, (10, 4)), (3, (8, -12)), (len(steps_c) - 1, (6, 5))):
+    marks = [int(np.where(steps_c == s)[0][0]) for s in (2, 16, 256)]
+    for k, off in zip(marks, ((10, 4), (8, -12), (6, 5))):
         ax3.annotate(f"{twoq[k]} CX", (dts_c[k], max(systematic[k], 1e-12)),
                      textcoords="offset points", xytext=off, fontsize=7,
                      color="#6b6b6b")
@@ -153,7 +168,7 @@ def main() -> None:
     annotate(ax3, "Left of a dashed line, shot noise dominates\n"
                   "and shrinking dt buys nothing. CX counts are\n"
                   "annotated because gate error grows with them.\n"
-                  "Gate error is not in this plot yet.")
+                  "Gate error is not included in this panel.")
 
     out = FIG / "05_qiskit_trotter.png"
     save(fig, out)

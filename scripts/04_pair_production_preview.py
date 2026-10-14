@@ -9,9 +9,13 @@ WHERE THE ENERGY COMES FROM, since this is the question you will be asked.
 Nothing is injected and no external agent pulls charges apart. The simulation
 starts in the BARE vacuum, which is an eigenstate of the mass and electric
 terms but not of the full Hamiltonian once w is nonzero. Total energy is
-conserved exactly (checked below). What changes is how that energy is
-distributed between electric field and rest mass. Pairs appear because the
-initial state was never the true ground state.
+conserved exactly (checked below). On the bare vacuum the mass term and the
+electric term are BOTH at their minimum, so making pairs raises both. The
+hopping term, zero on the bare vacuum, goes negative and pays for the two of
+them. At t = 0.89 (m = 0.5 w) the split is mass -0.07, electric +0.97,
+hopping -1.90, total -1.00; scripts/09_verification_table.py prints it. An
+earlier draft said the energy "moves between field and rest mass". It cannot:
+both start at their floor.
 
 Run:  python scripts/04_pair_production_preview.py
 """
@@ -69,7 +73,7 @@ def main() -> None:
     ax1.legend(loc="upper right", ncol=2)
     annotate(ax1, "Starts at exactly zero by construction. Heavier fermions cost more to make,\n"
                   "so the density oscillates with smaller amplitude. Energy is conserved\n"
-                  "throughout: it moves between electric field and rest mass, nothing enters.")
+                  "throughout: the hopping energy falls and pays for both mass and field.")
 
     m = 0.5
     H = hamiltonian(N, m, 1.0, 1.0)
@@ -89,9 +93,9 @@ def main() -> None:
     worst = float(np.max(np.abs(profile[:, 0] - profile[:, 2])))
     print(f"\n  CP check: max |<L_1> - <L_3>| over the evolution = {worst:.3e}")
     annotate(ax2, "The two outer links lie exactly on top of each other. That is not a\n"
-                  "coincidence: CP symmetry forces <L_n> = <L_(N-n)> on any neutral state, so\n"
-                  "it is a free correctness check. The field is not independent either, since\n"
-                  "Gauss's law fixes it from the charges to its left.")
+                  "coincidence: the bare vacuum is CP-symmetric and H keeps it so, which forces\n"
+                  "<L_n> = <L_(N-n)>. A free correctness check. The field is not independent\n"
+                  "either, since Gauss's law fixes it from the charges to its left.")
 
     out = FIG / "04_pair_production.png"
     save(fig, out)

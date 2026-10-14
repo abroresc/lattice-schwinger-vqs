@@ -75,6 +75,9 @@ def main() -> None:
         ed = np.sort(ed)
         err_fixed.append(np.max(np.abs(ed - tfim_periodic_spectrum(N, 1.0, r))))
         err_naive.append(np.max(np.abs(ed - tfim_periodic_spectrum_naive(N, 1.0, r))))
+    print()
+    print(f"  periodic TFIM, N = {N}, full spectrum: parity-sector formula residual "
+          f"{max(err_fixed):.1e}; naive formula {max(err_naive):.2f}")
 
     ax2.plot(ratios, np.maximum(err_naive, 1e-17), color=PALETTE[1], marker=MARKERS[1],
              markevery=6, label="naive: sqrt at every k")

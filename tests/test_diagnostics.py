@@ -93,7 +93,7 @@ def test_global_depolarizing_round_trip():
 
 
 def test_cp_asymmetry_vanishes_on_exact_neutral_evolution():
-    """CP forces <L_1> = <L_3> on neutral states; the table must see that."""
+    """<L_1> = <L_3> on the CP-symmetric trajectory from the bare vacuum; the table must see that."""
     n = 4
     states = evolve(bare_vacuum(n), hamiltonian(n, 0.5, 1.0, 1.0), np.linspace(0, 6, 25))
     worst = max(abs(observables_from_distribution(np.abs(s) ** 2, n)["cp_asymmetry"])

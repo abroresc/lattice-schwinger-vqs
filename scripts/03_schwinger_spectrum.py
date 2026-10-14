@@ -120,7 +120,7 @@ def main() -> None:
     ax2.set_title("Order parameter, computed two independent ways")
     ax2.legend(loc="upper right")
     annotate(ax2, "Hellmann-Feynman: the operator expectation and the derivative of the ground\n"
-                  "energy must agree. They do, to 1e-11. Two different computations, one answer.")
+                  "energy must agree. They do, to 3e-11, the size of the finite-difference error.")
 
     out = FIG / "03_schwinger_spectrum.png"
     save(fig, out)

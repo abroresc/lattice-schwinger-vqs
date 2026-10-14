@@ -7,10 +7,20 @@
 %  against the paper itself (papers/ folder) or, where the paper is not in
 %  papers/, against its abstract. Do not add an entry without doing the same.
 %
+%  2026-10-13: added creutz1980, durr2008, knee2015, magesan2011, mckay2017 (all
+%  Crossref-checked); kanno2023 and miura2026 updated to their published
+%  versions; McKay spelling and Zheng surname fixed; style switched to
+%  apsrev4-2 (Physical Review), so arXiv notes are no longer needed.
+%
 %  Correction made on 2026-10-12: farrell2024 previously listed the authors of
 %  a different Farrell et al. paper (Chernyshev, Powell, Zemlevskiy). The
 %  PRX Quantum 5, 020315 authors are Farrell, Illa, Ciavarella and Savage.
 % ============================================================================
+
+% apsrev4-2 drops article titles by default (Physical Review house style). This
+% control entry turns them back on, so a reader can see what each paper is
+% about; both thesis wrappers \nocite it before anything else is cited.
+@CONTROL{apsrev42Control,author="48",editor="1",pages="0",title="0",year="1"}
 
 % ---------------------------------------------------------------- the model
 @article{schwinger1962,
@@ -53,6 +63,28 @@
   doi     = {10.1103/PhysRevD.10.2445}
 }
 
+@article{creutz1980,
+  title   = {Monte {C}arlo study of quantized {SU}(2) gauge theory},
+  author  = {Creutz, Michael},
+  journal = {Phys. Rev. D},
+  volume  = {21},
+  pages   = {2308--2315},
+  year    = {1980},
+  doi     = {10.1103/PhysRevD.21.2308}
+}
+
+@article{durr2008,
+  title   = {Ab Initio Determination of Light Hadron Masses},
+  author  = {D{\"u}rr, S. and Fodor, Z. and Frison, J. and Hoelbling, C. and Hoffmann, R. and
+             Katz, S. D. and Krieg, S. and Kurth, T. and Lellouch, L. and Lippert, T. and
+             Szabo, K. K. and Vulvert, G.},
+  journal = {Science},
+  volume  = {322},
+  pages   = {1224--1227},
+  year    = {2008},
+  doi     = {10.1126/science.1163233}
+}
+
 @article{kogut1975,
   title   = {Hamiltonian formulation of {W}ilson's lattice gauge theories},
   author  = {Kogut, John and Susskind, Leonard},
@@ -84,7 +116,7 @@
 }
 
 @article{nielsen1981,
-  title   = {Absence of neutrinos on a lattice},
+  title   = {Absence of neutrinos on a lattice: ({I}). {P}roof by homotopy theory},
   author  = {Nielsen, H. B. and Ninomiya, M.},
   journal = {Nucl. Phys. B},
   volume  = {185},
@@ -94,7 +126,7 @@
 }
 
 @article{jordan1928,
-  title   = {{\"U}ber das {P}aulische {\"A}quivalenzverbot},
+  title   = {{\"U}ber das {P}aulische {{\"A}quivalenzverbot}},
   author  = {Jordan, P. and Wigner, E.},
   journal = {Z. Phys.},
   volume  = {47},
@@ -105,7 +137,7 @@
 
 @article{hamer1997,
   title   = {Series expansions for the massive {S}chwinger model in {H}amiltonian lattice theory},
-  author  = {Hamer, C. J. and Weihong, Zheng and Oitmaa, J.},
+  author  = {Hamer, C. J. and Zheng, Weihong and Oitmaa, J.},
   journal = {Phys. Rev. D},
   volume  = {56},
   pages   = {55--67},
@@ -127,8 +159,7 @@
   title   = {The mass spectrum of the {S}chwinger model with matrix product states},
   author  = {Ba{\~n}uls, M. C. and Cichy, K. and Jansen, K. and Cirac, J. I.},
   journal = {J. High Energy Phys.},
-  volume  = {2013},
-  number  = {11},
+  volume  = {11},
   pages   = {158},
   year    = {2013},
   doi     = {10.1007/JHEP11(2013)158}
@@ -330,7 +361,7 @@
 @article{nguyen2022,
   title   = {Digital Quantum Simulation of the {S}chwinger Model and Symmetry Protection with Trapped Ions},
   author  = {Nguyen, Nhung H. and Tran, Minh C. and Zhu, Yingyue and Green, Alaina M. and
-             Alderete, C. Huerta and Davoudi, Zohreh and Linke, Norbert M.},
+             Huerta Alderete, C. and Davoudi, Zohreh and Linke, Norbert M.},
   journal = {PRX Quantum},
   volume  = {3},
   pages   = {020324},
@@ -367,8 +398,7 @@
   year          = {2025},
   eprint        = {2510.26951},
   archivePrefix = {arXiv},
-  primaryClass  = {quant-ph},
-  note          = {arXiv:2510.26951}
+  primaryClass  = {quant-ph}
 }
 
 % --------------------------------------------------------- Trotter error
@@ -403,7 +433,38 @@
   doi     = {10.1103/PhysRevX.11.011020}
 }
 
+@article{knee2015,
+  title   = {Optimal {T}rotterization in universal quantum simulators under faulty control},
+  author  = {Knee, George C. and Munro, William J.},
+  journal = {Phys. Rev. A},
+  volume  = {91},
+  pages   = {052327},
+  year    = {2015},
+  doi     = {10.1103/PhysRevA.91.052327}
+}
+
 % ------------------------------------------- noise, mitigation, symmetry
+@article{magesan2011,
+  title   = {Scalable and Robust Randomized Benchmarking of Quantum Processes},
+  author  = {Magesan, Easwar and Gambetta, J. M. and Emerson, Joseph},
+  journal = {Phys. Rev. Lett.},
+  volume  = {106},
+  pages   = {180504},
+  year    = {2011},
+  doi     = {10.1103/PhysRevLett.106.180504}
+}
+
+@article{mckay2017,
+  title   = {Efficient {Z} gates for quantum computing},
+  author  = {McKay, David C. and Wood, Christopher J. and Sheldon, Sarah and Chow, Jerry M. and
+             Gambetta, Jay M.},
+  journal = {Phys. Rev. A},
+  volume  = {96},
+  pages   = {022330},
+  year    = {2017},
+  doi     = {10.1103/PhysRevA.96.022330}
+}
+
 @article{cai2023,
   title   = {Quantum error mitigation},
   author  = {Cai, Zhenyu and Babbush, Ryan and Benjamin, Simon C. and Endo, Suguru and
@@ -499,7 +560,7 @@
 
 @article{bravyi2021,
   title   = {Mitigating measurement errors in multiqubit experiments},
-  author  = {Bravyi, Sergey and Sheldon, Sarah and Kandala, Abhinav and Mckay, David C. and
+  author  = {Bravyi, Sergey and Sheldon, Sarah and Kandala, Abhinav and McKay, David C. and
              Gambetta, Jay M.},
   journal = {Phys. Rev. A},
   volume  = {103},
@@ -542,16 +603,16 @@
   doi     = {10.1038/s41467-021-27045-6}
 }
 
-@misc{kanno2023,
-  title         = {Quantum-Selected Configuration Interaction: classical diagonalization of
-                   {H}amiltonians in subspaces selected by quantum computers},
-  author        = {Kanno, Keita and Kohda, Masaya and Imai, Ryosuke and Koh, Sho and Mitarai, Kosuke and
-                   Mizukami, Wataru and Nakagawa, Yuya O.},
-  year          = {2023},
-  eprint        = {2302.11320},
-  archivePrefix = {arXiv},
-  primaryClass  = {quant-ph},
-  note          = {arXiv:2302.11320}
+@article{kanno2023,
+  title   = {Quantum-selected configuration interaction: Classical diagonalization of
+             {H}amiltonians in subspaces selected by quantum computers},
+  author  = {Kanno, Keita and Kohda, Masaya and Imai, Ryosuke and Koh, Sho and Mitarai, Kosuke and
+             Mizukami, Wataru and Nakagawa, Yuya O.},
+  journal = {Phys. Rev. Res.},
+  volume  = {8},
+  pages   = {023268},
+  year    = {2026},
+  doi     = {10.1103/dmn4-snfx}
 }
 
 @article{robledo2025,
@@ -569,7 +630,7 @@
 
 @misc{yu2025,
   title         = {Quantum-Centric Algorithm for Sample-Based {K}rylov Diagonalization},
-  author        = {Yu, Jeffery and Robledo Moreno, Javier and Iosue, Joseph T. and Bertels, Luke and
+  author        = {Yu, Jeffery and Robledo-Moreno, Javier and Iosue, Joseph T. and Bertels, Luke and
                    Claudino, Daniel and Fuller, Bryce and Groszkowski, Peter and Humble, Travis S. and
                    Jurcevic, Petar and Kirby, William and Maier, Thomas A. and Motta, Mario and
                    Pokharel, Bibek and Seif, Alireza and Shehata, Amir and Sung, Kevin J. and
@@ -577,18 +638,16 @@
   year          = {2025},
   eprint        = {2501.09702},
   archivePrefix = {arXiv},
-  primaryClass  = {quant-ph},
-  note          = {arXiv:2501.09702}
+  primaryClass  = {quant-ph}
 }
 
-@misc{miura2026,
-  title         = {Active Sampling Sample-based Quantum Diagonalization from Finite-Shot Measurements},
-  author        = {Miura, Rinka},
-  year          = {2026},
-  eprint        = {2603.13536},
-  archivePrefix = {arXiv},
-  primaryClass  = {quant-ph},
-  note          = {arXiv:2603.13536}
+@inproceedings{miura2026,
+  title     = {Active Sampling Sample-Based Quantum Diagonalization from Finite-Shot Measurements},
+  author    = {Miura, Rinka},
+  booktitle = {2026 International Conference on Quantum Communications, Networking, and Computing (QCNC)},
+  pages     = {1065--1070},
+  year      = {2026},
+  doi       = {10.1109/QCNC69040.2026.00163}
 }
 
 % --------------------------------------------- statistics and software
@@ -602,9 +661,8 @@
 }
 
 @book{nielsen2010,
-  title     = {Quantum Computation and Quantum Information},
+  title     = {Quantum Computation and Quantum Information: 10th Anniversary Edition},
   author    = {Nielsen, Michael A. and Chuang, Isaac L.},
-  edition   = {10th anniversary},
   publisher = {Cambridge University Press},
   address   = {Cambridge},
   year      = {2010}
@@ -618,8 +676,7 @@
   year          = {2024},
   eprint        = {2405.08810},
   archivePrefix = {arXiv},
-  primaryClass  = {quant-ph},
-  note          = {arXiv:2405.08810}
+  primaryClass  = {quant-ph}
 }
 
 @article{harris2020,

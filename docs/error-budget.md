@@ -84,8 +84,9 @@ Ideal evolution conserves Q, so ideally every shot has Q = 0. Three diagnostics:
 **CP survives Trotterization.** Each Trotter factor (diagonal part, even bonds,
 odd bond) maps the neutral sector to itself and commutes with CP there. Even
 bonds map to even bonds under reflection at N = 4. So the noiseless circuit has
-`<L_1> = <L_3>` exactly (5e-16 at any dt). A measured CP asymmetry is hardware
-error, never Trotter error.
+`<L_1> = <L_3>` exactly at any dt (the argument is general; the check, at
+dt = 0.5, 0.25 and 0.1 at three times, gives 5e-16). A measured CP asymmetry is
+hardware error, never Trotter error.
 
 **From violation to fidelity.** Assume global depolarizing noise,
 `rho -> F rho + (1 - F) I/16`. Every diagonal expectation is then linear in F:
@@ -138,9 +139,14 @@ the answer worse.
 ## 7. The failure threshold, and why it is about two errors
 
 The exact density rises to 0.463 at t = 0.89 and falls to 0.133 at t = 1.76 as
-pairs recombine. Depolarizing noise alone, starting from the bare vacuum, can
-only push nu up toward 1/2. It cannot make nu FALL. So the recombination dip
-`D = nu(0.89) - nu(1.76)` is the part of the signal noise cannot fake.
+pairs recombine. Each channel modelled here, applied to the bare vacuum with no
+dynamics, can only push nu up toward 1/2; it cannot make nu FALL. Under these
+channels noise therefore erodes a fall rather than creating one, so the
+recombination dip `D = nu(0.89) - nu(1.76)` is the part of the signal this
+noise cannot fake. That is a heuristic, not a theorem: in the circuit the noise
+acts between coherent steps, and a COHERENT error (an over-rotated RXX, say) is
+a different unitary with its own oscillations, which could shift or mimic the
+dip. Coherent errors are not modelled.
 
 Threshold eps*: the smallest two-qubit error at which `D <= 2 sigma_D`.
 
@@ -150,12 +156,20 @@ Threshold eps*: the smallest two-qubit error at which `D <= 2 sigma_D`.
 | 0.2 | 288 | 6.9e-3 | 1.98 |
 | 0.3 | 192 | 1.06e-2 | 2.03 |
 
-**Why the product is constant.** D shrinks roughly in proportion to the
-fidelity F of the deeper circuit, and F ~ exp(-c eps n_CX). The signal is gone
-when F ~ 2 sigma_D / D_0 ~ 0.024/0.33 ~ 0.07. So the threshold is a fixed value
-of eps x n_CX: about two two-qubit errors in the deepest circuit. Ten times the
-shots moves eps* only ~20 %, because F falls exponentially and sigma only as
-1/sqrt(M).
+**Why the product is constant.** eps* x n_CX ~ 2 says the signal is lost once
+the summed infidelity of the CX gates in the deepest circuit reaches about two.
+For depolarizing noise that is about 2.5 Pauli errors on average, since a
+two-qubit depolarizing channel makes a non-identity Pauli error with probability
+(15/16) lambda = 1.25 eps. At small error D shrinks roughly in proportion to the
+fidelity of the trough circuit (at eps2 = 1e-3: D/D0 = 0.51, 0.72, 0.81 against
+F_Q = 0.54, 0.74, 0.82 for dt = 0.1, 0.2, 0.3). Near the threshold D falls
+faster than F, and F_Q at eps* is still 0.11 to 0.13. D then reaches ZERO at a
+finite eps, eps*(M = inf), only about 1.37 times the 1000-shot threshold. That
+zero crossing is why ten times the shots moves eps* only ~20 %. An earlier
+version of this paragraph said D ~ F ~ exp(-c eps n_CX) all the way down and
+that the signal dies at F ~ 0.07; a pure exponential would give +44 % for ten
+times the shots and an infinite threshold without shot noise, and neither is
+what scripts/06 prints.
 
 ## 8. Does the diagnostic predict the threshold?
 
@@ -165,10 +179,19 @@ eps_0. Read F at each time from Var(Q). Assume `F(eps) = exp(-kappa eps)`, so
 distribution, `p_ideal = (p - (1 - F)/16) / F`, then re-noise it at every other
 eps to predict D and sigma_D. Where they cross is the predicted threshold.
 
-Result: for gate noise, predicted / true = 1.10 to 1.17 at 1000 shots. Always
-an overestimate (optimistic): real local noise erodes the dip slightly faster
-than a global channel with the same charge violation. For logical dephasing the
-prediction is infinite, because Var(Q) never moves.
+Result: for depolarizing gate noise, predicted / true = 1.10 to 1.17 at 1000
+shots when Var(Q) at eps_0 comes from the full, unsampled distribution. Every
+case is an overestimate (optimistic): real local noise erodes the dip slightly
+faster than a global channel with the same charge violation. A real experiment
+has shot-sampled data at eps_0, so `scripts/06` part E repeats the prediction
+on 200 data sets of 1000 shots sampled from the eps_0 distribution: the median
+ratio is 1.09 to 1.18, the 16-84 % range has a half-width of 0.11 to 0.16, and
+8 to 20 % of runs come out pessimistic. One run is optimistic 80 to 92 % of the
+time, but its scatter is as large as the bias, so it cannot measure its own
+bias. For dephasing on the CX gates (part G) the prediction is much worse:
+predicted / true = 1.27 to 1.42. How well Var(Q) predicts the threshold depends
+on the kind of noise. For logical dephasing the prediction is infinite, because
+Var(Q) never moves.
 
 ## 9. SKQD in one paragraph, and the formula that checks it
 
@@ -189,7 +212,7 @@ energies. Checked against 20,000 simulated runs (1.020e-3 vs 1.002(40)e-3).
 
 The physics: the ground state puts only 6.5e-4 of its weight on |1100>, the
 longest flux string. Confinement suppresses exactly the bitstring SKQD is most
-likely to miss. Noise makes it slightly WORSE (20 shots per step instead of 12
+likely to miss. Noise makes it slightly WORSE (15 shots per step instead of 12
 for 1e-3 accuracy), because noisy shots land on charged bitstrings and are
 thrown away.
 
@@ -206,9 +229,12 @@ thrown away.
 6. Give the physical reason logical dephasing is invisible to Var(Q), and the
    reason CX-level dephasing is not.
 7. Why are the four biases guaranteed to add up with no cross terms?
-8. Why is the recombination dip, not the peak, the signal noise cannot fake?
+8. Why is the recombination dip, not the peak, the signal the modelled noise
+   cannot fake? What kind of error could fake it?
 9. Explain eps* x n_CX ~ 2 without a formula.
-10. The diagnostic's predicted threshold is always too high. What does that say
-    about real local noise compared with a global channel?
+10. For depolarizing noise, with Var(Q) taken from the unsampled distribution,
+    the predicted threshold is always too high. What does that say about real
+    local noise compared with a global channel, why can a single 1000-shot run
+    not measure it, and why is the prediction worse for CX dephasing?
 11. Why can SKQD never report an energy below E_0, even on a broken device?
 12. Why does gate noise make SKQD slightly worse at N = 4 instead of better?

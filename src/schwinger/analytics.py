@@ -64,12 +64,15 @@ def hellmann_feynman_residual(n_sites: int, m: float, w: float, J: float, dm: fl
     Check <psi-bar psi> two ways: as an operator expectation, and as (1/N) dE_0/dm.
 
     The Hellmann-Feynman theorem says these must agree exactly. They are
-    computed by completely different routes (one from the ground-state vector,
-    one from a finite difference of eigenvalues), so agreement is a real check
-    on both the Hamiltonian and the observable.
+    computed by different routes (one from the ground-state vector, one from a
+    finite difference of eigenvalues). What agreement proves is narrow: the
+    theorem dE0/dm = <dH/dm> holds for ANY H0 + m V, so it confirms that the
+    condensate operator is exactly (1/N) dH/dm, i.e. that the observable and
+    the mass term agree in sign and normalisation. A wrong hopping or electric
+    term would pass it. The constructions and the limits cover those terms.
 
-    Returns the absolute difference. Expect ~1e-9 with a central difference at
-    dm = 1e-5; anything at 1e-3 or larger is a bug, not truncation error.
+    Returns the absolute difference. Measured 4e-12 at m = 0.5w and 3e-11 at
+    m = 1.5w with a central difference at dm = 1e-5; anything at 1e-3 or larger is a bug, not truncation error.
     """
     from .observables import chiral_condensate
     from .schwinger import ground_state
@@ -145,10 +148,13 @@ def cp_symmetry_residual(n_sites: int, m: float, w: float, J: float) -> tuple[fl
 
 def link_symmetry_residual(state: np.ndarray, n_sites: int) -> float:
     """
-    On a neutral state, CP forces  <L_n> = <L_{N-n}>.
+    On a neutral state that CP leaves unchanged,  <L_n> = <L_{N-n}>.
 
-    Returns the worst violation. Nonzero means either the state left the
-    neutral sector or the electric-field operators are wrong.
+    Neutrality alone is not enough: |0110> is neutral, not CP-symmetric, and
+    has links (0, 0, -1). The states this project evolves are CP-symmetric
+    (they start from the bare vacuum, and H commutes with CP at Q = 0).
+    Returns the worst violation. Nonzero on such a state means it left the
+    neutral sector, lost the symmetry, or the field operators are wrong.
     """
     from .observables import electric_field_profile
 

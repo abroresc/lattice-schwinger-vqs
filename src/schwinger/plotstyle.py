@@ -68,4 +68,6 @@ def save(fig, path) -> None:
 
     p = pathlib.Path(path)
     fig.savefig(p.with_suffix(".png"))
-    fig.savefig(p.with_suffix(".pdf"))
+    # No creation date in the PDF, so rerunning a script on unchanged data gives
+    # a byte-identical file and git shows a figure as changed only when it is.
+    fig.savefig(p.with_suffix(".pdf"), metadata={"CreationDate": None})

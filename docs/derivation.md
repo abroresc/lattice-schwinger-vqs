@@ -46,9 +46,16 @@ Three pieces, and you need to know what each is for rather than how to compute
 with it.
 
 - `psi` is the matter field, a two-component spinor. Two components because in
-  1+1 dimensions the Dirac equation needs two, one for the particle and one
-  for the antiparticle. There is no spin up and spin down here; the two
-  components are a particle-antiparticle pair, not a spin doublet.
+  1+1 dimensions the gamma matrices are 2x2, so the Dirac equation needs only
+  two. There is no spin here. Careful with the next step, because it is the
+  one most often said wrong: the two components are NOT "one for the particle
+  and one for the antiparticle". Each component contains both particle and
+  antiparticle modes; particle and antiparticle come from the positive- and
+  negative-frequency solutions of the whole field. In the chiral basis the two
+  components are the right- and left-movers. The field describes a particle
+  and its antiparticle, each with a single internal state. Sites that hold
+  particles versus holes are a feature of the staggered LATTICE (section 2),
+  not of the continuum components.
 - `D_mu = partial_mu + i g A_mu` is the covariant derivative. The gauge field
   `A_mu` is there because the theory is required to be unchanged under a local
   phase rotation of `psi`. That requirement is what forces the photon to
@@ -212,9 +219,12 @@ it is exactly zero on the whole space, not just on physical states.
 The proposal's diagnostic has to change. What survives as a symmetry is total
 charge, `Q = sum_n rho_n`, which commutes with `H` exactly, so physical
 evolution never leaves its charge sector. A noisy device does not respect that.
-So `Var(Q)` is the model-independent measure of how far noise has pushed the
-state out of the physical sector, and it plays the role the proposal assigned
-to Gauss's law. There is a second one, described in section 7.
+So the charge diagnostics, `Var(Q)` and the leakage `1 - P(Q = 0)`, take over
+the role the proposal gave Gauss's law. The leakage measures directly how much
+of the state has left the neutral sector; `Var(Q)` does not quite (a state
+wholly in `Q = 2` has `Var(Q) = 0`), and turning either into a fidelity needs a
+noise model (`docs/error-budget.md` section 4). There is a second symmetry,
+described in section 7.
 
 ---
 
@@ -410,7 +420,9 @@ to explain without notes.
 
 ## 6. The checks, and what each one actually proves
 
-Every number below is produced by `scripts/03_schwinger_spectrum.py`. None of
+Every number below is produced by `scripts/03_schwinger_spectrum.py`, which
+takes the worst case over several parameter sets, except the row marked
+`scripts/09`. None of
 them is a pass or fail flag; they are residuals, so you can see how much room
 is left.
 
@@ -422,8 +434,8 @@ is left.
 | `[H, Q] = 0` | 0 | Charge bookkeeping is consistent |
 | Strong coupling `E0 = -mN/2` at `w = 0` | 0 | Mass and electric terms |
 | Free fermion limit, all 16 levels | 9e-16 | Hopping term and the JW string |
-| Hellmann-Feynman on the condensate | 3e-11 | Hamiltonian and observable agree |
-| CP symmetry inside `Q = 0` | 4e-16 | Structure of the electric term |
+| Hellmann-Feynman on the condensate (worst of m = 0.5w, 1.5w) | 3e-11 | Condensate operator matches the mass term (only that) |
+| CP symmetry inside `Q = 0` (`scripts/09`) | 0 | Structure of the electric term |
 | Qiskit `SparsePauliOp` rebuild | 0 | The implementation, independent of the derivation |
 
 Three of these deserve a sentence.
@@ -443,9 +455,16 @@ every subset sum. All 16 levels, not just the ground state.
 **Hellmann-Feynman.** The staggered mass term is exactly `m N` times the
 chiral condensate operator, so `<psi-bar psi> = (1/N) dE0/dm`. Computing the
 condensate from the ground-state vector and from a finite difference of
-eigenvalues are completely different calculations. They agree to 3e-11. That
-is the check that would catch a wrong Hamiltonian and a matching wrong
-observable, which no single check can.
+eigenvalues are different calculations, and they agree to 4e-12 at m = 0.5w and
+3e-11 at m = 1.5w, the size of
+the finite-difference error. Be precise about what that proves. The theorem
+`dE0/dm = <dH/dm>` holds for ANY Hamiltonian of the form `H0 + m V`, whatever
+`H0` is. So agreement shows that the condensate operator is exactly
+`(1/N) dH/dm`: the observable and the mass term cannot disagree in sign or
+normalisation. A wrong hopping or electric term would pass it. It is a narrow
+consistency check, not the strongest one; the three constructions and the two
+limits are what cover the other terms. (An earlier draft called it "the
+check that would catch a wrong Hamiltonian". It would not.)
 
 ---
 
@@ -458,27 +477,39 @@ Define `CP = R . X^(x)N`, where `R` reflects `n -> N+1-n` and `X^(x)N` flips
 every spin (charge conjugation, since it exchanges occupied and empty).
 Neither factor alone commutes with `H`. The product does, but **only inside
 the neutral sector**, and the reason is the same asymmetry that made the
-electric term long-ranged. `L_n` counts charge to the left only, so under
-reflection
+electric term long-ranged. Under CP the charge density maps as
 
 ```
-    L_n  ->  Q - L_{N-n}
+    rho_n  ->  -rho_{N+1-n}
 ```
 
-On states with `Q = 0` that is just `-L_{N-n}`, so `L_n^2 -> L_{N-n}^2` and
-`sum_n L_n^2` is invariant. On charged states the cross term survives and the
-symmetry is broken. Measured: the commutator is 4e-16 inside `Q = 0` and
-about 6.5 on the full space.
+Reflection moves it to the mirror site; charge conjugation flips its sign.
+(Reflection alone does not even give a density back, because at even N it
+swaps the staggering. That is why the `X^(x)N` is needed.) `L_n` counts charge
+to the left only, so summing the mapped densities gives
+
+```
+    L_n  ->  L_{N-n} - Q
+```
+
+On states with `Q = 0` that is just `L_{N-n}`, so `sum_n L_n^2` is invariant.
+On charged states the cross term `-2 Q L_{N-n}` survives and the symmetry is
+broken. Both maps are tested as operator identities
+(`test_cp_maps_densities_and_links_as_derived`). Measured at m = 0.5w, J = w:
+the commutator is 0 inside `Q = 0` and 5 on the full space.
 
 Two payoffs.
 
-- **A free correctness check.** On any neutral state, `<L_n> = <L_{N-n}>`. At
-  N = 4 the two outer links must always carry equal flux. Any simulation of
-  the neutral sector that violates this is wrong, and it costs nothing to
-  measure.
-- **A second noise diagnostic.** CP joins total charge as a symmetry a noisy
-  device will break, which matters for M11 and M12 now that Gauss's law is
-  unavailable for that job.
+- **A free correctness check.** On a neutral state that CP leaves unchanged,
+  `<L_n> = <L_{N-n}>`. Neutrality alone is not enough: `|0110>` is neutral
+  and has links `(0, 0, -1)`. But the bare vacuum IS CP-symmetric, `H` keeps
+  it so, and the ground state is too. So at N = 4 the two outer links of
+  every state this project evolves must carry equal flux. A simulation that
+  violates this is wrong, and it costs nothing to measure.
+- **A second noise diagnostic.** CP joins total charge as a symmetry that most
+  device noise breaks, which matters for M11 and M12 now that Gauss's law is
+  unavailable for that job. Not all noise breaks it: dephasing on the logical
+  state respects both symmetries (`docs/error-budget.md`).
 
 This is a small result, but it is the project's own, it was found by checking
 rather than reading.
@@ -513,8 +544,9 @@ sentence that implies you are following their construction.
 Section 3 above. The proposal calls this "the piece of the design I most want
 scrutinised", so it is worth catching now rather than in November. The
 replacement is total charge variance, plus the CP check from section 7. Both
-are exact, both are cheap, and both break under noise in the same way Gauss's
-law would have.
+are exact and both are cheap. Most noise breaks both, as it would have broken
+Gauss's law, but logical-frame dephasing breaks neither; that blind spot is a
+result in its own right (`docs/error-budget.md`).
 
 This is a strengthening rather than a loss: `Var(Q)` and the CP asymmetry are
 two independent diagnostics instead of one.
@@ -553,10 +585,15 @@ land.
 Answer to 8, since it is the one most often got wrong and the proposal has it
 framed loosely: nothing is injected and no external agent pulls charges apart.
 The simulation starts in the bare vacuum, which is not an eigenstate of the
-full Hamiltonian once `w` is nonzero. Total energy is conserved exactly. What
-changes is how it is distributed between electric field and rest mass. The
-size of the effect tracks the gap between the bare vacuum energy and the true
-ground state energy, which
+full Hamiltonian once `w` is nonzero. Total energy is conserved exactly. On
+the bare vacuum the mass term (`-mN/2`) and the electric term (0) are both at
+their minimum, so making pairs raises BOTH. The hopping term, zero on the bare
+vacuum, goes negative and pays for them. At m = 0.5w, t = 0.89: mass -0.07
+(up 0.93), electric +0.97, hopping -1.90, total -1.00 throughout
+(`scripts/09_verification_table.py`). Do not say the energy "moves between the
+field and the rest mass": both start at their floor, so neither can feed the
+other. The size of the effect tracks the gap between the bare vacuum energy
+and the true ground state energy, which
 `scripts/04_pair_production_preview.py` tabulates.
 
 ---
@@ -602,4 +639,10 @@ this document. Two errors in the AI-drafted material were caught by those
 checks and are documented in place rather than quietly fixed: the Qiskit
 endianness adapter in section 5 of `CONVENTIONS.md`, and the Bogoliubov
 conditioning issue in section 4.1. The corrections in section 8 were found the
-same way.
+same way. A later review (October 2026) caught four more statements in the
+AI-drafted prose that the numbers contradicted, each now corrected where it
+stood: the spinor components described as particle and antiparticle
+(section 1), Hellmann-Feynman described as the check that catches a wrong
+Hamiltonian (section 6), the link equality claimed for every neutral state
+(section 7), and the pair energy described as moving between field and mass
+(answer to question 8).

@@ -302,11 +302,46 @@ def test_cp_operator_properties(n):
     assert np.allclose(r @ r, np.eye(2 ** n))
 
 
+@pytest.mark.parametrize("n", [4, 6])
+def test_cp_maps_densities_and_links_as_derived(n):
+    """
+    The two operator identities behind the symmetry argument, checked as
+    matrices: CP rho_n CP = -rho_{N+1-n}, and CP L_n CP = L_{N-n} - Q. The
+    second is why CP holds only at Q = 0. Reflection alone gives neither.
+    """
+    from schwinger.schwinger import charge_density_op, cp_operator, site_reversal_op
+    cp, r, q = cp_operator(n), site_reversal_op(n), total_charge_op(n)
+    for j in range(n):
+        rho, mirror = charge_density_op(j, n), charge_density_op(n - 1 - j, n)
+        assert np.max(np.abs(cp @ rho @ cp + mirror)) < TOL
+        assert np.max(np.abs(r @ rho @ r - mirror)) > 0.5        # reflection alone fails
+    for j in range(n - 1):                                         # link n = j + 1
+        mapped = cp @ electric_field_op(j, n) @ cp
+        assert np.max(np.abs(mapped - (electric_field_op(n - 2 - j, n) - q))) < TOL
+
+
+def test_link_equality_needs_cp_symmetry_not_just_neutrality():
+    """
+    The counterexample to "CP forces <L_n> = <L_{N-n}> on any neutral state",
+    a claim an earlier draft made. |0110> is neutral but not CP-symmetric (CP
+    maps it to |1001>), and its links are (0, 0, -1): the outer links differ.
+    """
+    from schwinger.paulis import basis_index
+    from schwinger.schwinger import cp_operator
+    n = 4
+    s = np.zeros(16, dtype=complex)
+    s[basis_index("0110")] = 1.0
+    assert total_charge(s, n) == pytest.approx(0.0, abs=TOL)
+    assert np.allclose(electric_field_profile(s, n), [0.0, 0.0, -1.0], atol=TOL)
+    assert abs((cp_operator(n) @ s)[basis_index("1001")]) == pytest.approx(1.0, abs=TOL)
+
+
 def test_outer_links_carry_equal_flux_on_neutral_states():
     """
-    CP forces <L_n> = <L_{N-n}> on any neutral state. At N = 4 the two outer
-    links must always agree, at every time. This is a free correctness check
-    on any simulation that is supposed to stay neutral.
+    On a neutral state that CP leaves unchanged, <L_n> = <L_{N-n}>. The bare
+    vacuum is such a state and H commutes with CP in the neutral sector, so
+    every state on the trajectory is too, and so is the ground state. At N = 4
+    the two outer links must agree at every time. A free correctness check.
     """
     from schwinger.analytics import link_symmetry_residual
     n = 4

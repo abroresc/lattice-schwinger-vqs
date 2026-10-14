@@ -162,8 +162,10 @@ because the headline results — the crossover point and the failure threshold
 measure (the constraint is substituted, not imposed — it holds identically).
 The actual noise diagnostics are total charge variance (`[H,Q] = 0` exactly
 in the clean theory) and a CP symmetry that only commutes with H inside the
-neutral sector. Both are exact on paper and both break under real noise,
-which is what makes them useful probes.
+neutral sector. Both are exact on paper and most real noise breaks them,
+which is what makes them useful probes. Not all noise does: dephasing on the
+logical state between Trotter steps breaks neither (the blind spot in
+`docs/error-budget.md`).
 
 - `derivation.md` section 7 ("a symmetry that was not in the plan") and
   section 8.2 (why the Gauss's-law diagnostic doesn't exist in this

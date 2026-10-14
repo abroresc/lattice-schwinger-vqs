@@ -10,7 +10,8 @@ symmetries survive. The derivation follows Kogut and Susskind~\cite{kogut1975}
 and Banks, Susskind and Kogut~\cite{banks1976} for the lattice formulation,
 Hamer \emph{et al.}~\cite{hamer1997} for the elimination of the gauge field, and
 Martinez \emph{et al.}~\cite{martinez2016} for the final spin Hamiltonian, whose
-printed form the result here was checked against term by term.
+printed form the result here was checked against term by term. Natural units,
+$\hbar = c = 1$, are used throughout.
 
 \subsection{The continuum theory}
 
@@ -22,26 +23,25 @@ dimension~\cite{schwinger1962},
               - \tfrac14 F_{\mu\nu}F^{\mu\nu},
   \qquad D_\mu = \partial_\mu + i g A_\mu .
 \end{equation}
-Here $\psi$ is a two-component Dirac field of mass $m$, $A_\mu$ is the gauge
-field, $g$ is the charge and $F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu
-A_\mu$. In one spatial dimension the two components of $\psi$ describe a
-particle and its antiparticle; there is no spin. A magnetic field needs two
-spatial directions to circulate in, so here there is none, and the
-electromagnetic field reduces to a single electric component $E = F_{01}$ with
-no propagating photon.
+Here $\psi$ is a Dirac field of mass $m$, $A_\mu$ is the gauge field, $g$ is the
+charge and $F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu A_\mu$. In one spatial
+dimension the Dirac field needs only two components and there is no spin: it
+describes a particle and its antiparticle, each with a single internal state. A
+magnetic field needs two spatial directions to circulate in, so here there is
+none, and the electromagnetic field reduces to a single electric component
+$E = F_{01}$, with no independent propagating photon.
 
 The consequence is confinement. Gauss's law, $\partial_x E = g\,\bar\psi
-\gamma^0\psi$, says that the field between two opposite charges cannot spread
-out, so it is constant and the potential energy grows linearly with separation,
-$V(r) = \tfrac12 g^2 r$~\cite{coleman1975}. Separating the charges costs energy
-without limit. Once the stored energy exceeds the rest energy of a new pair, the
-vacuum produces one, the new charges screen the old ones, and the flux string
-breaks. When the theory is quenched, meaning started in a state that is not its
-ground state, pairs are produced and annihilated in real time. This is the
-Schwinger mechanism Martinez \emph{et al.}\ observed~\cite{martinez2016}, and it
-is the signal whose survival under noise this thesis measures.
+\gamma^0\psi$, fixes the field between two opposite charges: it cannot spread
+out, so it is constant, and the potential energy grows linearly with
+separation, $V(r) = \tfrac12 g^2 r$~\cite{coleman1975}. When the theory is
+quenched, meaning started in a state that is not its ground state, pairs are
+produced and annihilated in real time. Martinez \emph{et al.}\ call this the
+Schwinger mechanism and observed it on four qubits~\cite{martinez2016}; it is
+the signal whose survival under noise this thesis measures.
 
 \subsection{Staggered fermions}
+\label{sec:staggered}
 
 Putting the theory on a lattice of spacing $a$ introduces a defect. The naive
 symmetric difference for the derivative in the Dirac equation has momentum-space
@@ -55,7 +55,10 @@ alternating sites, so a single-component field $\hat c_n$ on $N$ sites
 describes both particle and antiparticle~\cite{kogut1975}. Even sites carry
 particles. Odd sites carry antiparticles as \emph{holes}, so in the vacuum every
 odd site is occupied and every even site is empty: the lattice version of the
-filled Dirac sea. The charge density measures departures from that reference,
+filled Dirac sea. Which excitation is called the particle is a convention;
+Martinez \emph{et al.}\ call the even-site excitation a positron~\cite{martinez2016},
+and nothing here depends on the choice. The charge density measures departures
+from the vacuum,
 \begin{equation}
   \label{eq:charge}
   \hat\rho_n = \hat c^\dagger_n \hat c_n - \frac{1 - (-1)^n}{2},
@@ -72,7 +75,7 @@ E_n$. On the lattice Gauss's law reads $\hat E_n - \hat E_{n-1} = \hat\rho_n$.
 In three dimensions this is a constraint: the field can circulate, so the
 equation restricts the allowed states without determining $\hat E$. In one
 dimension there is nowhere to circulate. With open boundaries and no background
-field, $\hat E_0 = 0$, and the equation can be solved,
+field, the field to the left of site~1 vanishes, and the equation can be solved,
 \begin{equation}
   \label{eq:gauss}
   \hat E_n = \Lop{n} = \sum_{k \le n} \hat\rho_k .
@@ -116,11 +119,15 @@ with a string of Pauli $\Zop{}$ operators on every site to the left,
 with $\sigp{} = |0\rangle\langle 1|$, so that $|0\rangle$, the $\Zop{}=+1$
 state, is an occupied site. On nearest neighbours the strings almost cancel and
 leave one $\Zop{}$, which gives $\hat c^\dagger_n \hat c_{n+1} =
--\sigp{n}\sigm{n+1}$. The minus sign is real. It is removed by the relabelling
-$\hat c_n \to (-1)^n \hat c_n$, which leaves the spectrum unchanged, and the code
-checks this numerically before any coefficient is trusted. With the charge
-density now $\hat\rho_n = \tfrac12[\Zop{n} + (-1)^n]$, the Hamiltonian becomes a
-pure spin chain,
+-\sigp{n}\sigm{n+1}$. The minus sign is real but removable: the relabelling
+$\hat c_n \to (-1)^n \hat c_n$ removes it without changing the spectrum, and
+the code checks this numerically before any coefficient is trusted. In this
+notation the filled Dirac sea of Section~\ref{sec:staggered}, odd sites occupied and even sites
+empty, is $|0101\rangle$ with site~1 leftmost. It is called the bare vacuum: the
+ground state of the mass and electric terms, but not of the full Hamiltonian
+once $w \ne 0$. With the charge density now
+$\hat\rho_n = \tfrac12[\Zop{n} + (-1)^n]$, the Hamiltonian becomes a pure spin
+chain,
 \begin{equation}
   \label{eq:H}
   \Hop = \frac{m}{2}\sum_{n=1}^{N}(-1)^n \Zop{n}
@@ -142,19 +149,20 @@ from each. For a neutral pair the overlapping fields cancel, and what remains is
 an energy $J$ for every link strictly between the two charges: the linear
 potential of the continuum theory, now in lattice form. The hopping term becomes
 $\tfrac12 w(\Xop{n}\Xop{n+1} + \Yop{n}\Yop{n+1})$. At $N = 4$ the result is the
-fourteen Pauli strings of Table~\ref{tab:pauli}. Two entries are worth
-explaining without notes. Site 4 has no $\Zop{}\Zop{}$ coupling, because with
-four sites there are three links and $\Lop{3}$ involves only sites 1 to 3. And
+fourteen Pauli strings of Table~\ref{tab:pauli}. Two entries deserve a word of
+explanation. Site~4 has no $\Zop{}\Zop{}$ coupling, because with four sites
+there are three links and $\Lop{3}$ involves only sites 1 to 3. And
 \texttt{ZZII} carries twice the coefficient of \texttt{ZIZI} and \texttt{IZZI},
-because two links (2 and 3) lie at or to the right of site 2, but only one
-(link 3) at or to the right of site 3.
+because two links (2 and 3) lie at or to the right of site~2, but only one
+(link~3) at or to the right of site~3.
 
 \begin{table}[t]
   \centering
   \caption{The $N=4$ Hamiltonian, Eq.~\eqref{eq:H}, as Pauli strings. The
   leftmost character acts on site~1. Printed by
-  \texttt{scripts/03\_schwinger\_spectrum.py}; two independent constructions of
-  the same matrix agree to $\num{9e-16}$ (Section~\ref{sec:verification}).}
+  \texttt{scripts/03\_schwinger\_spectrum.py}; the three constructions of the
+  matrix described in Section~\ref{sec:verification} agree to \num{9e-16} or better
+  (Section~\ref{sec:verification}).}
   \label{tab:pauli}
   \small
   \begin{tabular}{llll}
@@ -171,24 +179,25 @@ because two links (2 and 3) lie at or to the right of site 2, but only one
 \end{table}
 
 \subsection{Parameters}
+\label{sec:parameters}
 
-All results use $N = 4$, $J = w$ and $m = 0.5\,w$, the parameters of the
-headline data of Martinez \emph{et al.}~\cite{martinez2016}, and time is
-measured in units of $1/w$. In lattice units $J/w = (ag)^2$, so $J = w$ means
-$ag = 1$ and $m/g = 0.25$: a coarse lattice, far from the continuum limit. No
-claim is made here about continuum physics. The four-site model is used as a
-fully checkable quantum system with the structure of a gauge theory, not as an
-approximation to the continuum Schwinger model.
+All results use $N = 4$, $J = w$ and $m = 0.5\,w$, the parameters of the main
+data set of Martinez \emph{et al.}~\cite{martinez2016}, and time is measured in
+units of $1/w$. In lattice units $J/w = (ag)^2$, so $J = w$ means $ag = 1$ and
+$m/g = 0.25$: a coarse lattice, far from the continuum limit. No claim is made
+here about continuum physics. The four-site model is used as a fully checkable
+quantum system with the structure of a gauge theory, not as an approximation to
+the continuum Schwinger model.
 
 \subsection{Symmetries and what survives as a diagnostic}
 \label{sec:symmetries}
 
-Because Gauss's law was solved and substituted rather than imposed, it holds on
-every state of the four qubits, physical or not. The operator identity
-$\Lop{n} - \Lop{n-1} - \hat\rho_n = 0$ is satisfied exactly on the whole
-sixteen-dimensional space, so there is no Gauss's-law violation to measure. This
-corrects the original project proposal, which planned to use one. Two exact
-symmetries survive, and both are broken by noise.
+As noted in Section~\ref{sec:intro-diagnostic}, Gauss's law holds identically
+in this encoding: the operator identity $\Lop{n} - \Lop{n-1} - \hat\rho_n = 0$
+is satisfied on the whole sixteen-dimensional space, so there is no
+Gauss's-law violation to measure. Two exact symmetries survive. The gate noise
+modelled in this thesis breaks both, but not every channel does:
+Section~\ref{sec:diagnostics} describes a dephasing channel that respects both.
 
 \emph{Total charge.} $\hat Q = \sum_n \hat\rho_n$ commutes with $\Hop$, so the
 evolution never leaves the charge sector it starts in. The bare vacuum has
@@ -200,19 +209,36 @@ list~\cite{martinez2016}.
 and let $\hat X^{\otimes N}$ flip every qubit, which exchanges occupied and empty
 sites and so acts as charge conjugation. Neither commutes with $\Hop$, but the
 product $\mathrm{CP} = R\,\hat X^{\otimes N}$ does, and only inside the neutral
-sector. The reason is the same asymmetry that made the electric term long-ranged:
-$\Lop{n}$ counts charge to the left only, so under reflection $\Lop{n} \to \hat Q
-- \Lop{N-n}$. When $Q = 0$ this is $-\Lop{N-n}$, the sum $\sum_n \Lop{n}^2$ is
-unchanged, and the symmetry holds; when $Q \ne 0$ a cross term survives and it
-does not. On any neutral state CP forces
+sector. Under CP the charge density maps as $\hat\rho_n \to -\hat\rho_{N+1-n}$:
+reflection moves it to the mirror site and charge conjugation flips its sign.
+Neither factor does this alone, because each also shifts the density by the
+staggered offset $(-1)^n$, and only in the product do the two shifts cancel.
+Summing over the sites to the left of link $n$ gives
+\begin{equation}
+  \label{eq:cpL}
+  \Lop{n} \to \Lop{N-n} - \hat Q .
+\end{equation}
+The restriction to $Q = 0$ comes from the same asymmetry that made the electric
+term long-ranged: $\Lop{n}$ counts charge from the left end only. When $Q = 0$
+the map is $\Lop{n} \to \Lop{N-n}$, the sum $\sum_n \Lop{n}^2$ is unchanged,
+and the symmetry holds; when $Q \ne 0$ the cross term $-2\hat Q\Lop{N-n}$
+survives and it does not. The mass and hopping terms are invariant in every
+sector. On a neutral state that CP leaves unchanged up to a phase,
+Eq.~\eqref{eq:cpL} gives
 \begin{equation}
   \label{eq:cp}
-  \langle \Lop{n} \rangle = \langle \Lop{N-n} \rangle,
+  \langle \Lop{n} \rangle = \langle \Lop{N-n} \rangle .
 \end{equation}
-so at $N = 4$ the two outer links always carry equal flux. Each factor of the
-Trotter step used later maps the neutral sector to itself and commutes with CP
-there, so the noiseless circuit preserves Eq.~\eqref{eq:cp} exactly, at any step
-size. A measured violation is therefore hardware error and never Trotter error.
+Neutrality alone is not enough: $|0110\rangle$ is neutral, but its links carry
+$(0, 0, -1)$. The bare vacuum, however, is CP-symmetric, since
+$\hat X^{\otimes 4}$ takes $|0101\rangle$ to $|1010\rangle$ and $R$ takes that
+back to $|0101\rangle$. Because $\Hop$ commutes with CP in the neutral sector,
+every state evolved from the bare vacuum is CP-symmetric too, and so is the
+ground state. At $N = 4$ the two outer links of these states therefore carry
+equal flux. Each factor of the Trotter step used later maps the neutral sector
+to itself and commutes with CP there, so the noiseless circuit keeps the state
+CP-symmetric and preserves Eq.~\eqref{eq:cp} exactly, at any step size. A
+measured violation is therefore hardware error and never Trotter error.
 
 \subsection{Observables}
 
@@ -235,9 +261,10 @@ and the condensate are the same operator up to a constant, and the staggered
 mass term is $mN\bar\psi\psi$, so the Hellmann--Feynman theorem gives
 $\langle\bar\psi\psi\rangle = N^{-1}\,dE_0/dm$ for the ground state.
 
-The simulation starts in the bare vacuum, $|0101\rangle$ in the site order used
-here, where every odd site is occupied and every even site empty. It is the
-ground state of the mass and electric terms but not of the full Hamiltonian once
-$w \ne 0$. Nothing is injected during the evolution and the energy is conserved
-exactly; pairs appear because the initial state is not an eigenstate, and the
-energy moves between the electric field and the rest mass of the pairs.
+The simulation starts in the bare vacuum. The total energy is conserved
+exactly and nothing is injected. On the
+bare vacuum the mass term sits at its minimum, $-mN/2$, and the electric term at
+its minimum, zero, so forming pairs raises both. The hopping term, which is zero
+on the bare vacuum, falls by the same amount. At the first maximum of the
+density, $t = 0.89$, the mass and electric terms have gained 0.93 and 0.97 and
+the hopping term has lost 1.90.

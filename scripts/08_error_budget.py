@@ -21,7 +21,8 @@ import numpy as np
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
 
-from schwinger.budget import budget, point_circuit
+from schwinger.budget import budget, first_crossing, point_circuit
+from schwinger.diagnostics import shot_noise_sigma
 from schwinger.noise import gate_noise_model
 from schwinger.plotstyle import MARKERS, MUTED, PALETTE, save, use_report_style
 
@@ -43,13 +44,14 @@ def main():
     print("=" * 72)
     print(f"A. CROSSOVER at t = {T}: Trotter bias vs shot noise, no hardware error")
     print("=" * 72)
+    # Exact shot noise of the exact distribution, Eq. (sigma), and the crossing
+    # interpolated in log dt (dts runs from large to small step).
+    tb = np.array([abs(budget(circuits[int(s)], N, None, 0.0, 1000).trotter_bias) for s in STEPS])
     for shots in (256, 1000, 4096):
-        tb = np.array([abs(budget(circuits[int(s)], N, None, 0.0, shots).trotter_bias) for s in STEPS])
-        sig = budget(circuits[int(STEPS[-1])], N, None, 0.0, shots).sigma
-        below = np.where(tb < sig)[0]
-        print(f"  M = {shots:>5}: sigma = {sig:.4f}; Trotter bias below it for dt <= "
-              f"{dts[below[0]]:.3f} ({circuits[int(STEPS[below[0]])].two_qubit_gates} CX)"
-              if below.size else f"  M = {shots}: no crossover on grid")
+        sig = shot_noise_sigma(circuits[int(STEPS[0])].exact, N, shots)
+        cross = first_crossing(dts, tb - sig)
+        print(f"  M = {shots:>5}: exact sigma = {sig:.4f}; Trotter bias falls below it at "
+              f"dt = {cross:.3f} (interpolated)")
 
     print()
     print("=" * 72)

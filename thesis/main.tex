@@ -7,6 +7,7 @@
 % ============================================================================
 \documentclass[11pt,letterpaper]{article}
 \input{preamble}
+\newcommand{\fullthesis}{}  % lets the shared Introduction outline Results and Discussion
 
 \title{\bf A quantified error budget for quantum simulation of the lattice
 Schwinger model}
@@ -45,14 +46,22 @@ The physics derivations, experimental design and analysis are mine, and every
 claim an AI tool made about the literature was verified against the source
 before it entered this repository.
 
-Two errors in AI-drafted material were caught by the verification design and
-are documented in place rather than quietly corrected: the Qiskit endianness
-adapter and the Bogoliubov conditioning issue. That is the verification
-structure working as intended, and it is the reason the structure exists.
-\todo{Add the third: the claim that gate-level dephasing is invisible to the
-charge diagnostic, caught by simulation on 2026-10-12 (Section~3.6).}
+Errors in AI-drafted material were caught by the verification design and are
+documented in place rather than quietly corrected. The first two were in the
+code: the Qiskit endianness adapter and the Bogoliubov conditioning issue. The
+third was a physics claim, that dephasing on the compiled gates is invisible to
+the charge diagnostic; simulation showed this holds only for dephasing on the
+logical state (Section~\ref{sec:diagnostics}). A review of the draft text then
+caught statements that the numbers contradicted: two test tolerances quoted as
+measured residuals, a symmetry argument for Eq.~\eqref{eq:cp} that claimed more
+than it proved, a description of the two spinor components that was wrong, the
+Hellmann--Feynman check presented as stronger than it is, and an account of
+where the energy of the produced pairs comes from that had it backwards. That is
+the verification structure working as intended, and it is the reason the
+structure exists.
 
-\bibliographystyle{unsrtnat}
+\clearpage
+\bibliographystyle{apsrev4-2}
 \bibliography{refs}
 
 \end{document}

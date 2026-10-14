@@ -8,12 +8,19 @@
 \usepackage{microtype}
 \usepackage{amsmath,amssymb,bm}
 \usepackage{graphicx}
+\usepackage{flafter}   % a float never appears before the text that introduces it
 \usepackage{booktabs}
 \usepackage{siunitx}
 \usepackage{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{positioning, arrows.meta, calc}
 \usepackage[numbers,sort&compress]{natbib}
+% The bibliography style is apsrev4-2. It reads its switches (article titles on)
+% from a control entry in refs.bib that must be cited before anything else. That
+% entry produces no reference, so natbib is told the key exists.
+\makeatletter
+\AtBeginDocument{\@namedef{b@apsrev42Control}{}\nocite{apsrev42Control}}
+\makeatother
 \usepackage{caption}
 \captionsetup{font=small,labelfont=bf}
 \usepackage[colorlinks=true,allcolors=blue!60!black]{hyperref}

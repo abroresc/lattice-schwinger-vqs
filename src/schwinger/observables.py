@@ -55,8 +55,11 @@ def chiral_condensate_op(n_sites: int) -> np.ndarray:
         <psi-bar psi>  =  (1/N) dE_0/dm
 
     `analytics.hellmann_feynman_residual` checks the operator expectation
-    against a numerical derivative of the ground energy. Two completely
-    different computations agreeing is worth more than either alone.
+    against a numerical derivative of the ground energy. Know what that proves
+    and what it does not: the theorem holds for ANY Hamiltonian H0 + m V, so
+    agreement shows that this operator is exactly (1/N) dH/dm, i.e. that the
+    observable and the mass term of H match in sign and normalisation. It says
+    nothing about the hopping or electric terms; other checks cover those.
     """
     dim = 2 ** n_sites
     out = np.zeros((dim, dim), dtype=complex)

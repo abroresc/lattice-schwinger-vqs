@@ -34,7 +34,7 @@ including how to push this to GitHub.
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python -m pytest tests/ -q                    # 473 tests, all against known answers
+python -m pytest tests/ -q                    # 476 tests, all against known answers
 python scripts/03_schwinger_spectrum.py       # the Gate 2 artifact and its residuals
 python scripts/05_qiskit_trotter.py           # circuits, Trotter scaling, shot noise
 ```
@@ -64,7 +64,11 @@ qubits; `scripts/03_schwinger_spectrum.py` prints the table.
 ## Verification
 
 Built three independent ways and checked against six analytic results.
-Residuals, not pass/fail flags:
+Residuals, not pass/fail flags, and measured rather than the tests'
+tolerances. `scripts/09_verification_table.py` prints every row of the
+thesis verification table at the thesis parameters (m = 0.5w, J = w); the
+first block below is `scripts/03`, which takes the worst case over three
+parameter sets.
 
 | Check | Residual |
 |---|---|
@@ -74,12 +78,12 @@ Residuals, not pass/fail flags:
 | `[H, Q] = 0` | 0 |
 | Strong coupling `E0 = -mN/2` at `w = 0` | 0 |
 | Free fermion limit, all 16 levels | 9e-16 |
-| Hellmann-Feynman on the chiral condensate | 3e-11 |
-| CP symmetry inside the neutral sector | 4e-16 |
-| Open TFIM: full 2^N spectrum vs closed-form free fermions | 1e-14 |
-| Periodic TFIM with parity sectors | 1e-13 |
+| Hellmann-Feynman on the chiral condensate (checks the observable against the mass term only) | 3e-11 |
+| CP symmetry inside the neutral sector (`scripts/09`) | 0 |
+| Open TFIM: full 2^N spectrum vs closed-form free fermions, N = 2, 4, 6, 8 | 3e-14 |
+| Periodic TFIM with parity sectors, N = 6 (`scripts/02`) | 2e-14 |
 | Qiskit `SparsePauliOp` independent rebuild | 0 |
-| Circuit statevector vs exact evolution, 4000 Trotter steps | 1e-5 |
+| Circuit statevector vs exact evolution, t = 2, 4000 second-order steps | 7e-8 |
 | Trotter exponent, first order (predicted 1) | measured 1.036 |
 | Trotter exponent, second order (predicted 2) | measured 2.003 |
 
@@ -101,7 +105,7 @@ src/schwinger/
   plotstyle.py       shared figure style
 scripts/             runnable, each regenerates one figure and prints residuals
 notebooks/           the guided walkthrough, output committed
-tests/               473 tests, every one against an independently known answer
+tests/               476 tests, every one against an independently known answer
 docs/derivation.md   the full derivation, from the continuum Lagrangian
 docs/error-budget.md noise, diagnostics, error budget and SKQD, explained
 thesis/              LaTeX skeleton for the final write-up, compiles today
@@ -143,17 +147,26 @@ hit them too.
   constraint is substituted, not imposed, so it holds identically on every
   state. The diagnostic has to be total charge variance instead. This changes
   a piece of the proposal; see `docs/derivation.md` section 8.2.
-- **A CP symmetry that holds only in the neutral sector**, which forces
-  `<L_n> = <L_{N-n}>` and gives a second free diagnostic. See section 7.
+- **A CP symmetry that holds only in the neutral sector**. On the
+  CP-symmetric states this project evolves (everything that starts from the
+  bare vacuum) it forces `<L_n> = <L_{N-n}>`, which gives a second free
+  diagnostic. Neutrality alone is not enough: `|0110>` is a counterexample.
+  See section 7.
 
 ## First numbers toward the thesis
 
 At N = 4, `m/w = 0.5`, `w = J = 1`, evolved to `t = 3` with second-order Trotter:
 
-| shots | shot-noise sigma on particle density | Trotter error falls below it at |
+| shots | exact shot-noise sigma on particle density | Trotter bias falls below it at |
 |---|---|---|
-| 256 | 0.0176 | `dt` about 0.19 |
-| 4096 | 0.0047 | `dt` about 0.094 |
+| 256 | 0.0190 | `dt` = 0.254 (between 11 and 12 steps) |
+| 1000 | 0.0096 | `dt` = 0.182 (between 16 and 17 steps) |
+| 4096 | 0.0047 | `dt` = 0.128 (between 23 and 24 steps) |
+
+Sigma is computed exactly from the outcome distribution and the crossing is
+interpolated in log `dt` (`scripts/05`). An earlier version of this table took
+sigma from one sampled run and read the crossing off a factor-of-two grid,
+which gave 0.19 and 0.094.
 
 Below those step sizes, shrinking `dt` buys nothing the statistics can see, and
 costs circuit depth: 320 two-qubit gates at `dt = 0.3` against 6400 at
@@ -162,8 +175,10 @@ the thesis is actually about.
 
 ## The write-up
 
-`thesis/` holds a LaTeX skeleton that already compiles, with sections 2 and 3
-substantially drafted and everything else marked in red. Figures are included
+`thesis/` holds the thesis in LaTeX. The Introduction, Theory and Materials
+and Methods are drafted (`thesis/intro_methods.pdf` builds them alone), the
+Results have a first draft, and the Discussion, Conclusion and Abstract are
+marked in red. Figures are included
 from `../figures/*.pdf`, so regenerating a figure updates the thesis on the next
 compile with no manual step.
 

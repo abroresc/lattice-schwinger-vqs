@@ -2,22 +2,23 @@
 \section{Results}
 \label{sec:results}
 % ============================================================================
-% FIRST DRAFT, written 2026-10-13 from scripts 04 to 08. Every number below is
-% printed by the script named next to it; rerun the script before trusting a
-% number here.
+% FIRST DRAFT. Every number below is printed by the script named next to it,
+% and VERIFICATION.txt (scripts/verify_all.sh) records one full run of all of
+% them; rerun before trusting a number here.
 
 \subsection{Pair production from the bare vacuum}
 
 Figure~\ref{fig:pairs} shows the particle density after a quench from the bare
-vacuum, computed exactly. Energy is conserved to \num{4e-15} throughout and the
-total charge never leaves zero. Nothing is injected: the bare vacuum is not an
-eigenstate of the full Hamiltonian, and the energy it already holds moves between
-the electric field and the rest mass of the pairs. Table~\ref{tab:quench} makes
-this quantitative. The larger the gap between the energy of the bare vacuum and
-the true ground-state energy, the more pairs appear, and the relation is
+vacuum, computed exactly. Energy is conserved to \num{5e-15} for all four
+masses, and the total charge never leaves zero. Nothing is injected: the bare
+vacuum is not an eigenstate of the full Hamiltonian, and as pairs form the mass
+and electric energies rise while the hopping energy falls by the same amount
+(Section~\ref{sec:theory}). Table~\ref{tab:quench} makes the link to the initial
+state quantitative. The larger the gap between the energy of the bare vacuum
+and the true ground-state energy, the more pairs appear, and the relation is
 monotone across the four masses studied. The two outer links carry identical
 flux at every time, $|\langle\Lop{1}\rangle - \langle\Lop{3}\rangle| <
-\num{1e-15}$, as the CP symmetry of Eq.~\eqref{eq:cp} requires.
+\num{1e-15}$, as Eq.~\eqref{eq:cp} requires for this CP-symmetric initial state.
 
 \begin{figure}[t]
   \centering
@@ -53,22 +54,24 @@ flux at every time, $|\langle\Lop{1}\rangle - \langle\Lop{3}\rangle| <
 The Trotter error scales with the predicted exponents (Figure~\ref{fig:trotter},
 left), so its size at any step can be trusted. Figure~\ref{fig:trotter} (right)
 compares the Trotter bias in the particle density at $t = 3$ with the shot-noise
-uncertainty. The standard error is \num{0.0176} at 256 shots and \num{0.0047} at
-4096, and the Trotter bias falls below these floors at $\delta t \approx 0.19$
-and $\delta t \approx 0.094$ respectively. At the first recombination minimum,
-$t = 1.76$, the crossover sits at $\delta t = 0.44$, $0.35$ and $0.22$ for 256,
-1000 and 4096 shots (\texttt{scripts/08}). Below the crossover a smaller step
-buys accuracy the statistics cannot resolve, while the circuit keeps growing:
-the two-qubit gate count at $t = 3$ rises from 320 at $\delta t = 0.3$ to 6400
-at $\delta t = 0.015$.
+uncertainty. The standard error computed from the full distribution is \num{0.0190} at
+256 shots,
+\num{0.0096} at 1000 and \num{0.0047} at 4096, and the Trotter bias falls below
+these floors at $\delta t_\times = 0.254$, $0.182$ and $0.128$, between 11 and
+12, 16 and 17, and 23 and 24 steps respectively. At the first recombination
+minimum, $t = 1.76$, the crossover sits at $\delta t_\times = 0.47$, $0.36$ and
+$0.25$ for the same shot counts (\texttt{scripts/08}). Below the crossover a
+smaller step buys accuracy the statistics cannot resolve, while the circuit
+keeps growing: the two-qubit gate count at $t = 3$ rises from 320 at
+$\delta t = 0.3$ to 6400 at $\delta t = 0.015$.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\textwidth]{05_qiskit_trotter.pdf}
   \caption{Left: Trotter error against step size, with the scaling exponent
   fitted rather than assumed. Centre: particle density measured from finite
-  shots. Right: the crossover between Trotter bias and shot noise at $t = 3$.
-  Produced by \texttt{scripts/05\_qiskit\_trotter.py}.}
+  shots. Right: the crossover between Trotter bias and the shot-noise
+  uncertainty computed from the full distribution, at $t = 3$. Produced by \texttt{scripts/05\_qiskit\_trotter.py}.}
   \label{fig:trotter}
 \end{figure}
 
@@ -104,14 +107,20 @@ threshold for three step sizes.
 
 The threshold is set by circuit depth. At 1000 shots the product
 $\epsilon^\ast n_{\mathrm{CX}}$ lies between 1.92 and 2.03 for all three step
-sizes: the signal is lost once the deepest circuit has accumulated about two
-two-qubit errors on average. This follows from the dip itself. Under depolarising
-noise $D$ shrinks roughly in proportion to the fidelity $F$ of the trough
-circuit, so the signal disappears when $F$ falls to $2\sigma_D/D_0 \approx 0.07$,
-and with $F \approx e^{-c\,\epsilon_2 n_{\mathrm{CX}}}$ that fixes the product
-$\epsilon_2 n_{\mathrm{CX}}$. More shots buy little. Going from $10^3$ to $10^4$
-shots raises the threshold by only about 20\,\%, because $F$ falls exponentially
-with gate count while the noise floor falls only as $M^{-1/2}$.
+sizes: the signal is lost once the summed infidelity of the CX gates in the
+deepest circuit reaches about two, which for depolarising noise means about 2.5
+Pauli errors on average. At small error the dip shrinks roughly in proportion to the
+fidelity of the trough circuit: at $\epsilon_2 = 10^{-3}$ it keeps 0.51, 0.72
+and 0.81 of its size for the three step sizes, against trough fidelities $F_Q$
+of 0.54, 0.74 and 0.82. Near the threshold it falls faster than that, and
+$F_Q$ at $\epsilon^\ast$ is still 0.11 to 0.13. The dip reaches zero at a
+finite gate error, only about 1.37 times the 1000-shot threshold (the column without
+shot noise in Table~\ref{tab:threshold}), and that zero crossing, not the
+$M^{-1/2}$ fall of the noise floor, limits what more shots can buy: going from
+$10^3$ to $10^4$ shots raises the threshold by only about 20\,\%. The assumed
+single-qubit error matters little: setting $\epsilon_1 = 0$ or
+$\epsilon_1 = 0.3\,\epsilon_2$ instead of $\epsilon_2/10$ moves the threshold by
+$+8\,\%$ and $-13\,\%$ at every step size.
 \todo{Compare with the two-qubit fidelity of 99.6\,\% quoted by Rosanowski
 \emph{et al.}\ and with the gate counts of Martinez \emph{et al.}\ and Farrell
 \emph{et al.}}
@@ -132,30 +141,47 @@ with gate count while the noise floor falls only as $M^{-1/2}$.
 
 \subsection{Does charge conservation predict the threshold?}
 
-For gate noise it does, to within about 15\,\%, and it errs in one direction.
-Using only the charge variance measured at one noise level
-$\epsilon_0 \approx \epsilon^\ast/10$, the procedure of
-Section~\ref{sec:budget-method} predicts thresholds 1.15, 1.14 and 1.17 times
-the true value for $\delta t = 0.1$, $0.2$ and $0.3$ at 1000 shots, and 1.10 to
-1.13 times it from $\epsilon_0 \approx \epsilon^\ast/3$. The prediction is always
-optimistic: real gate noise erodes the dip somewhat faster than a global
-depolarising channel with the same charge violation would.
-Figure~\ref{fig:threshold}(c) shows why. The points for depolarising and for
-gate-level dephasing noise lie close to the diagonal but slightly below it. At
-$10^4$ shots the threshold sits at lower fidelity, where this small offset
-matters more, and the overestimate grows to between 19 and 36\,\%.
+For depolarising gate noise it does, to between 10 and 17\,\% at 1000 shots,
+and always on the optimistic side. With $\mathrm{Var}(Q)$ at
+$\epsilon_0 \approx \epsilon^\ast/10$ computed from the full, unsampled
+distribution, the procedure of Section~\ref{sec:budget-method} predicts
+thresholds 1.15, 1.14 and 1.17 times the true value for $\delta t = 0.1$, $0.2$
+and $0.3$, and 1.10 to 1.13 times it from $\epsilon_0 \approx \epsilon^\ast/3$.
+Real gate noise erodes the dip somewhat faster than a global depolarising
+channel with the same charge violation would, and Figure~\ref{fig:threshold}(c)
+shows it: the depolarising points lie close to the diagonal but slightly below
+it. At $10^4$ shots the threshold sits at lower fidelity, where this small offset
+matters more, and the overestimate grows to between 19 and 36\,\%. For
+dephasing on the CX gates the prediction is worse. Those points lie well below
+the diagonal, and the same procedure overestimates the threshold by 27 to
+42\,\% at 1000 shots. How well the charge diagnostic predicts the threshold
+depends on the kind of gate noise, not only on how much of it there is.
+
+With 1000-shot data at $\epsilon_0$, the shot noise on $\mathrm{Var}(Q)$ itself
+matters about as much as the bias. For depolarising noise, over 200 sampled
+data sets, the median predicted ratio is between 1.09 and 1.18 for the six
+combinations of step size and $\epsilon_0$, and the central 68\,\% of
+predictions has a half-width of 0.11 to 0.16, comparable to the bias. A single
+run is optimistic 80 to 92\,\% of the time, but its scatter is as large as its
+bias, so one run cannot measure its own bias.
 
 For dephasing on the logical state the diagnostic fails completely.
-$\mathrm{Var}(Q)$ stays at \num{1e-33} while the dip shrinks to zero at a
-phase-flip probability of 0.036 per qubit per step, and the points in
+$\mathrm{Var}(Q)$ stays below \num{1e-33} while the dip shrinks to zero at a
+phase-flip probability of 0.036 per qubit per step of $\delta t = 0.1$ (18 steps
+to $t_{\mathrm{t}}$), and the points in
 Figure~\ref{fig:threshold}(c) form a vertical line at $F_Q = 1$. The CP
 asymmetry is equally blind, because a uniform dephasing channel respects CP. A
 charge-based diagnostic therefore bounds the damage from errors that move charge
 and says nothing about errors that only scramble phases. This matters for the
-literature: the error model Martinez \emph{et al.}\ fitted to their four-qubit
-data was exactly this kind of dephasing~\cite{martinez2016}.
-\todo{Discuss against Nguyen et al.\ symmetry protection, which targets coherent
-errors, and Halimeh and Hauke on the slow growth of gauge violation.}
+literature. The error model Martinez \emph{et al.}\ fitted to their four-qubit
+data was exactly this kind of dephasing, chosen because their postselection
+onto the neutral states had already partly removed the errors that move
+charge~\cite{martinez2016}. Their fitted probability per step, 0.038, is not
+directly comparable with 0.036 here, because their time steps were
+different.
+\todo{Discuss against Nguyen et al., whose symmetry protection targeted coherent
+errors and had negligible effect, and Halimeh and Hauke on the slow growth of
+gauge violation.}
 
 \subsection{The full budget and the optimal step size}
 
@@ -165,10 +191,11 @@ error the total error falls as $\delta t$ shrinks until it reaches the floor set
 by shot noise and readout bias. With gate error it has a minimum. The optimal
 step is $\delta t = 0.35$ (160 CX) at $\epsilon_2 = 3\times 10^{-4}$,
 $0.44$ (128 CX) at $10^{-3}$, and $0.59$ (96 CX) at $3\times10^{-3}$: the worse
-the hardware, the coarser the best Trotter step. At the optimum gate error
+the hardware, the coarser the best Trotter step, as the bound of Shaw
+\emph{et al.}\ anticipates~\cite{shaw2020}. At the optimum gate error
 dominates, and the Trotter bias is between a quarter and two-fifths of it.
-Refining the step past the optimum makes the answer worse, as the proposal
-anticipated, and the figure shows by how much.
+Refining the step past the optimum makes the answer worse, and the figure shows
+by how much.
 
 The decomposition depends on the observable (Figure~\ref{fig:budget}(b)). At
 $\epsilon_2 = 10^{-3}$ and the optimal step, gate error is 89\,\% of the summed
@@ -201,27 +228,32 @@ suppresses exactly the bitstrings SKQD is most likely to miss.
 Figure~\ref{fig:skqd} shows the exact expected SKQD energy error against the
 number of shots per Krylov step. With four full Trotter steps of
 $\delta t = 0.3$, the relative energy error falls below $10^{-3}$ at 12 shots
-per step and below $10^{-6}$ at about 100. With a single hopping-only step, as
-in Rosanowski \emph{et al.}, 50 shots are needed for $10^{-3}$. Gate error at
-$\epsilon_2 = 3\times10^{-3}$ makes SKQD slightly worse, not better: 20 shots per
-step instead of 12. Noise spreads probability over all sixteen bitstrings, but
-the ten charged ones are discarded, so at a fixed shot count fewer samples land
-in the neutral sector. At $N = 4$ the only error left in SKQD is coverage, and a
-few hundred shots remove it.
+per step, and by 500 shots it is zero to machine precision. The chiral
+condensate converges with it: its expected error is \num{-8.3e-3} at 5 shots per
+step and \num{-2.2e-5} at 50. A single hopping-only step of the kind Rosanowski
+\emph{et al.}\ use needs 38 shots for $10^{-3}$ at $w\,\delta t = 0.77$ and 278 at
+$w\,\delta t = 0.385$, the rotation their step makes. Gate error at
+$\epsilon_2 = 3\times10^{-3}$ makes SKQD slightly worse, not better: 15 shots
+per step instead of 12. Noise spreads
+probability over all sixteen bitstrings, but the ten charged ones are
+discarded, so at a fixed shot count fewer samples land in the neutral sector. At
+$N = 4$ the only error left in SKQD is coverage, and a few hundred shots remove
+it.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\textwidth]{07_skqd.pdf}
   \caption{(a) Exact expected SKQD energy error against shots per Krylov step,
   for four full second-order steps without and with gate error, and for one
-  hopping-only step; crosses are a Monte Carlo check. The dashed line is a
-  relative error of $10^{-3}$. (b) Probability that at least one bitstring of the
-  ground state is never sampled. The single-step configuration uses a quarter of
-  the total shots at the same horizontal position. Produced by
-  \texttt{scripts/07\_skqd\_ground\_state.py}.}
+  hopping-only step at $w\,\delta t = 0.77$ and $0.385$; crosses are a Monte
+  Carlo check. The dashed line is a relative error of $10^{-3}$. (b) Probability
+  that at least one bitstring of the ground state is never sampled. The
+  single-step configurations use a quarter of the total shots at the same
+  horizontal position. Produced by \texttt{scripts/07\_skqd\_ground\_state.py}.}
   \label{fig:skqd}
 \end{figure}
 
+\clearpage  % flush the Results figures before the Discussion begins
 % ============================================================================
 \section{Discussion}
 \label{sec:discussion}
@@ -230,8 +262,11 @@ few hundred shots remove it.
 \todo{Due with the Results and Discussion draft. Three paragraphs planned:
 (1) the depth rule $\epsilon^\ast n_{\mathrm{CX}} \approx 2$ against published
 gate counts (Martinez: more than 200 gates; Farrell: 13,858 two-qubit gates) and
-fidelities; (2) what the optimistic bias and the dephasing blind spot mean for
-symmetry-based diagnostics in the literature (Martinez leakage, Nguyen symmetry
-protection, Halimeh and Hauke); (3) limitations: depolarising and dephasing
-models only, no coherent or correlated error, no amplitude damping, one
-parameter point, $N = 4$, and a coarse lattice far from the continuum.}
+fidelities; (2) what the optimistic bias, its shot-noise scatter, the worse
+prediction under CX dephasing and the logical-dephasing blind spot mean for
+symmetry-based diagnostics in the literature
+(Martinez leakage, Nguyen postselection and symmetry protection, Halimeh and
+Hauke); (3) limitations: depolarising and dephasing models only, no coherent or
+correlated error, no amplitude damping, readout left out of the threshold, all
+qubits coupled directly, one parameter point, $N = 4$, and a coarse lattice far
+from the continuum.}

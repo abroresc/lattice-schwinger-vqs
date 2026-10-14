@@ -244,9 +244,12 @@ def bare_vacuum(n_sites: int) -> np.ndarray:
     bit-string form with |0> = occupied that is |0101...>.
 
     This is the state the real-time simulation starts from. It is NOT the true
-    ground state of H at finite w, which is the entire reason pairs appear:
-    the energy is already there, stored in the mismatch, and time evolution
-    redistributes it between field and mass. Nothing is injected.
+    ground state of H at finite w, which is the entire reason pairs appear.
+    Nothing is injected and the total energy stays at -mN/2. On this state the
+    mass term sits at its minimum (-mN/2) and the electric term at its minimum
+    (0), so making pairs RAISES both. The hopping term, zero here, goes negative
+    and pays for both (scripts/09 prints the split: at t = 0.89, the first
+    maximum of the density, mass -0.07, electric +0.97, hopping -1.90).
     """
     bits = "".join("0" if j % 2 == 0 else "1" for j in range(n_sites))
     state = np.zeros(2 ** n_sites, dtype=complex)
@@ -373,24 +376,33 @@ def cp_operator(n_sites: int) -> np.ndarray:
     reason is worth understanding because it is the same reason the electric
     term is long-range.
 
-    L_n counts the charge to the LEFT of link n only, so it is not a
-    reflection-covariant object. Under reflection,
+    Under CP the charge density maps as
 
-        L_n  ->  Q - L_{N-n}
+        rho_n  ->  -rho_{N+1-n}
 
-    where Q is the total charge. On states with Q = 0 that is just -L_{N-n},
-    so L_n^2 -> L_{N-n}^2 and the electric energy sum_{n=1}^{N-1} L_n^2 is
-    invariant. On states with Q != 0 the Q cross-term survives and the
-    symmetry is broken. Charge conjugation is what fixes the staggering, which
-    reflection flips when N is even.
+    Reflection moves it to the mirror site and charge conjugation flips its
+    sign. (Reflection alone does not even map rho_n to a density, because at
+    even N it swaps the staggering; X^(x)N swaps it back.) L_n counts the
+    charge to the LEFT of link n only, so summing the mapped densities gives
+
+        L_n  ->  L_{N-n} - Q
+
+    where Q is the total charge. On states with Q = 0 that is just L_{N-n},
+    so the electric energy sum_{n=1}^{N-1} L_n^2 is invariant. On states with
+    Q != 0 the cross term -2 Q L_{N-n} survives and the symmetry is broken.
+    The mass and hopping terms are invariant in every sector. Both maps are
+    checked as operator identities in tests/test_schwinger.py.
 
     Consequences, both useful:
-      - On any neutral state, <L_n> = <L_{N-n}>. At N = 4 that means the two
-        outer links always carry equal flux, which is visible in
-        figures/04_pair_production.png and is a free correctness check on any
-        simulation of the neutral sector.
-      - CP joins total charge as a symmetry that a noisy device will break, so
-        it is a second diagnostic observable for M11 and M12.
+      - On a neutral state that CP leaves unchanged, <L_n> = <L_{N-n}>. The
+        bare vacuum is one, so is every state evolved from it by H (H and CP
+        commute in that sector), and so is the ground state. At N = 4 the two
+        outer links of these states carry equal flux, visible in
+        figures/04_pair_production.png. A neutral state WITHOUT the symmetry
+        need not: |0110> has links (0, 0, -1).
+      - CP joins total charge as a symmetry that most hardware noise breaks,
+        so <L_1> - <L_3> is a second diagnostic for M11 and M12. Not all noise
+        breaks it: logical-frame dephasing respects both (see noise.py).
     """
     from .paulis import pauli_string
 

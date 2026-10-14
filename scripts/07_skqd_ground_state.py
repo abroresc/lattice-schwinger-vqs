@@ -7,7 +7,8 @@ M6 / M7: the ground state by Sample-based Krylov Quantum Diagonalization.
   B. Which bitstrings matter: ground-state weight of each neutral bitstring.
   C. The SKQD energy and condensate bias against shots per Krylov step,
      computed EXACTLY (no sampling) for noiseless and noisy circuits, for the
-     project's full Trotter step and for Rosanowski et al.'s kinetic step.
+     project's full Trotter step and for a hopping-only step of the kind
+     Rosanowski et al. use (see the note above CONFIGS on what that means).
 
 Run:  python scripts/07_skqd_ground_state.py
 """
@@ -33,10 +34,17 @@ import matplotlib.pyplot as plt
 FIG = pathlib.Path(__file__).resolve().parents[1] / "figures"
 N, M, W, J = 4, 0.5, 1.0, 1.0
 SHOTS = np.array([2, 3, 5, 8, 12, 20, 30, 50, 80, 120, 200, 300, 500])
+# The two kinetic rows are a hopping-only step OF THE KIND Rosanowski et al.
+# use, not a reproduction of their run. Their step is exp[i (dt/4) sum(XX+YY)]
+# per bond (their Eq. 15); ours is RXX(w dt) RYY(w dt) = exp[-i (w dt/2)(XX+YY)],
+# twice the angle. So w dt = 0.77 here is the NUMBER they chose, and
+# w dt = 0.385 is the ROTATION they chose. Their run also started from |0011>
+# at m_lat/g = 10 with a background field, none of which is copied here.
 CONFIGS = [  # label, dt, Krylov steps, evolution, eps2
     ("full step, dt=0.3, K=4", 0.3, 4, "full", 0.0),
     ("full step, dt=0.3, K=4, eps2=3e-3", 0.3, 4, "full", 3e-3),
-    ("kinetic step, dt=0.77, K=1", 0.77, 1, "kinetic", 0.0),
+    ("hopping-only step, w dt=0.77, K=1", 0.77, 1, "kinetic", 0.0),
+    ("hopping-only step, w dt=0.385, K=1", 0.385, 1, "kinetic", 0.0),
 ]
 
 
@@ -50,10 +58,12 @@ def main():
     print("=" * 70)
     e_full, v_full = subspace_ground_state(basis, ham)
     print(f"  full neutral sector vs exact diagonalisation, energy    : {abs(e_full - e0):.1e}")
-    print(f"  full neutral sector vs exact, 1 - |overlap|              : {1 - abs(np.vdot(gs, v_full)):.1e}")
+    print(f"  full neutral sector vs exact, 1 - |overlap|              : {abs(1 - abs(np.vdot(gs, v_full))):.1e}")
+    # Proper subspaces only: the full sector is the first line, and including it
+    # here would report its rounding error (-9e-16) as the "smallest margin".
     margins = [subspace_ground_state(s, ham)[0] - e0
-               for r in range(1, len(basis) + 1) for s in itertools.combinations(basis, r)]
-    print(f"  smallest E(S) - E0 over all 63 subspaces (must be >= 0)  : {min(margins):.1e}")
+               for r in range(1, len(basis)) for s in itertools.combinations(basis, r)]
+    print(f"  smallest E(S) - E0 over the 62 proper subspaces (> 0)    : {min(margins):.1e}")
     dists = [noisy_probabilities(c) for c in krylov_circuits(N, M, W, J, 0.3, 4)]
     ex = expected_skqd_energy(dists, 15, N, M, W, J)
     rng = np.random.default_rng(20261012)
@@ -91,8 +101,12 @@ def main():
                                  - chiral_condensate(gs, N))
             cond.append(c)
         curves[label] = (np.array(bias), np.array(pfull), np.array(cond))
-        ok = np.array(bias) / abs(e0) < 1e-3
-        need = SHOTS[np.argmax(ok)] if np.any(ok) else None
+        # The smallest INTEGER shot count with relative bias below 1e-3, found by
+        # searching every count rather than reading the next point of the
+        # plotting grid (which overstated it: 20 instead of 15, for example).
+        # The expected bias falls monotonically with shots, so the first hit is it.
+        need = next((s for s in range(1, 2001)
+                     if expected_skqd_energy(dd, s, N, M, W, J).mean_bias / abs(e0) < 1e-3), None)
         print(f"  {label:<36}: bias at 5/50/500 shots = "
               f"{bias[2]:.2e} / {bias[7]:.2e} / {bias[12]:.2e};  shots for 1e-3 relative: {need}")
         print(f"  {'':<36}  condensate bias at 5/50 shots = {cond[2]:+.2e} / {cond[7]:+.2e}")
