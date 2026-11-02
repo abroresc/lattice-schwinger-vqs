@@ -10,15 +10,31 @@
 
 Figure~\ref{fig:pairs} shows the particle density after a quench from the bare
 vacuum, computed exactly. Energy is conserved to \num{5e-15} for all four
-masses, and the total charge never leaves zero. Nothing is injected: the bare
-vacuum is not an eigenstate of the full Hamiltonian, and as pairs form the mass
-and electric energies rise while the hopping energy falls by the same amount
-(Section~\ref{sec:theory}). Table~\ref{tab:quench} makes the link to the initial
-state quantitative. The larger the gap between the energy of the bare vacuum
-and the true ground-state energy, the more pairs appear, and the relation is
-monotone across the four masses studied. The two outer links carry identical
+masses, and the total charge never leaves zero. Pairs appear because the bare
+vacuum is not an eigenstate of the full Hamiltonian
+(Section~\ref{sec:observables}), and Table~\ref{tab:quench} makes that
+quantitative: the larger the gap between the energy of the bare vacuum and the
+true ground-state energy, the more pairs appear, monotonically across the four
+masses studied. The two outer links carry identical
 flux at every time, $|\langle\Lop{1}\rangle - \langle\Lop{3}\rangle| <
 \num{1e-15}$, as Eq.~\eqref{eq:cp} requires for this CP-symmetric initial state.
+
+Four sites are enough for this signal. Solved exactly on chains of up to 12
+sites, in the neutral sector, the same Hamiltonian shows the same rise and dip
+(Figure~\ref{fig:sizes}); at $N = 12$ the dip is 9\,\% deeper, the extrema 4
+to 6\,\% earlier and the ground-state condensate 4\,\% smaller. Only after the
+first oscillation, which the signal here does not use, does the short chain
+depart. The lattice spacing is fixed, so this says nothing about the continuum.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{12_larger_lattices.pdf}
+  \caption{(a) Particle density after the quench for $N = 4$ to 12, solved
+  exactly; dashed lines mark $t_{\mathrm{p}}$ and $t_{\mathrm{t}}$. (b) The
+  recombination dip and the ground-state condensate against $N$. Produced by
+  \texttt{scripts/12\_larger\_lattices.py}.}
+  \label{fig:sizes}
+\end{figure}
 
 \begin{figure}[t]
   \centering
@@ -71,7 +87,8 @@ $\delta t = 0.3$ to 6400 at $\delta t = 0.015$.
   \caption{Left: Trotter error against step size, with the scaling exponent
   fitted rather than assumed. Centre: particle density measured from finite
   shots. Right: the crossover between Trotter bias and the shot-noise
-  uncertainty computed from the full distribution, at $t = 3$. Produced by \texttt{scripts/05\_qiskit\_trotter.py}.}
+  uncertainty at 256, 1000 and 4096 shots, at $t = 3$. Produced by
+  \texttt{scripts/05\_qiskit\_trotter.py}.}
   \label{fig:trotter}
 \end{figure}
 
@@ -138,12 +155,12 @@ $+8\,\%$ and $-13\,\%$ at every step size.
 
 \subsection{Does charge conservation predict the threshold?}
 
-For depolarising gate noise it does, to between 10 and 17\,\% at 1000 shots,
-and always on the optimistic side. With $\mathrm{Var}(Q)$ at
-$\epsilon_0 \approx \epsilon^\ast/10$ computed from the full, unsampled
-distribution, the procedure of Section~\ref{sec:budget-method} predicts
-thresholds 1.15, 1.14 and 1.17 times the true value for $\delta t = 0.1$, $0.2$
-and $0.3$, and 1.10 to 1.13 times it from $\epsilon_0 \approx \epsilon^\ast/3$.
+For depolarising gate noise it does, to between 10 and 17\,\% at 1000 shots.
+With $\mathrm{Var}(Q)$ at $\epsilon_0 \approx \epsilon^\ast/10$ computed from
+the full, unsampled distribution, the procedure of
+Section~\ref{sec:budget-method} predicts thresholds 1.15, 1.14 and 1.17 times
+the true value for $\delta t = 0.1$, $0.2$ and $0.3$, and 1.10 to 1.13 times it
+from $\epsilon_0 \approx \epsilon^\ast/3$: every prediction is optimistic.
 Real gate noise erodes the dip somewhat faster than a global depolarising
 channel with the same charge violation would, and Figure~\ref{fig:threshold}(c)
 shows it: the depolarising points lie close to the diagonal but slightly below
@@ -229,8 +246,8 @@ $\epsilon_2 = 3\times10^{-3}$ makes SKQD slightly worse, not better: 15 shots
 per step instead of 12. Noise spreads
 probability over all sixteen bitstrings, but the ten charged ones are
 discarded, so at a fixed shot count fewer samples land in the neutral sector. At
-$N = 4$ the only error left in SKQD is coverage, and a few hundred shots remove
-it.
+$N = 4$ the only error left in SKQD is a needed bitstring that is never
+sampled, and a few hundred shots remove it.
 
 \begin{figure}[t]
   \centering

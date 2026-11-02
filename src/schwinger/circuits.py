@@ -123,8 +123,10 @@ def trotter_step(n_sites: int, m: float, w: float, J: float, dt: float,
     """
     One Trotter step of exp(-i H dt).
 
-    order = 1:  e^{-i H_Z dt} e^{-i H_even dt} e^{-i H_odd dt}
-                error per step O(dt^2), so total error over fixed time O(dt).
+    order = 1:  e^{-i H_odd dt} e^{-i H_even dt} e^{-i H_Z dt}
+                as an operator: the diagonal layer is applied FIRST in time, so
+                it is the rightmost factor (checked in tests/test_circuits.py).
+                Error per step O(dt^2), so total error over fixed time O(dt).
 
     order = 2:  symmetric (Strang) splitting, half steps on the outside.
                 error per step O(dt^3), total error O(dt^2).

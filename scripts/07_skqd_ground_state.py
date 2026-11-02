@@ -114,11 +114,18 @@ def main():
     use_report_style()
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10.0, 3.7))
     fig.subplots_adjust(wspace=0.3)
+    # Legend text in the thesis notation. The plain CONFIGS labels stay as they
+    # are because they are printed above and recorded in VERIFICATION.txt.
+    pretty = [r"full step, $\delta t = 0.3$, $K = 4$",
+              r"full step, $\delta t = 0.3$, $K = 4$, $\epsilon_2 = 3\times10^{-3}$",
+              r"hopping only, $w\,\delta t = 0.77$, $K = 1$",
+              r"hopping only, $w\,\delta t = 0.385$, $K = 1$"]
     for i, (label, *_rest) in enumerate(CONFIGS):
         bias, pfull, cond = curves[label]
-        ax1.loglog(SHOTS, np.maximum(bias, 1e-16), color=PALETTE[i], marker=MARKERS[i], label=label)
+        ax1.loglog(SHOTS, np.maximum(bias, 1e-16), color=PALETTE[i], marker=MARKERS[i],
+                   label=pretty[i])
         ax2.semilogx(SHOTS, np.maximum(1 - pfull, 1e-16), color=PALETTE[i], marker=MARKERS[i],
-                     label=label)
+                     label=pretty[i])
     rng = np.random.default_rng(7)
     mc = [np.mean([run_skqd(dists, int(s), rng, N, M, W, J)[-1].energy for _ in range(4000)]) - e0
           for s in SHOTS[:8]]
@@ -129,10 +136,10 @@ def main():
     ax1.set_xlabel("shots per Krylov step")
     ax1.set_ylabel(r"expected $E_{\rm SKQD} - E_0$")
     ax1.set_title("(a) SKQD energy bias, computed exactly")
-    ax1.legend(loc="upper right", fontsize=7.5)
+    ax1.legend(loc="lower left", fontsize=7.5)  # the lower left is empty; upper right hid the curves
     ax2.set_xlabel("shots per Krylov step")
     ax2.set_ylabel("P(a ground-state bitstring is missed)")
-    ax2.set_title("(b) Coverage of the six neutral bitstrings")
+    ax2.set_title("(b) Chance of missing a needed bitstring")
     ax2.set_yscale("log")
     ax2.set_ylim(1e-6, 1.2)
     out = FIG / "07_skqd.png"

@@ -13,15 +13,19 @@ cd "$(dirname "$0")/.."
 PY=python
 [ -x .venv/bin/python ] && PY=.venv/bin/python
 OUT=VERIFICATION.txt
+# Read the commit BEFORE the redirect below truncates VERIFICATION.txt: that
+# file is tracked, so asking afterwards always reports "-dirty".
+COMMIT=$(git describe --always --dirty 2>/dev/null || echo none)
 {
   echo "VERIFICATION LOG"
   # "-dirty" means the run used uncommitted changes on top of that commit.
-  echo "schwinger-n4  |  generated $(date -u '+%Y-%m-%d %H:%M UTC')  |  commit $(git describe --always --dirty 2>/dev/null || echo none)"
+  echo "schwinger-n4  |  generated $(date -u '+%Y-%m-%d %H:%M UTC')  |  commit $COMMIT"
   $PY -c "import sys, numpy, scipy, qiskit, qiskit_aer, matplotlib; print(f'python {sys.version.split()[0]}  numpy {numpy.__version__}  scipy {scipy.__version__}  qiskit {qiskit.__version__}  qiskit-aer {qiskit_aer.__version__}  matplotlib {matplotlib.__version__}')"
   echo
   echo "############ TEST SUITE ############"
   $PY -m pytest tests/ -q 2>&1 | tail -3
-  for s in scripts/0*.py; do
+  # 10_talk_figures.py only redraws slides, so it is not part of the record.
+  for s in scripts/0*.py scripts/1[1-9]_*.py; do
     echo
     echo "############ $s ############"
     $PY "$s" 2>&1 | sed "s|$(pwd)/||g"

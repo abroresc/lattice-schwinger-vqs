@@ -19,8 +19,9 @@ the vacuum.
 This repository covers milestones M2 to M12 of the semester plan in
 simulation: the verified Hamiltonian (Gate 2), Trotterised circuits, SKQD
 ground-state preparation, gate and readout error models, the symmetry
-diagnostics, and the four-way error budget. What remains is writing, and the
-discussion against the literature.
+diagnostics, and the four-way error budget. The thesis now has a full first
+draft, including the discussion against the literature; what remains is
+revision.
 
 The design principle throughout: **every stage has a known answer attached**,
 so a wrong result is caught in minutes rather than weeks. Nothing is trusted
@@ -34,7 +35,7 @@ including how to push this to GitHub.
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python -m pytest tests/ -q                    # 476 tests, all against known answers
+python -m pytest tests/ -q                    # 496 tests, all against known answers
 python scripts/03_schwinger_spectrum.py       # the Gate 2 artifact and its residuals
 python scripts/05_qiskit_trotter.py           # circuits, Trotter scaling, shot noise
 ```
@@ -105,7 +106,7 @@ src/schwinger/
   plotstyle.py       shared figure style
 scripts/             runnable, each regenerates one figure and prints residuals
 notebooks/           the guided walkthrough, output committed
-tests/               476 tests, every one against an independently known answer
+tests/               496 tests, every one against an independently known answer
 docs/derivation.md   the full derivation, from the continuum Lagrangian
 docs/error-budget.md noise, diagnostics, error budget and SKQD, explained
 thesis/              LaTeX skeleton for the final write-up, compiles today
@@ -176,9 +177,9 @@ the thesis is actually about.
 ## The write-up
 
 `thesis/` holds the thesis in LaTeX. The Introduction, Theory and Materials
-and Methods are drafted (`thesis/intro_methods.pdf` builds them alone), the
-Results have a first draft, and the Discussion, Conclusion and Abstract are
-marked in red. Figures are included
+and Methods are drafted (`thesis/intro_methods.pdf` builds them alone), and the
+Results, Discussion, Conclusion and Abstract have a first draft
+(`thesis/main.pdf` is the whole thesis). Figures are included
 from `../figures/*.pdf`, so regenerating a figure updates the thesis on the next
 compile with no manual step.
 

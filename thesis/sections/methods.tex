@@ -99,6 +99,23 @@ so it confirms only that the observable matches the mass term in sign,
 staggering and normalisation; the hopping and electric terms rest on the other
 checks.
 
+\emph{Replication.} At the parameters of Martinez \emph{et al.}, the code
+reproduces the three theory curves of their Fig.~2(a), the exact evolution,
+first-order steps of $w\,\delta t = \pi/8$ and those steps with their fitted
+dephasing, to 0.001, within the 0.002 to which the figure can be read by pixel
+analysis (Figure~\ref{fig:replication})~\cite{martinez2016}. A step 10\,\%
+longer or shorter misses by 0.05, fixing their unstated step at $\pi/8$.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.62\textwidth]{11_martinez_replication.pdf}
+  \caption{Fig.~2(a) of Martinez \emph{et al.}~\cite{martinez2016},
+  recomputed: lines are this code, open symbols and dots their curves read off
+  the published figure, filled circles their measured data. Produced by
+  \texttt{scripts/11\_martinez\_replication.py}.}
+  \label{fig:replication}
+\end{figure}
+
 \subsection{Trotterised time evolution}
 
 In the product formula of Section~\ref{sec:intro}, one step under
@@ -112,7 +129,8 @@ so the outer bonds are even). Adjacent bonds share a site and do not commute,
 hence the split; terms within a group commute, so each group exponentiates
 exactly.
 The first-order step is
-$U_1(\delta t) = e^{-i\Hop_Z\delta t}e^{-i\Hop_{\mathrm{e}}\delta t}e^{-i\Hop_{\mathrm{o}}\delta t}$;
+$U_1(\delta t) = e^{-i\Hop_{\mathrm{o}}\delta t}e^{-i\Hop_{\mathrm{e}}\delta t}e^{-i\Hop_Z\delta t}$,
+the diagonal terms acting first;
 the second-order step used throughout is the symmetric product
 \begin{equation}
   \label{eq:strang}

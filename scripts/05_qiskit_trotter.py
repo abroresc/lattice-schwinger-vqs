@@ -149,15 +149,18 @@ def main() -> None:
         print(f"  {shots:>5} shots: exact sigma = {sigma:.5f};  Trotter bias falls below it at "
               f"dt = {cross:.3f} (interpolated between steps {T / dts_c[k - 1]:.0f} and "
               f"{T / dts_c[k]:.0f})")
-        if shots in (256, 4096):
-            i = 0 if shots == 256 else 1
-            ax3.axhline(sigma, color=PALETTE[i], linewidth=1.4, linestyle=(0, (4, 3)))
-            ax3.text(dts_c.min() * 1.15, sigma * 1.25, f"shot noise, {shots} shots",
-                     fontsize=7.5, color=PALETTE[i])
+        # All three shot counts are drawn: the 1000-shot crossover is the one
+        # the thesis quotes in the abstract and conclusion.
+        colour = PALETTE[{256: 0, 1000: 3, 4096: 1}[shots]]
+        ax3.axhline(sigma, color=colour, linewidth=1.4, linestyle=(0, (4, 3)))
+        ax3.text(dts_c.min() * 1.15, sigma * 1.2, f"{shots}-shot noise",
+                 fontsize=7.5, color=colour)
 
     ax3.set_xlim(dts_c.min() * 0.55, dts_c.max() * 2.2)
     marks = [int(np.where(steps_c == s)[0][0]) for s in (2, 16, 256)]
-    for k, off in zip(marks, ((10, 4), (8, -12), (6, 5))):
+    # Offsets keep each label off the curve and off the shot-noise lines: the
+    # 512 CX label goes right of the curve, where the plot is empty.
+    for k, off in zip(marks, ((10, 4), (14, -7), (8, -9))):
         ax3.annotate(f"{twoq[k]} CX", (dts_c[k], max(systematic[k], 1e-12)),
                      textcoords="offset points", xytext=off, fontsize=7,
                      color="#6b6b6b")

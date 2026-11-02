@@ -1,11 +1,11 @@
 VERIFICATION LOG
-schwinger-n4  |  generated 2026-10-14 08:46 UTC  |  commit 3a5cbd3-dirty
+schwinger-n4  |  generated 2026-11-02 21:53 UTC  |  commit 7ae12d4-dirty
 python 3.11.7  numpy 2.4.6  scipy 1.17.1  qiskit 2.5.2  qiskit-aer 0.17.2  matplotlib 3.11.1
 
 ############ TEST SUITE ############
-........................................................................ [ 90%]
-............................................                             [100%]
-476 passed in 12.31s
+........................................................................ [ 87%]
+................................................................         [100%]
+496 passed in 14.78s
 
 ############ scripts/01_tfim_phase_transition.py ############
 wrote figures/01_tfim.png
@@ -312,3 +312,48 @@ ENERGY AFTER THE QUENCH FROM THE BARE VACUUM
   t = 0.89: <H_mass>, <H_hop>, <H_el>, <H>                                       -0.074, -1.896, +0.970, -1.000
   t = 1.76: <H_mass>, <H_hop>, <H_el>, <H>                                       -0.733, -0.707, +0.440, -1.000
   largest drift of <H> over t in [0, 12], m/w = 0, 0.5, 1, 2                     5.3e-15
+
+############ scripts/11_martinez_replication.py ############
+======================================================================
+A. GATE ORDER: their pulse sequence against this code's first-order step
+======================================================================
+  largest difference in nu over four steps of pi/8: 3.9e-16
+
+======================================================================
+B. MARTINEZ ET AL. FIG. 2(a) AGAINST THIS CODE (reading uncertainty 0.002)
+======================================================================
+  wt       ideal (exact)    discretization    error model     measured
+           this code        theirs   this     theirs  this    (theirs)
+  1pi/8   0.194            0.199   0.198    0.198   0.198   0.184
+  2pi/8   0.449            0.471   0.472    0.448   0.448   0.439
+  3pi/8   0.370            0.424   0.424    0.433   0.433   0.447
+  4pi/8   0.163            0.225   0.225    0.312   0.312   0.337
+  largest residual: ideal curve (33 points) 0.0011;  discretization 0.0008;  error model 0.0004
+  exact peak: nu = 0.4631 at wt = 0.889  (their green curve peaks at 0.464)
+
+======================================================================
+C. WHAT THE MATCH PINS DOWN
+======================================================================
+  step 0.9 x pi/8: largest residual against their discretization curve 0.060
+  step 1.0 x pi/8: largest residual against their discretization curve 0.001
+  step 1.1 x pi/8: largest residual against their discretization curve 0.052
+  error model without their dephasing (p = 0): residual 0.087; with p = 0.038: 0.0004
+  their measured data minus their own model: -0.014, -0.009, +0.014, +0.025  (data sit above the model late on)
+
+wrote figures/11_martinez_replication.png
+
+############ scripts/12_larger_lattices.py ############
+==========================================================================
+A. QUENCH FROM THE BARE VACUUM   B. GROUND STATE   (J = w, m = 0.5 w)
+==========================================================================
+   N  neutral dim   t_peak  nu_peak   t_trough  nu_trough   dip D    E0/N     condensate
+   4         6     0.888   0.4631    1.758     0.1333    0.3298  -0.5189    -0.3458
+   6        20     0.862   0.4799    1.724     0.1262    0.3537  -0.5416    -0.3392
+   8        70     0.850   0.4891    1.704     0.1314    0.3577  -0.5532    -0.3355
+  10       252     0.842   0.4948    1.690     0.1352    0.3596  -0.5601    -0.3332
+  12       924     0.838   0.4986    1.682     0.1375    0.3611  -0.5647    -0.3316
+  N = 4 against N = 12: peak time +6.0 %, trough time +4.5 %, dip -8.7 %, condensate -4.3 %
+  change in the dip from each N to the next: 0.0240, 0.0040, 0.0019, 0.0015
+  second peak, after the trough (not used in the thesis): N = 4: nu = 0.336 at t = 2.67, N = 6: nu = 0.421 at t = 2.66, N = 8: nu = 0.437 at t = 2.64, N = 10: nu = 0.444 at t = 2.63, N = 12: nu = 0.449 at t = 2.62
+
+wrote figures/12_larger_lattices.png

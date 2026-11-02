@@ -83,6 +83,45 @@ def test_trotter_error_scaling_exponent(order, expected_slope):
     assert slope == pytest.approx(expected_slope, abs=0.05), f"measured slope {slope:.3f}"
 
 
+def _step_operators(n, m, w, J, dt):
+    """exp(-i dt X) for the diagonal, outer-bond and middle-bond parts, from the Pauli terms."""
+    from scipy.linalg import expm
+
+    from schwinger.paulis import pauli_string
+    from schwinger.schwinger import hamiltonian_terms
+
+    terms = hamiltonian_terms(n, m, w, J)
+    part = lambda keep: sum(c * pauli_string(s) for s, c in terms if keep(s))
+    diag = part(lambda s: set(s) <= {"I", "Z"})
+    outer = part(lambda s: s in ("XXII", "YYII", "IIXX", "IIYY"))
+    middle = part(lambda s: s in ("IXXI", "IYYI"))
+    return [lambda f, A=A: expm(-1j * A * dt * f) for A in (diag, outer, middle)]
+
+
+def test_first_order_step_applies_the_diagonal_terms_first():
+    """
+    The circuit applies the diagonal layer first, so as an operator it is
+    e^{-i H_o dt} e^{-i H_e dt} e^{-i H_Z dt}. The reverse product is a
+    different operator; an earlier docstring and the thesis Methods wrote it.
+    """
+    from qiskit.quantum_info import Operator
+    n, m, w, J, dt = 4, 0.5, 1.0, 1.0, 0.3
+    Z, E, O = _step_operators(n, m, w, J, dt)
+    got = Operator(trotter_step(n, m, w, J, dt, order=1)).data
+    assert np.max(np.abs(phase_align(got, O(1) @ E(1) @ Z(1)) - O(1) @ E(1) @ Z(1))) < TOL
+    assert np.max(np.abs(phase_align(got, Z(1) @ E(1) @ O(1)) - Z(1) @ E(1) @ O(1))) > 0.1
+
+
+def test_second_order_step_is_the_symmetric_product():
+    """Eq. (strang): half diagonal, half outer, full middle, half outer, half diagonal."""
+    from qiskit.quantum_info import Operator
+    n, m, w, J, dt = 4, 0.5, 1.0, 1.0, 0.3
+    Z, E, O = _step_operators(n, m, w, J, dt)
+    want = Z(.5) @ E(.5) @ O(1) @ E(.5) @ Z(.5)
+    got = Operator(trotter_step(n, m, w, J, dt, order=2)).data
+    assert np.max(np.abs(phase_align(got, want) - want)) < TOL
+
+
 def test_single_trotter_step_is_unitary():
     n = 4
     from qiskit.quantum_info import Operator

@@ -71,9 +71,12 @@ def main() -> None:
     ax1.set_ylabel("particle density")
     ax1.set_title("Pairs created out of the bare vacuum, N = 4")
     ax1.legend(loc="upper right", ncol=2)
-    annotate(ax1, "Starts at exactly zero by construction. Heavier fermions cost more to make,\n"
-                  "so the density oscillates with smaller amplitude. Energy is conserved\n"
-                  "throughout: the hopping energy falls and pays for both mass and field.")
+    # Short lines: matplotlib wraps at the figure edge, not the panel edge, so a
+    # long line here runs into the right panel's note.
+    annotate(ax1, "Starts at exactly zero by construction. Heavier fermions\n"
+                  "cost more to make, so the density oscillates with smaller\n"
+                  "amplitude. Energy is conserved throughout: the hopping\n"
+                  "energy falls and pays for both mass and field.")
 
     m = 0.5
     H = hamiltonian(N, m, 1.0, 1.0)
@@ -87,14 +90,15 @@ def main() -> None:
              linestyle=(0, (5, 3)), label="link 3 (outer)")
     ax2.axhline(0.0, color="#9a9a9a", linewidth=1.0)
     ax2.set_xlabel("time  (units of 1/w)")
-    ax2.set_ylabel("electric field  <L_n>")
+    ax2.set_ylabel(r"electric field  $\langle L_n\rangle$")
     ax2.set_title(f"Flux on each link, m/w = {m}")
-    ax2.legend(loc="upper right")
+    ax2.set_ylim(top=0.62)  # headroom so the legend sits above the data
+    ax2.legend(loc="upper right", ncol=3, fontsize=7.5)
     worst = float(np.max(np.abs(profile[:, 0] - profile[:, 2])))
     print(f"\n  CP check: max |<L_1> - <L_3>| over the evolution = {worst:.3e}")
     annotate(ax2, "The two outer links lie exactly on top of each other. That is not a\n"
                   "coincidence: the bare vacuum is CP-symmetric and H keeps it so, which forces\n"
-                  "<L_n> = <L_(N-n)>. A free correctness check. The field is not independent\n"
+                  r"$\langle L_n\rangle = \langle L_{N-n}\rangle$. A free correctness check. The field is not independent" "\n"
                   "either, since Gauss's law fixes it from the charges to its left.")
 
     out = FIG / "04_pair_production.png"
