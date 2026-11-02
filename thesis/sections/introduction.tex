@@ -56,8 +56,8 @@ After proposals for cold atoms and trapped ions~\cite{banerjee2012,hauke2013},
 Martinez \emph{et al.}\ carried out the first digital quantum simulation of a
 lattice gauge theory in 2016~\cite{martinez2016}. Solving Gauss's law eliminated
 the electric field, so four lattice sites needed only four trapped-ion qubits,
-and over more than 200 gates they watched electron--positron pairs appear out of
-the bare vacuum, the state with no particles or field. Klco \emph{et al.}\ kept
+and with sequences of more than 200 gates they observed electron--positron pairs
+appear out of the bare vacuum, the state with no particles or field. Klco \emph{et al.}\ kept
 the field as qubits, on two and four staggered sites
 (Section~\ref{sec:staggered}) with periodic boundaries~\cite{klco2018}; Kokail
 \emph{et al.}\ prepared ground states variationally on up to 20
@@ -94,9 +94,9 @@ needs more gates for the same evolution time, hence more hardware error, so the
 best step depends on the error rate of the machine, as Knee and Munro showed for
 a general simulator with faulty gates~\cite{knee2015}. For the lattice Schwinger
 model, Shaw \emph{et al.}\ derived worst-case bounds on the root-mean-square
-error of the mean positron density that add Trotter error, two-qubit gate error
-and shot noise in quadrature, and from them an optimal Trotter error that grows
-with the gate error~\cite{shaw2020}.
+error of the mean positron density: the Trotter and two-qubit gate-error biases
+add, their sum combines in quadrature with shot noise, and the optimal Trotter
+error grows with the gate error~\cite{shaw2020}.
 
 Martinez \emph{et al.}\ took a phenomenological route. They postselected their
 data onto the six states of zero total charge (Section~\ref{sec:intro-diagnostic})
@@ -116,8 +116,8 @@ shots that violate them, is established error mitigation in quantum
 chemistry~\cite{bonetmonroig2018,mcardle2019} and in lattice gauge theories,
 both Abelian, like electromagnetism, and non-Abelian, like
 QCD~\cite{stryker2019,ballini2025}. An energy penalty in the Hamiltonian can
-also hold off violations caused by weak gauge-breaking
-errors~\cite{halimeh2020}.
+also keep the violation caused by weak, coherent gauge-breaking terms
+small~\cite{halimeh2020}.
 
 In the encoding used here Gauss's law cannot play this role: it has been solved
 and substituted into the Hamiltonian, so it holds on every qubit state. Keeping
@@ -155,12 +155,12 @@ quantum diagonalisation (SKQD) samples the states $U^k|\psi_0\rangle$,
 $k = 1,\dots,K$, made by applying one time step $U$ repeatedly to a simple
 starting state $|\psi_0\rangle$; together they span what is called a Krylov
 subspace~\cite{yu2025}. No optimiser is needed, and the circuits can be those of
-the dynamics. Rosanowski \emph{et al.}\ computed the ground-state energy and
-particle number of the Schwinger model this way on 4 to 30 qubits, and
-demonstrated the method on four sites evolving under the hopping term alone, the
-term that moves fermions between neighbouring sites~\cite{rosanowski2025}. An
-unsampled bitstring cannot enter the subspace, so a finite shot count biases the
-energy upward~\cite{miura2026}.
+the dynamics. Rosanowski \emph{et al.}\ computed the ground-state particle
+number of the Schwinger model this way on 4 to 30 qubits and its energy on up to
+20, with every circuit evolving under the hopping term alone, the term that
+moves fermions between neighbouring sites~\cite{rosanowski2025}. An unsampled
+bitstring cannot enter the subspace~\cite{miura2026}, so a finite shot count
+biases the energy upward~\cite{kanno2023}.
 
 \subsection{What this thesis contributes}
 \label{sec:contribution}

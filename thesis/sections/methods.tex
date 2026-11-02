@@ -281,8 +281,9 @@ would misstate every threshold by a factor $4/3$; the conversion is checked agai
 Qiskit.
 
 The two-qubit error $\epsilon_2$ is swept over a range that brackets the
-$4\times10^{-3}$ reported for the trapped-ion processor used by Rosanowski
-\emph{et al.}~\cite{rosanowski2025}. Assuming a single-qubit error $\epsilon_1
+error of about $4\times10^{-3}$ implied by the typical fidelity of 99.6(2)\,\%
+that Rosanowski \emph{et al.}\ quote for their trapped-ion
+processor~\cite{rosanowski2025}. Assuming a single-qubit error $\epsilon_1
 = \epsilon_2/10$ makes the 24 SX gates of a step add under a tenth of the error
 of its 32 CX; repeating the threshold sweep with $\epsilon_1 = 0$ and
 $0.3\,\epsilon_2$ tests this.
@@ -528,5 +529,5 @@ $\exp[i(dt/4)\sum_n(\Xop{n}\Xop{n+1} + \Yop{n}\Yop{n+1})]$, which, when their
 $dt$ equals this thesis's $w\,\delta t$, turns each bond half as far as
 $\mathrm{RXX}(w\,\delta t)\,\mathrm{RYY}(w\,\delta t)$; their four-qubit run
 also started from $|0011\rangle$ at different parameters~\cite{rosanowski2025}.
-Both $w\,\delta t = 0.77$, their value, and $0.385$, which reproduces the
-rotation of their step, are therefore run.
+Both $w\,\delta t = 0.77$, the number they quote, and $0.385$, which
+reproduces their step, are therefore run.

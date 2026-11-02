@@ -36,9 +36,11 @@ Last updated: 2026-10-13.
   `docs/error-budget.md`.
 - **Writing:** Introduction (2nd draft), Theory, and Materials and Methods
   drafted in `thesis/sections/`; `thesis/intro_methods.pdf` is the partial
-  submission. Results drafted from scripts 04-08; Discussion, Conclusion and
-  Abstract still TODO.
-- **Not done:** Discussion against the literature; hardware run (optional);
+  submission. Results drafted from scripts 04-08. 2026-11-01: Discussion,
+  Conclusion and Abstract drafted (`thesis/sections/discussion.tex`), with
+  every literature claim checked against the paper; full draft is about 7,920
+  prose words excluding captions and tables (cap 8,000).
+- **Not done:** hardware run (optional);
   coherent/correlated noise models; amplitude damping. Decide with Andresen
   whether any of these is in scope.
 

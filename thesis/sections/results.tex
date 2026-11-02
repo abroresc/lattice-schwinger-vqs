@@ -121,9 +121,6 @@ $10^3$ to $10^4$ shots raises the threshold by only about 20\,\%. The assumed
 single-qubit error matters little: setting $\epsilon_1 = 0$ or
 $\epsilon_1 = 0.3\,\epsilon_2$ instead of $\epsilon_2/10$ moves the threshold by
 $+8\,\%$ and $-13\,\%$ at every step size.
-\todo{Compare with the two-qubit fidelity of 99.6\,\% quoted by Rosanowski
-\emph{et al.}\ and with the gate counts of Martinez \emph{et al.}\ and Farrell
-\emph{et al.}}
 
 \begin{figure}[t]
   \centering
@@ -172,16 +169,10 @@ to $t_{\mathrm{t}}$), and the points in
 Figure~\ref{fig:threshold}(c) form a vertical line at $F_Q = 1$. The CP
 asymmetry is equally blind, because a uniform dephasing channel respects CP. A
 charge-based diagnostic therefore bounds the damage from errors that move charge
-and says nothing about errors that only scramble phases. This matters for the
-literature. The error model Martinez \emph{et al.}\ fitted to their four-qubit
-data was exactly this kind of dephasing, chosen because their postselection
-onto the neutral states had already partly removed the errors that move
-charge~\cite{martinez2016}. Their fitted probability per step, 0.038, is not
-directly comparable with 0.036 here, because their time steps were
-different.
-\todo{Discuss against Nguyen et al., whose symmetry protection targeted coherent
-errors and had negligible effect, and Halimeh and Hauke on the slow growth of
-gauge violation.}
+and says nothing about errors that only scramble phases. This is the kind of
+dephasing Martinez \emph{et al.}\ fitted to their data~\cite{martinez2016}
+(Section~\ref{sec:discussion}); their fitted 0.038 per step is not directly
+comparable with 0.036 here, because their time steps were longer.
 
 \subsection{The full budget and the optimal step size}
 
@@ -232,7 +223,8 @@ per step, and by 500 shots it is zero to machine precision. The chiral
 condensate converges with it: its expected error is \num{-8.3e-3} at 5 shots per
 step and \num{-2.2e-5} at 50. A single hopping-only step of the kind Rosanowski
 \emph{et al.}\ use needs 38 shots for $10^{-3}$ at $w\,\delta t = 0.77$ and 278 at
-$w\,\delta t = 0.385$, the rotation their step makes. Gate error at
+$w\,\delta t = 0.385$, the step they actually applied
+(Section~\ref{sec:skqd}). Gate error at
 $\epsilon_2 = 3\times10^{-3}$ makes SKQD slightly worse, not better: 15 shots
 per step instead of 12. Noise spreads
 probability over all sixteen bitstrings, but the ten charged ones are
@@ -254,19 +246,3 @@ it.
 \end{figure}
 
 \clearpage  % flush the Results figures before the Discussion begins
-% ============================================================================
-\section{Discussion}
-\label{sec:discussion}
-% ============================================================================
-
-\todo{Due with the Results and Discussion draft. Three paragraphs planned:
-(1) the depth rule $\epsilon^\ast n_{\mathrm{CX}} \approx 2$ against published
-gate counts (Martinez: more than 200 gates; Farrell: 13,858 two-qubit gates) and
-fidelities; (2) what the optimistic bias, its shot-noise scatter, the worse
-prediction under CX dephasing and the logical-dephasing blind spot mean for
-symmetry-based diagnostics in the literature
-(Martinez leakage, Nguyen postselection and symmetry protection, Halimeh and
-Hauke); (3) limitations: depolarising and dephasing models only, no coherent or
-correlated error, no amplitude damping, readout left out of the threshold, all
-qubits coupled directly, one parameter point, $N = 4$, and a coarse lattice far
-from the continuum.}

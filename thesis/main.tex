@@ -20,8 +20,22 @@ Schwinger model}
 \maketitle
 
 \begin{abstract}
-\todo{Write last. One paragraph: the system, the two numbers measured, the
-diagnostic test and its blind spot, and the honest limitation.}
+Quantum computers can follow gauge theories in real time, where lattice Monte
+Carlo fails, but each result carries Trotter error from discrete time steps,
+shot noise from finitely many measurements, and hardware error. This thesis
+separates the three for the lattice Schwinger model, quantum electrodynamics in
+one dimension, on four sites and four simulated qubits, checking every stage
+against exact diagonalisation. At 1000 shots the Trotter error on the particle
+density falls below the shot noise at a step of 0.18 at $t = 3$. At that shot
+count the pair-production signal is lost once the two-qubit gate infidelity
+times the number of CX gates reaches about two at all three step sizes tried,
+and the best step grows with the gate error. The violation of charge
+conservation, measured without the exact answer, predicts that threshold with
+an optimistic bias of 10 to 17\,\% for depolarising noise and a larger one for
+dephasing on the gates, and misses it entirely for dephasing between time
+steps, the noise model fitted to the first experiment on this system. A
+sample-based Krylov method reaches a mean relative energy error of $10^{-3}$
+with 12 shots per circuit, or 15 with gate error.
 \end{abstract}
 
 \tableofcontents
@@ -31,34 +45,34 @@ diagnostic test and its blind spot, and the honest limitation.}
 \input{sections/theory}
 \input{sections/methods}
 \input{sections/results}
-
-% ============================================================================
-\section{Conclusion}
-% ============================================================================
-
-\todo{What was achieved, what was not, and what the honest limitations are.}
+\input{sections/discussion}  % Discussion and Conclusion
 
 \section*{Statement on AI assistance}
 
 AI tooling was used for implementation scaffolding, debugging (particularly
 sign conventions in Jordan--Wigner strings), literature navigation and drafting.
 The physics derivations, experimental design and analysis are mine, and every
-claim an AI tool made about the literature was verified against the source
-before it entered this repository.
+claim an AI tool made about the literature has been checked against the source.
 
 Errors in AI-drafted material were caught by the verification design and are
-documented in place rather than quietly corrected. The first two were in the
-code: the Qiskit endianness adapter and the Bogoliubov conditioning issue. The
+listed here rather than quietly corrected. The first two were in the code: a
+wrong guess about Qiskit's qubit order and an ill-conditioned step in the
+Ising-chain check. The
 third was a physics claim, that dephasing on the compiled gates is invisible to
 the charge diagnostic; simulation showed this holds only for dephasing on the
 logical state (Section~\ref{sec:diagnostics}). A review of the draft text then
 caught statements that the numbers contradicted: two test tolerances quoted as
 measured residuals, a symmetry argument for Eq.~\eqref{eq:cp} that claimed more
-than it proved, a description of the two spinor components that was wrong, the
+than it proved, a wrong description of the two components of $\psi$, the
 Hellmann--Feynman check presented as stronger than it is, and an account of
-where the energy of the produced pairs comes from that had it backwards. That is
-the verification structure working as intended, and it is the reason the
-structure exists.
+where the energy of the produced pairs comes from that had it backwards.
+Checking every literature claim against the papers before the Discussion was
+written caught four more in the Introduction and Methods: Shaw \emph{et al.}'s
+bound adds the Trotter and gate biases linearly, not in quadrature; Rosanowski
+\emph{et al.}\ report energies on up to 20 qubits, not 30, and quote rather than
+measure their gate fidelity; and the penalty result of Halimeh and Hauke was
+quoted without its restriction to coherent errors. That is the verification structure working as intended,
+and it is the reason the structure exists.
 
 \clearpage
 \bibliographystyle{apsrev4-2}

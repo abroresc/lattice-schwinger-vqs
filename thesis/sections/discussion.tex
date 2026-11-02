@@ -1,0 +1,131 @@
+% ============================================================================
+\section{Discussion}
+\label{sec:discussion}
+% ============================================================================
+% FIRST DRAFT. Every number from this project is printed by scripts 04-08
+% (VERIFICATION.txt). Every statement about a paper was checked against the
+% paper. Derived numbers: 247 and 181 CX per qubit are twice Farrell et al.'s
+% CNOT counts (13,858 and 10,154) over 112 qubits, as their Table III prints;
+% 288 per qubit is 2 x 576 / 4; Shaw et al.'s worst-case CX error is the
+% non-identity Pauli probability of the depolarising channel, 15/16 x 4/3 eps2
+% = 1.25 eps2, so their bound fails at eps2 n_CX = 0.5 / 1.25 = 0.4.
+
+\subsection{The depth rule and published experiments}
+
+Each of the four qubits takes part in $n_{\mathrm{CX}}/2$ CX gates on average,
+so the 1000-shot rule $\epsilon^\ast n_{\mathrm{CX}} \approx 2$ also reads per
+qubit: without mitigation the signal is lost once the summed infidelity of the
+gates on the average qubit reaches about one.
+
+The per-qubit form is the one to carry to larger devices, since Farrell
+\emph{et al.}\ argue that two-qubit gates per qubit, not their total, limit
+large simulations~\cite{farrell2024}. Their deepest hadron circuit has
+\num{13858} CX gates on 112 qubits~\cite{farrell2024b}, on average 247 per
+qubit, close to the 288 per qubit of the $\delta t = 0.1$ trough circuit here.
+Already at 181 per qubit their data showed no wave packet until heavy error
+mitigation restored it, and the results still often differed from classical
+simulations by many standard deviations~\cite{farrell2024b}. Neither Farrell
+paper quotes its device's gate error, and Martinez \emph{et al.}\ give no gate
+fidelity and use no CX gates~\cite{martinez2016}, so none of the three can test
+the rule. Rosanowski \emph{et al.}\ quote a typical two-qubit fidelity of
+99.6(2)\,\% for their trapped-ion processor~\cite{rosanowski2025}; its error,
+$2\times10^{-3}$ to $6\times10^{-3}$, straddles $\epsilon^\ast$ at
+$\delta t = 0.1$ and lies below it at 0.2 and 0.3.
+
+Shaw \emph{et al.}\ bound the gate-error bias by the number of noisy CX gates
+times their worst-case error~\cite{shaw2020}. For the positron density, which
+cannot exceed $\tfrac12$, the bound says nothing once that product passes
+$\tfrac12$. For depolarising CX gates, whose worst-case error is
+$1.25\,\epsilon_2$, that happens at $\epsilon_2 n_{\mathrm{CX}} = 0.4$, a fifth
+of the value at which the dip here is lost. Their lattice keeps the gauge
+field, so the factor is indicative, but it is the small-scale comparison the
+authors ask for.
+
+\subsection{The optimal step}
+
+Knee and Munro~\cite{knee2015} and Shaw \emph{et al.}~\cite{shaw2020} predict
+that the best Trotter step grows with the gate error, and the optima here agree:
+five, four and three steps to $t_{\mathrm{t}}$ for $\epsilon_2 =
+3\times10^{-4}$, $10^{-3}$ and $3\times10^{-3}$, too few integer points to test
+a power law. Experiments have made the same choice by eye: Klco \emph{et al.}\
+moved from $\delta t = 0.1$ to $0.25$ and Nguyen \emph{et al.}\ doubled their
+step, each because after a few steps hardware error, not Trotter error,
+dominated~\cite{klco2018,nguyen2022}. At $\epsilon_2 = 3\times10^{-4}$ the
+optimal step, 0.35, sits at the 1000-shot crossover at $t_{\mathrm{t}}$, 0.36;
+at larger error it is coarser, so at the best achievable step the Trotter error
+exceeds the shot noise.
+
+\subsection{What a symmetry check can and cannot tell}
+
+Martinez \emph{et al.}\ called the leakage out of the neutral states a useful
+measure of fidelity, and Nguyen \emph{et al.}\ reported it, but neither turned a
+charge violation into an error on an observable~\cite{martinez2016,nguyen2022}.
+Section~\ref{sec:results} does, with two lessons.
+
+The prediction is optimistic because Eq.~\eqref{eq:FQ} assumes a global
+depolarising channel, as do the rescaling methods of Vovrosh \emph{et al.}\ and
+Urbanek \emph{et al.}, who treat it as an approximation for deep circuits on
+many qubits~\cite{vovrosh2021,urbanek2021}. Four qubits with local noise are
+the opposite case, and the optimistic bias is the residual: local noise erodes
+the dip faster than a global channel with the same charge violation. Farrell
+\emph{et al.}\ moved from a global rescaling to one factor per observable, and
+still attribute part of their disagreement with simulation to the simplicity of
+the assumed noise~\cite{farrell2024b}. Since every prediction from unsampled
+data overshot the true threshold, a threshold read from a symmetry check is best
+treated as an upper bound on the usable depth, though the prediction from a
+single 1000-shot run falls below the true threshold 8 to 20\,\% of the time.
+
+The blind spot is general, since a symmetry check cannot catch an error that
+commutes with the symmetry~\cite{cai2023}, and the noise model of the first
+experiment falls in it. Martinez \emph{et al.}\ fitted a phase-flip probability
+per qubit per step to their postselected data, choosing that model because
+postselection already partly corrects population errors~\cite{martinez2016}.
+Their leakage of 14 to 31\,\% and their fitted dephasing thus describe
+complementary parts of the noise, and $\mathrm{Var}(Q)$ would read exactly zero
+for the second.
+
+\subsection{The ground state}
+
+Rosanowski \emph{et al.}\ argue that SKQD resists noise because only which
+bitstrings are sampled matters, not how often, provided every needed one
+appears at least once~\cite{rosanowski2025}. The exact calculation here
+confirms this: gate error at $\epsilon_2 = 3\times10^{-3}$ raises the cost only
+from 12 to 15 shots per step. The neutral sector grows as $\binom{N}{N/2}$, so
+the bias from rare bitstrings left unsampled~\cite{miura2026} is what will limit
+larger lattices, and four sites cannot show how it grows.
+
+\subsection{Limitations}
+\label{sec:limitations}
+
+The noise models are the main limitation. Depolarising and dephasing noise act
+on each gate independently and without memory; real devices also have coherent
+errors such as over-rotation, which could shift or imitate the dip, correlated
+errors, and amplitude damping, whose end state Eq.~\eqref{eq:FQ} reads as
+perfect fidelity (Section~\ref{sec:noise}). Farrell \emph{et al.}\ saw
+systematic errors that grow with the rotation angle of the
+gates~\cite{farrell2024b}, which no depolarising model produces and which would
+favour smaller steps. Readout error is left out of the threshold; all qubit
+pairs are coupled, whereas nearest-neighbour hardware needs SWAP gates for the
+RZZ between sites 1 and 3; and the criterion $D \le 2\sigma_D$ is a choice.
+Everything is at one parameter point on four sites, a coarse lattice far from
+the continuum, in simulation with assumed noise.
+
+% ============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+% ============================================================================
+
+The four-site lattice Schwinger model was simulated with Trotter error, shot
+noise, gate error and readout error separated, each propagated onto the
+particle density and the electric fields, and every stage checked against exact
+diagonalisation. At 1000 shots the Trotter error on the particle density falls
+below the shot noise at a step of 0.18 at $t = 3$. At the same shot count the
+pair-production signal is lost when the two-qubit infidelity times the CX count
+of the deepest circuit reaches about two at all three step sizes tried, and from
+an error of $10^{-3}$ upward the best step for the density minimum is coarser
+than its 1000-shot crossover, 0.36. The charge variance predicts that threshold
+with an optimistic bias of 10 to 17\,\% for depolarising noise and a larger one
+for dephasing on the gates, and misses it entirely for dephasing between time
+steps, the model fitted to the first experiment on this system. Whether these
+numbers survive coherent and correlated errors, and real hardware, is the next
+question.
