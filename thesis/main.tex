@@ -9,15 +9,27 @@
 \input{preamble}
 \newcommand{\fullthesis}{}  % lets the shared Introduction outline Results and Discussion
 
-\title{\bf A quantified error budget for quantum simulation of the lattice
-Schwinger model}
-\author{Abror Niyazmetov\\[2pt]
-\small Department of Physics, Gettysburg College\\
-\small Advisor: Dr.\ Kurt Andresen}
-\date{\today}
-
 \begin{document}
-\maketitle
+
+% Title page, contents, abstract: the order the PHY 420 thesis guidelines list.
+\begin{titlepage}
+  \centering
+  \vspace*{1.6in}
+  {\LARGE\bfseries A quantified error budget for quantum simulation\\[4pt]
+   of the lattice Schwinger model\par}
+  \vspace{0.6in}
+  {\large Abror Niyazmetov\par}
+  \vspace{0.35in}
+  Senior thesis, Physics 420\\
+  Department of Physics, Gettysburg College\\[10pt]
+  Advisor: Dr.\ Kurt Andresen\par
+  \vfill
+  {\today\par}
+  \vspace*{0.4in}
+\end{titlepage}
+
+\tableofcontents
+\newpage
 
 \begin{abstract}
 Quantum computers can follow gauge theories in real time, where lattice Monte
@@ -37,8 +49,6 @@ steps, the noise model fitted to the first experiment on this system. A
 sample-based Krylov method reaches a mean relative energy error of $10^{-3}$
 with 12 shots per circuit, or 15 with gate error.
 \end{abstract}
-
-\tableofcontents
 \newpage
 
 \input{sections/introduction}

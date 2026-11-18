@@ -70,10 +70,7 @@ pinned in a lock file. Sampling uses fixed seeds,
 \texttt{scripts/09\_verification\_table.py} prints every row of
 Table~\ref{tab:checks}, and 496 tests compare every module against
 independently known answers. The repository is private at the time of writing
-and available from the author on request. Qiskit reads Pauli labels in the
-order of Table~\ref{tab:pauli} but numbers its qubits in reverse, so site $n$ is
-Qiskit qubit $N-n$, and every gate index passes through one tested conversion
-function.
+and available from the author on request.
 
 \subsection{Exact reference and verification}
 \label{sec:verification}
@@ -94,10 +91,9 @@ at $m = J = 0$, all sixteen levels as subset sums of the free-fermion energies
 $2w\cos[k\pi/(N+1)]$, blind to the electric term.
 
 The condensate from the ground-state vector agrees with $N^{-1}dE_0/dm$ from a
-finite difference. Hellmann--Feynman guarantees this for any $\Hop_0 + m\hat V$,
-so it confirms only that the observable matches the mass term in sign,
-staggering and normalisation; the hopping and electric terms rest on the other
-checks.
+finite difference. By Hellmann--Feynman this holds for any $\Hop_0 + m\hat V$,
+so it checks only that the observable matches the mass term; the hopping and
+electric terms rest on the other checks.
 
 \emph{Replication.} At the parameters of Martinez \emph{et al.}, the code
 reproduces the three theory curves of their Fig.~2(a), the exact evolution,

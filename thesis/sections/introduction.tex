@@ -18,10 +18,8 @@ $e^{-i\Hop t}$ into the Boltzmann-like factor $e^{-\Hop\tau}$, so each field
 configuration gets a positive weight and can be sampled like a thermal ensemble.
 In real time the weights become complex phases that largely cancel, and the
 statistical error grows exponentially with time and system size: the sign
-problem. Fermions can have one even in imaginary time, for example at
-nonzero density, and a general cure would make every problem whose answer can
-be checked quickly (the complexity class NP) quick to solve as well, so none is
-expected~\cite{troyer2005}. Real-time
+problem. Fermions at nonzero density have one even in imaginary time, and no
+general cure is expected~\cite{troyer2005}. Real-time
 processes, such as the string breaking described below~\cite{hebenstreit2013},
 therefore remain largely beyond first-principles
 calculation~\cite{banuls2020,bauer2023}.
@@ -29,7 +27,10 @@ calculation~\cite{banuls2020,bauer2023}.
 A quantum computer does not have this problem. Its qubits are two-level quantum
 systems, realised for example in trapped ions or superconducting circuits; a
 gate is a unitary operation on one or two qubits, and a circuit is a sequence of
-gates ending in a measurement that returns one bit per qubit. Feynman argued
+gates ending in a measurement that returns one bit per qubit. An exact
+classical simulation of $N$ qubits must store $2^N$ complex amplitudes, so each
+added qubit doubles its memory~\cite{nielsen2010}; the processor holds that
+state in its $N$ qubits. Feynman argued
 that a quantum system can be simulated efficiently only by another quantum
 system~\cite{feynman1982}. Lloyd showed that gates can approximate
 $e^{-i\Hop t}$ for any Hamiltonian built from local terms, with an error made

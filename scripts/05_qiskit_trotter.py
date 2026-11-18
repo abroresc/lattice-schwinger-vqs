@@ -92,9 +92,13 @@ def main() -> None:
     print("B. PARTICLE DENSITY FROM FINITE SHOTS")
     print("=" * 66)
     times = np.linspace(0.0, 8.0, 33)
+    # The exact line is drawn on its own fine grid: through the 33 points above
+    # it showed corners the evolution does not have. The sampled points below
+    # still use times[::4], so every printed number and seed is unchanged.
+    fine = np.linspace(0.0, 8.0, 801)
     exact_curve = np.array([particle_density(s, N)
-                            for s in evolve(v0, H, times)])
-    ax2.plot(times, exact_curve, color="#6b6b6b", linewidth=1.6, label="exact")
+                            for s in evolve(v0, H, fine)])
+    ax2.plot(fine, exact_curve, color="#6b6b6b", linewidth=1.6, label="exact")
 
     for i, shots in enumerate((256, 4096)):
         sample_t = times[::4]

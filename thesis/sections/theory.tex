@@ -46,8 +46,10 @@ measures.
 \subsection{Staggered fermions}
 \label{sec:staggered}
 
-On a lattice of spacing $a$ the derivative becomes a symmetric difference
-between neighbouring sites, whose momentum-space form $(i/a)\sin(pa)$ vanishes at
+On a lattice the field lives only on evenly spaced points, the sites, a
+distance $a$ apart: a discretisation, like a finite-difference grid, not objects
+in nature. The derivative becomes a symmetric difference between neighbouring
+sites, whose momentum-space form $(i/a)\sin(pa)$ vanishes at
 $p = 0$ and again at $p = \pi/a$, where the field alternates in sign from site
 to site. The energy, $\pm\sqrt{\sin^2(pa)/a^2 + m^2}$, is as low there as at
 $p = 0$, so the lattice holds a second fermion species, a ``doubler''. Nielsen and Ninomiya proved
@@ -141,7 +143,19 @@ without changing the spectrum, as the code checks.
 The filled sea is now $|\mathrm{vac}\rangle = |0101\rangle$, site~1 leftmost,
 called the bare vacuum:
 the ground state of the mass and electric terms, but not of the full Hamiltonian
-once $w \ne 0$. With $\hat\rho_n = \tfrac12[\Zop{n} + (-1)^n]$ the Hamiltonian
+once $w \ne 0$. Figure~\ref{fig:states} shows it with the other bitstrings of
+zero total charge.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.72\textwidth]{13_lattice_states.pdf}
+  \caption{The six bitstrings of zero total charge, with the charge on each
+  site from Eq.~\eqref{eq:charge}, the field on each link from
+  Eq.~\eqref{eq:gauss}, and the energy without hopping ($m = 0.5\,w$, $J = w$):
+  $m$ per charge plus $J$ per unit of field on each link. Produced by
+  \texttt{scripts/13\_lattice\_states.py}.}
+  \label{fig:states}
+\end{figure} With $\hat\rho_n = \tfrac12[\Zop{n} + (-1)^n]$ the Hamiltonian
 becomes a spin chain, up to a constant that vanishes for even $N$,
 \begin{equation}
   \label{eq:H}
