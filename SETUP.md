@@ -1,89 +1,71 @@
-# Setup, and getting this onto GitHub
+# Setup
 
-## 1. Get it running on your laptop, once
+Everything here runs on a laptop. Four sites make a 16-dimensional problem, so
+nothing needs a cluster or a quantum computer; the slowest script takes about
+five minutes.
 
-You need Python 3.11 or newer, VS Code, and git.
+## 1. Get it running
 
-1. **Python.** python.org, or `brew install python` on a Mac. Check with
-   `python3 --version`.
-2. **VS Code.** code.visualstudio.com. Then install two extensions from the
-   Extensions panel: **Python** and **Jupyter**, both by Microsoft.
-3. **Open the project.** File > Open Folder, pick `schwinger-n4`.
-4. **Make a virtual environment.** In the VS Code terminal
-   (Terminal > New Terminal):
-
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate        # Windows: .venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-
-   Then bottom-right of VS Code, or Cmd/Ctrl+Shift+P > "Python: Select
-   Interpreter", pick the one inside `.venv`.
-
-5. **Check it works.**
-
-   ```bash
-   python -m pytest tests/ -q
-   ```
-
-   You should get 394 passed. If you do, everything below will work.
-
-## 2. Day to day
+You need Python 3.11 or newer and git.
 
 ```bash
-python -m pytest tests/ -q                    # after any change to src/
-python scripts/03_schwinger_spectrum.py       # the Gate 2 artifact
-python scripts/05_qiskit_trotter.py           # circuits, Trotter, shot noise
+git clone <this repository's URL>
+cd lattice-schwinger-vqs
+python3 -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-Open `notebooks/schwinger_walkthrough.ipynb` in VS Code and it runs inline. That
-notebook is the thing to show people.
+`requirements.txt` gives minimum versions. The exact versions every number in
+the thesis came from are pinned in `requirements-lock.txt`; install from that
+file instead if a residual ever differs from the published one.
 
-**Why VS Code and not Jupyter Lab on its own.** This is a package with several
-modules and a test suite, not a single scratch file. VS Code edits the package,
-runs the tests in a terminal, opens the notebook natively, and does git, all in
-one window. Jupyter Lab does the notebook well and everything else badly. You
-lose nothing by using VS Code: `.ipynb` files open there with the same cell
-interface.
-
-**Keep the exploration in notebooks and the real code in `src/`.** Anything you
-want to keep and test goes into a module; the notebook imports it. Code that
-lives only in notebook cells is how projects become undefendable.
-
-## 3. Putting it on GitHub
-
-Git history is already initialised with a first commit, so this is three steps.
-
-1. Make an empty repo at github.com/new. Name it `schwinger-n4`. **Do not** tick
-   "Add a README", "Add .gitignore", or "Choose a license", since this repo
-   already has all three and it will refuse to push.
-2. Decide public or private. Nothing here is sensitive.
-   You can start private and flip it public later from Settings.
-3. In the VS Code terminal, from inside `schwinger-n4`:
-
-   ```bash
-   git remote add origin https://github.com/<your-username>/schwinger-n4.git
-   git branch -M main
-   git push -u origin main
-   ```
-
-   It will ask you to sign in. Use the browser flow or a personal access token.
-
-After that, `git add -A && git commit -m "..." && git push` whenever you finish
-something.
-
-**Set the author name first** if you have not used git before, so the commits
-are yours:
+Check that it works:
 
 ```bash
-git config --global user.name "Abror Niyazmetov"
-git config --global user.email "you@example.com"
+python -m pytest tests/ -q
 ```
 
-Then, for the existing commit only, rewrite the author:
+You should see `496 passed` in about fifteen seconds. If you do, everything
+below will work.
+
+> **If you use Anaconda,** a bare `python` may be Anaconda's, with different
+> library versions, even inside the virtual environment. Call
+> `.venv/bin/python` explicitly to be sure.
+
+## 2. Exploring
 
 ```bash
-git commit --amend --reset-author --no-edit
+python scripts/03_schwinger_spectrum.py      # the Hamiltonian and its checks
+python scripts/04_pair_production_preview.py # pairs out of the vacuum
+python scripts/05_qiskit_trotter.py          # circuits, Trotter error, shots
+python scripts/06_noise_threshold.py         # gate error and the failure threshold (slow)
+bash scripts/verify_all.sh                   # everything, rewriting VERIFICATION.txt
 ```
 
+The README has a table of every script and what it shows. The notebook,
+`notebooks/schwinger_walkthrough.ipynb`, opens in Jupyter or in VS Code with
+the Python and Jupyter extensions.
+
+## 3. The thesis
+
+```bash
+cd thesis && make        # builds main.pdf and intro_methods.pdf
+```
+
+This needs a LaTeX installation with `latexmk` (BasicTeX on a Mac is enough).
+Without one, upload `thesis/` and `figures/` to Overleaf and press Recompile.
+The thesis includes the figure PDFs straight from `figures/`, so rerunning a
+script updates the thesis on the next build.
+
+## 4. If you change something
+
+- Run `python -m pytest tests/ -q` after any change to `src/`.
+- New code gets a test against an answer known independently: a hand-written
+  matrix, an algebraic identity, a closed-form result, or a second
+  construction that shares no code with the first.
+- Exploration can live in a notebook; anything worth keeping moves into
+  `src/` with a test.
+- Read [`CONVENTIONS.md`](CONVENTIONS.md) before touching site order, signs or
+  Qiskit qubit indices. Those are the conventions that give plausible wrong
+  answers without any error message.

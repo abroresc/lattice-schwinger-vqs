@@ -1,11 +1,11 @@
 VERIFICATION LOG
-schwinger-n4  |  generated 2026-11-02 21:53 UTC  |  commit 7ae12d4-dirty
+schwinger-n4  |  generated 2026-11-18 00:07 UTC  |  commit 994d7b6-dirty
 python 3.11.7  numpy 2.4.6  scipy 1.17.1  qiskit 2.5.2  qiskit-aer 0.17.2  matplotlib 3.11.1
 
 ############ TEST SUITE ############
 ........................................................................ [ 87%]
 ................................................................         [100%]
-496 passed in 14.78s
+496 passed in 12.89s
 
 ############ scripts/01_tfim_phase_transition.py ############
 wrote figures/01_tfim.png
@@ -357,3 +357,27 @@ A. QUENCH FROM THE BARE VACUUM   B. GROUND STATE   (J = w, m = 0.5 w)
   second peak, after the trough (not used in the thesis): N = 4: nu = 0.336 at t = 2.67, N = 6: nu = 0.421 at t = 2.66, N = 8: nu = 0.437 at t = 2.64, N = 10: nu = 0.444 at t = 2.63, N = 12: nu = 0.449 at t = 2.62
 
 wrote figures/12_larger_lattices.png
+
+############ scripts/13_lattice_states.py ############
+state    charges            link fields       energy  2m x pairs + J x links
+|0101>  [+0. +0. +0. +0.]  [+0. +0. +0.]     -1.000                  -1.000   Gauss residual 0e+00
+|1001>  [-1. +1. +0. +0.]  [-1. +0. +0.]     +1.000                  +1.000   Gauss residual 0e+00
+|0011>  [+0. +1. -1. +0.]  [+0. +1. +0.]     +1.000                  +1.000   Gauss residual 0e+00
+|0110>  [+0. +0. -1. +1.]  [+0. +0. -1.]     +1.000                  +1.000   Gauss residual 0e+00
+|1100>  [-1. +0. +0. +1.]  [-1. -1. -1.]     +3.000                  +3.000   Gauss residual 0e+00
+|1010>  [-1. +1. -1. +1.]  [-1. +0. -1.]     +3.000                  +3.000   Gauss residual 0e+00
+wrote figures/13_lattice_states.png (and .pdf)
+energies in units of w at m = 0.5 w, J = w; every assert passed
+
+############ scripts/14_readme_animations.py ############
+first peak  nu = 0.463 at t = 0.89   (thesis: 0.463 at 0.89)
+first trough nu = 0.133 at t = 1.76   (thesis: 0.133 at 1.76)
+energy change at t = 0.89: mass +0.93, field +0.97, hopping -1.90   (thesis: mass +0.93, field +0.97, hopping -1.90)
+total energy drift over the animation: 1.1e-15
+wrote figures/readme/pairs_from_empty_space.gif  (111 frames, 1.72 MB)
+trough circuit: 576 CX   (thesis: 576)
+noiseless dip D = 0.332
+threshold from this grid: eps* = 3.31e-03   (thesis: 3.3e-3 at 1000 shots)
+dip kept at eps = 1e-3: 0.51   (thesis: 0.51)
+wrote figures/readme/signal_dies.gif  (35 frames, 0.50 MB)
+every assert passed: the animations show the thesis numbers

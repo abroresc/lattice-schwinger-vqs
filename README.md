@@ -1,204 +1,222 @@
-# schwinger-n4
+# A quantified error budget for quantum simulation of the lattice Schwinger model
 
-Quantum simulation of the lattice Schwinger model on four staggered sites:
-exact diagonalisation, verified against every analytic limit available.
+Electrons, positrons and their electric field on four qubits, with every
+error measured against the exact answer.
 
-PHY 420 capstone, Gettysburg College, Fall 2026. Abror Niyazmetov, advised by
-Dr. Kurt Andresen.
+PHY 420 senior thesis, Gettysburg College, Fall 2026. Abror Niyazmetov,
+advised by Dr. Kurt Andresen.
 
----
+[Read the thesis (PDF)](thesis/main.pdf) · [Take the tour](docs/tour/README.md) · [Run it yourself](#run-it-yourself) · [How every number is checked](#how-every-number-is-checked)
 
-## What this is
+<p align="center">
+  <img src="figures/readme/pairs_from_empty_space.gif" width="780"
+       alt="Animation: four sites start as empty space; particle and antiparticle probabilities rise and fall on the sites while the particle density rises to 0.46, dips to 0.13 and swings again, and the energy bars show mass and field energy rising while hopping energy falls by the same amount.">
+</p>
 
-Quantum electrodynamics in one space and one time dimension, put on a
-four-site lattice, with the gauge field eliminated by solving Gauss's law, and
-mapped to four qubits by Jordan-Wigner. The result is a 16 by 16 Hermitian
-matrix that confines charges and produces particle-antiparticle pairs out of
-the vacuum.
+## The project in one paragraph
 
-This repository covers milestones M2 to M12 of the semester plan in
-simulation: the verified Hamiltonian (Gate 2), Trotterised circuits, SKQD
-ground-state preparation, gate and readout error models, the symmetry
-diagnostics, and the four-way error budget. The thesis now has a full first
-draft, including the discussion against the literature; what remains is
-revision.
+Start with empty space on a line of four sites, switch on the physics of
+electrons and their electric field, and particle-antiparticle pairs appear,
+recombine and appear again (above, computed exactly). A quantum computer can
+follow this in real time, which ordinary computers find hard, but every answer
+it gives carries error from three sources: chopping time into steps,
+measuring only a finite number of times, and imperfect gates. In 2016 a team
+in Innsbruck ran this simulation on four trapped-ion qubits
+([Martinez et al., Nature 534, 516](https://doi.org/10.1038/nature18318)), and
+their data drifted away from the exact curve. This project rebuilds that
+experiment on a simulated quantum computer where the exact answer is known at
+every stage, switches the errors on one at a time, and measures how much each
+one moves the result.
 
-The design principle throughout: **every stage has a known answer attached**,
-so a wrong result is caught in minutes rather than weeks. Nothing is trusted
-because it looks right.
+## What came out
 
-## Start here
+All at four sites, with the parameters of the 2016 experiment.
 
-New to the toolchain? [`SETUP.md`](SETUP.md) is the step-by-step version,
-including how to push this to GitHub.
+### 1. Past a certain step size, smaller time steps buy nothing you can see
+
+At 1000 shots, the error from chopping time falls below the shot noise at a
+step of 0.18 (about 17 steps to time 3). Finer steps only add gates.
+[Chapter 4 →](docs/tour/04-time-steps-and-shots.md)
+
+### 2. The signal dies when error rate × two-qubit gates ≈ 2
+
+The pair-production signal is lost in the noise when the two-qubit gate error
+times the number of CX gates in the deepest circuit reaches 1.92, 1.98 and
+2.03 for three different step sizes, which is about one error's worth per
+qubit. [Chapter 5 →](docs/tour/05-gate-errors.md)
+
+<p align="center">
+  <img src="figures/readme/signal_dies.gif" width="720"
+       alt="Animation: as the two-qubit gate error rises from 0 to 1.5 percent, the particle density flattens toward 0.5 and the dip between its first peak and trough shrinks until it is lost in the 1000-shot noise at 0.33 percent per gate.">
+</p>
+
+### 3. Worse hardware wants coarser steps
+
+With gate error there is a best
+step size, and it grows from 0.35 to 0.44 to 0.59 as the two-qubit error goes
+from 0.03 % to 0.1 % to 0.3 %. Refining past it makes the answer worse.
+[Chapter 5 →](docs/tour/05-gate-errors.md#putting-every-error-together-the-best-step-size)
+
+### 4. A warning light that works, with a blind spot
+
+Without knowing the
+right answer, the spread of the measured total charge predicts the failure
+point 10 to 17 % too optimistically for depolarising noise and 27 to 42 % for
+dephasing on the gates. It reads exactly zero for dephasing between time
+steps, which is the noise model fitted to the 2016 data.
+[Chapter 6 →](docs/tour/06-warning-light.md)
+
+Also: the ground state, found with a sample-based Krylov method (SKQD) from
+the same circuits, reaches a relative energy error of $10^{-3}$ from 12 shots
+per circuit, or 15 with gate error. [Chapter 7 →](docs/tour/07-ground-state-from-bitstrings.md)
+
+## Read it at the depth you want
+
+| You have | Read |
+|---|---|
+| 2 minutes | This page, down to here |
+| 45 minutes | [The tour](docs/tour/README.md): nine short chapters from "why simulate empty space?" to "where this stops", built up from basic quantum mechanics, with the math in boxes you can open or skip |
+| An evening | [The thesis](thesis/main.pdf): about 8,000 words, 62 references |
+| A weekend | [`docs/derivation.md`](docs/derivation.md), the Hamiltonian derived from the continuum Lagrangian, and [`docs/error-budget.md`](docs/error-budget.md), the noise and error analysis in full |
+| Doubts about a number | Run the script that prints it (below), or [break the code on purpose](docs/tour/08-how-we-know-it-is-right.md#break-it-yourself) and watch the tests catch it |
+
+Chapters of the tour:
+[1 Why simulate empty space?](docs/tour/01-why-simulate-empty-space.md) ·
+[2 Four sites, four qubits](docs/tour/02-four-sites-four-qubits.md) ·
+[3 Why pairs appear](docs/tour/03-why-pairs-appear.md) ·
+[4 Time steps and shots](docs/tour/04-time-steps-and-shots.md) ·
+[5 Imperfect gates](docs/tour/05-gate-errors.md) ·
+[6 The warning light](docs/tour/06-warning-light.md) ·
+[7 Ground state from bitstrings](docs/tour/07-ground-state-from-bitstrings.md) ·
+[8 How we know it is right](docs/tour/08-how-we-know-it-is-right.md) ·
+[9 Where this stops](docs/tour/09-where-this-stops.md) ·
+[Glossary](docs/tour/glossary.md)
+
+## The model in one equation
+
+```math
+\hat H \;=\; \underbrace{\frac{m}{2}\sum_{n=1}^{4}(-1)^n \hat Z_n}_{\text{mass}}
+\;+\; \underbrace{w\sum_{n=1}^{3}\left(\hat\sigma^+_n\hat\sigma^-_{n+1} + \mathrm{h.c.}\right)}_{\text{hopping}}
+\;+\; \underbrace{J\sum_{n=1}^{3}\hat L_n^{\,2}}_{\text{electric field}},
+\qquad
+\hat L_n = \frac12\sum_{k\le n}\bigl[\hat Z_k + (-1)^k\bigr]
+```
+
+Quantum electrodynamics in one space dimension (the Schwinger model) on four
+staggered sites with open ends. Solving Gauss's law removes the electric field
+as a separate variable, so four sites need exactly four qubits, and the
+Jordan-Wigner transformation turns the fermions into 14 Pauli strings. This
+is the spin Hamiltonian of Martinez et al. (Methods, Eq. 3 in
+[arXiv:1605.04570v1](https://arxiv.org/abs/1605.04570v1)). Parameters
+throughout: $m = 0.5\,w$, $J = w$, time in units of $1/w$.
+[Chapter 2](docs/tour/02-four-sites-four-qubits.md) builds it step by step.
+
+## Run it yourself
+
+Python 3.11 or newer. [`SETUP.md`](SETUP.md) has a slower, step-by-step
+version.
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-python -m pytest tests/ -q                    # 496 tests, all against known answers
-python scripts/03_schwinger_spectrum.py       # the Gate 2 artifact and its residuals
-python scripts/05_qiskit_trotter.py           # circuits, Trotter scaling, shot noise
+pip install -r requirements.txt         # exact versions used: requirements-lock.txt
+python -m pytest tests/ -q              # 496 tests, each against an independently known answer
+python scripts/03_schwinger_spectrum.py # the Hamiltonian and its checks
 ```
 
-**[`notebooks/schwinger_walkthrough.ipynb`](notebooks/schwinger_walkthrough.ipynb)
-is the guided tour**, with all output already committed, so it reads on GitHub
-without running anything.
+Each script prints the numbers behind its results, and all but script 09
+also redraw their figures (PNG and PDF, in [`figures/`](figures)):
 
-Then read [`docs/derivation.md`](docs/derivation.md), which derives the whole
-thing from the continuum Lagrangian for a reader with one quantum mechanics
-course. [`CONVENTIONS.md`](CONVENTIONS.md) is the sign and ordering reference;
-check it first when a spectrum comes out wrong.
+| Script | Shows | Tour |
+|---|---|---|
+| `01_tfim_phase_transition.py`, `02_jw_verification.py` | the warm-up: Jordan-Wigner checked on the Ising chain | [8](docs/tour/08-how-we-know-it-is-right.md) |
+| `03_schwinger_spectrum.py` | the 14 Pauli strings, all 16 energy levels, the analytic limits | [2](docs/tour/02-four-sites-four-qubits.md) |
+| `04_pair_production_preview.py` | pairs out of the vacuum, computed exactly | [3](docs/tour/03-why-pairs-appear.md) |
+| `05_qiskit_trotter.py` | Trotter scaling, shots, the crossover | [4](docs/tour/04-time-steps-and-shots.md) |
+| `06_noise_threshold.py` | gate error, the failure threshold, the warning light (about five minutes) | [5](docs/tour/05-gate-errors.md), [6](docs/tour/06-warning-light.md) |
+| `07_skqd_ground_state.py` | the SKQD ground state and its exact shot cost | [7](docs/tour/07-ground-state-from-bitstrings.md) |
+| `08_error_budget.py` | all errors together, the best step size | [5](docs/tour/05-gate-errors.md) |
+| `09_verification_table.py` | every row of the thesis verification table | [8](docs/tour/08-how-we-know-it-is-right.md) |
+| `10_talk_figures.py` | the figures for the capstone talk | |
+| `11_martinez_replication.py` | Fig. 2(a) of the 2016 paper, recomputed | [8](docs/tour/08-how-we-know-it-is-right.md) |
+| `12_larger_lattices.py` | the same model solved exactly on up to 12 sites | [3](docs/tour/03-why-pairs-appear.md) |
+| `13_lattice_states.py` | what each bitstring means: charges, fields, energies | [2](docs/tour/02-four-sites-four-qubits.md) |
+| `14_readme_animations.py` | the two animations on this page, checked against the thesis numbers | |
 
-## The Hamiltonian
+`bash scripts/verify_all.sh` runs all of it in about ten minutes and rewrites
+[`VERIFICATION.txt`](VERIFICATION.txt), the log every number in the thesis
+traces back to. The notebook
+[`notebooks/schwinger_walkthrough.ipynb`](notebooks/schwinger_walkthrough.ipynb)
+walks through the Hamiltonian and circuits as code, with its output saved so
+it reads on GitHub without running anything.
 
-```
-    H  =  (m/2) sum_{n=1..N}   (-1)^n Z_n
-       +   w    sum_{n=1..N-1} ( sigma^+_n sigma^-_{n+1} + h.c. )
-       +   J    sum_{n=1..N-1} L_n^2,     L_n = (1/2) sum_{m<=n} ( Z_m + (-1)^m )
-```
+## How every number is checked
 
-The spin Hamiltonian of Martinez et al., Nature **534**, 516 (2016), Methods Eq. (3)
-in arXiv:1605.04570v1 (Eq. (2) there is Gauss's law), who run exactly
-this system at N = 4 on a trapped-ion device. Fourteen Pauli strings on four
-qubits; `scripts/03_schwinger_spectrum.py` prints the table.
-
-## Verification
-
-Built three independent ways and checked against six analytic results.
-Residuals, not pass/fail flags, and measured rather than the tests'
-tolerances. `scripts/09_verification_table.py` prints every row of the
-thesis verification table at the thesis parameters (m = 0.5w, J = w); the
-first block below is `scripts/03`, which takes the worst case over three
-parameter sets.
+The working rule: every stage has an answer known in advance by an
+independent route, and nothing is trusted because it looks right. Checks
+report the size of the disagreement, not a pass or fail flag.
 
 | Check | Residual |
 |---|---|
-| Pauli expansion vs direct matrix construction | 9e-16 |
-| Fermion construction through Jordan-Wigner vs spin form | 9e-16 |
-| Gauss's law is an identity on the full Hilbert space | 0 |
-| `[H, Q] = 0` | 0 |
-| Strong coupling `E0 = -mN/2` at `w = 0` | 0 |
-| Free fermion limit, all 16 levels | 9e-16 |
-| Hellmann-Feynman on the chiral condensate (checks the observable against the mass term only) | 3e-11 |
-| CP symmetry inside the neutral sector (`scripts/09`) | 0 |
-| Open TFIM: full 2^N spectrum vs closed-form free fermions, N = 2, 4, 6, 8 | 3e-14 |
-| Periodic TFIM with parity sectors, N = 6 (`scripts/02`) | 2e-14 |
-| Qiskit `SparsePauliOp` independent rebuild | 0 |
-| Circuit statevector vs exact evolution, t = 2, 4000 second-order steps | 7e-8 |
-| Trotter exponent, first order (predicted 1) | measured 1.036 |
-| Trotter exponent, second order (predicted 2) | measured 2.003 |
+| Hamiltonian built three independent ways | 0 to $9\times10^{-16}$ |
+| Strong-coupling and free-fermion limits | 0 and $9\times10^{-16}$ |
+| Circuit against exact evolution, 4000 steps | $7\times10^{-8}$ |
+| Trotter error slopes, predicted 1 and 2 | 1.036 and 2.003 |
+| Quoted shot noise against the scatter of 400 simulated runs | ratio 0.97 to 1.01 |
+| Published curves of Martinez et al. Fig. 2(a), recomputed | within 0.001 |
 
-## Layout
+[Chapter 8](docs/tour/08-how-we-know-it-is-right.md) has the full ledger, the
+mistakes the checks caught, and three one-line ways to break the code that the
+tests catch (6, 102 and 22 failures). A fresh run of the whole pipeline on
+17 November 2026 reproduced the 2 November log line for line.
+
+## What is where
 
 ```
-src/schwinger/
-  paulis.py          Pauli-string machinery, conventions, Qiskit adapter
-  jordan_wigner.py   JW operators, algebra checks, Bogoliubov solver
-  ising.py           TFIM and its closed-form spectrum (the warm-up)
-  schwinger.py       the Schwinger Hamiltonian, Gauss's law, CP, states
-  observables.py     particle density, condensate, field profile, evolution
-  analytics.py       the analytic limits everything is checked against
-  circuits.py        Qiskit layer: state prep, Trotter steps, shots, gate counts
-  noise.py           gate and readout error, exact noisy probabilities (M11)
-  diagnostics.py     observables and symmetry diagnostics from Z-basis data
-  skqd.py            SKQD ground state with exact finite-shot expectation (M6/M7)
-  budget.py          four-way error budget, failure threshold, prediction (M10/M12)
-  plotstyle.py       shared figure style
-scripts/             runnable, each regenerates one figure and prints residuals
-notebooks/           the guided walkthrough, output committed
-tests/               496 tests, every one against an independently known answer
-docs/derivation.md   the full derivation, from the continuum Lagrangian
-docs/error-budget.md noise, diagnostics, error budget and SKQD, explained
-thesis/              LaTeX skeleton for the final write-up, compiles today
-figures/             regenerated by the scripts, PNG and PDF, no manual steps
+src/schwinger/          the package
+  paulis.py             Pauli strings, conventions, the Qiskit qubit-order adapter
+  jordan_wigner.py      fermions to qubits, and the algebra checks
+  ising.py              the transverse-field Ising warm-up and its exact spectrum
+  schwinger.py          the Hamiltonian (three constructions), Gauss's law, CP
+  observables.py        particle density, condensate, fields, exact evolution
+  analytics.py          the analytic limits everything is checked against
+  circuits.py           Trotter circuits, compilation, shots
+  noise.py              gate and readout error, exact noisy probabilities
+  diagnostics.py        observables and symmetry checks from one measurement
+  budget.py             the error budget, the threshold and its prediction
+  skqd.py               the SKQD ground state with its exact shot cost
+  finite_size.py        the same model on up to 12 sites
+  replication.py        the 2016 experiment's curves
+tests/                  496 tests, each against an independently known answer
+scripts/                one per figure, printing the numbers behind it
+figures/                every figure, PNG and PDF, regenerated by the scripts
+docs/tour/              the nine-chapter tour and glossary
+docs/derivation.md      the Hamiltonian from the continuum Lagrangian
+docs/error-budget.md    noise, diagnostics, the budget and SKQD in full
+docs/LEARNING.md        reading guide, topic by topic
+thesis/                 the thesis in LaTeX; main.pdf is the current build
+CONVENTIONS.md          site order, signs, Qiskit qubit numbering
+VERIFICATION.txt        the log of one full run of everything
 ```
 
-Figures are written as both PNG and PDF. The PDFs are vector, so they go
-straight into the LaTeX thesis without regenerating anything in December.
-
-## Figures
-
-| File | What it shows |
-|---|---|
-| `01_tfim.png` | TFIM crossover, and JW verified against the closed form |
-| `02_jordan_wigner.png` | The fermion algebra, and the periodic-boundary trap |
-| `03_schwinger_spectrum.png` | All 16 levels vs mass; condensate two ways |
-| `04_pair_production.png` | Pairs created out of the vacuum; flux on each link |
-| `05_qiskit_trotter.png` | Trotter scaling with fitted slopes; measured density with shot noise; the systematic-vs-statistical crossover |
-| `06_noise_threshold.png` | Pair production under gate error; the failure threshold; whether Var(Q) sees the damage |
-| `07_skqd.png` | SKQD energy bias against shots, computed exactly |
-| `08_error_budget.png` | Total error against step size with the optimum; the four-way decomposition |
-
-## Things found by checking rather than reading
-
-Recorded because they were not in the reading list and the next person will
-hit them too.
-
-- **Qiskit endianness.** Pauli label strings coincide with ours; the qubit
-  *numbering* is reversed. Reversing the label, which is the natural guess, is
-  wrong. Found by a numerical cross-check. See `CONVENTIONS.md` section 5.
-- **A conditioning bug in the standard Bogoliubov recipe.** Forming
-  `(A-B)(A+B)` squares the condition number. The quasiparticle energies are
-  the singular values of `A+B`, so take an SVD and never form the product.
-  Worst residual at N = 8, `h/J = 0.05`: 7e-10 improved to 1e-14.
-- **The periodic-boundary Jordan-Wigner trap.** At `k = 0` and `k = pi` the
-  pairing term vanishes and the energy is the signed `2(h - J cos k)`, not the
-  positive square root. Wrong by exactly `|2(h-J)|`, and only when `h < J`.
-- **There is no Gauss's law violation to measure in this encoding.** The
-  constraint is substituted, not imposed, so it holds identically on every
-  state. The diagnostic has to be total charge variance instead. This changes
-  a piece of the proposal; see `docs/derivation.md` section 8.2.
-- **A CP symmetry that holds only in the neutral sector**. On the
-  CP-symmetric states this project evolves (everything that starts from the
-  bare vacuum) it forces `<L_n> = <L_{N-n}>`, which gives a second free
-  diagnostic. Neutrality alone is not enough: `|0110>` is a counterexample.
-  See section 7.
-
-## First numbers toward the thesis
-
-At N = 4, `m/w = 0.5`, `w = J = 1`, evolved to `t = 3` with second-order Trotter:
-
-| shots | exact shot-noise sigma on particle density | Trotter bias falls below it at |
-|---|---|---|
-| 256 | 0.0190 | `dt` = 0.254 (between 11 and 12 steps) |
-| 1000 | 0.0096 | `dt` = 0.182 (between 16 and 17 steps) |
-| 4096 | 0.0047 | `dt` = 0.128 (between 23 and 24 steps) |
-
-Sigma is computed exactly from the outcome distribution and the crossing is
-interpolated in log `dt` (`scripts/05`). An earlier version of this table took
-sigma from one sampled run and read the crossing off a factor-of-two grid,
-which gave 0.19 and 0.094.
-
-Below those step sizes, shrinking `dt` buys nothing the statistics can see, and
-costs circuit depth: 320 two-qubit gates at `dt = 0.3` against 6400 at
-`dt = 0.015`. Adding gate error turns that two-way trade into the three-way one
-the thesis is actually about.
-
-## The write-up
-
-`thesis/` holds the thesis in LaTeX. The Introduction, Theory and Materials
-and Methods are drafted (`thesis/intro_methods.pdf` builds them alone), and the
-Results, Discussion, Conclusion and Abstract have a first draft
-(`thesis/main.pdf` is the whole thesis). Figures are included
-from `../figures/*.pdf`, so regenerating a figure updates the thesis on the next
-compile with no manual step.
-
-```bash
-cd thesis && latexmk -pdf main.tex
-```
-
-It also builds on Overleaf: upload `thesis/` and `figures/` and press Recompile.
+The thesis includes the figure PDFs straight from `figures/`, so rerunning a
+script updates the thesis on the next compile (`cd thesis && make`).
 
 ## Statement on AI assistance
 
 AI tooling was used for implementation scaffolding, debugging (particularly
 sign conventions in Jordan-Wigner strings), literature navigation and drafting.
 The physics derivations, experimental design and analysis are mine, and every
-claim an AI tool made about the literature was verified against the source
+claim an AI tool made about the literature was checked against the source
 before it entered this repository.
 
-Two errors in AI-drafted material were caught by the verification design and
-are documented in place rather than quietly corrected: the Qiskit endianness
-adapter and the Bogoliubov conditioning issue, both listed above. That is the
-verification structure working as intended, and it is the reason the structure
-exists.
+Errors in AI-drafted material were caught by the verification design and are
+recorded rather than quietly corrected: a wrong guess about Qiskit's qubit
+order, an ill-conditioned step in the Ising-chain check, and a physics claim
+that dephasing on the compiled gates is invisible to the charge diagnostic.
+The thesis's own statement lists the rest, including statements in the draft
+text that the numbers contradicted. That is the verification structure
+working as intended, and it is the reason the structure exists.
+
+---
+
+MIT License. See [`LICENSE`](LICENSE).

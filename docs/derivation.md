@@ -409,8 +409,13 @@ to explain without notes.
    left-counting definition of `L_n`.
 2. **`ZZII` has twice the coefficient of `ZIZI` and `IZZI`.** From
    `(J/2)(N - m')`: the pair (1,2) has `m' = 2` and gets `J`, the pairs (1,3)
-   and (2,3) have `m' = 3` and get `J/2`. Sites closer to the left edge are
-   separated by more links, so they cost more. Confinement, in a table.
+   and (2,3) have `m' = 3` and get `J/2`. Put plainly: sites 1 and 2 appear
+   together in two of the three link fields (`L_2` and `L_3`), while sites 1
+   and 3, and 2 and 3, share only `L_3`. The pattern comes from counting the
+   field from the left end. The physics underneath it does not depend on that
+   choice: a neutral pair costs `J` for every link between its charges.
+   (Corrected 2026-11-17; this line used to say the left-edge pairs are
+   "separated by more links", which is false: sites 1 and 2 are neighbours.)
 3. **At `m = J` the `IZII` coefficient vanishes.** An accidental cancellation
    between mass and electric contributions at that one parameter point, which
    is why the printed list at `m = w = J = 1` has thirteen terms rather than

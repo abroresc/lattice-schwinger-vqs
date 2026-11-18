@@ -1,80 +1,56 @@
-# Roadmap: dates, deliverables, status
+# Timeline: how the project ran
 
-One file, merging two calendars that otherwise live in separate PDFs: the
-PHY 420 course deadlines (`course/ProjectDetails2026.pdf`), the week-by-week
-research schedule from the proposal (`course/Schwinger_Capstone_Proposal.pdf`,
-Section 8). Regenerate this by hand
-when a date changes; it is a snapshot, not a live document.
+A record of what was done when, and of the decisions that changed the plan on
+the way. Dates come from the commit history and the weekly meeting notes. The
+semester plan was organised around *gates*: checkpoints with a known answer
+attached, where the project would stop and fix things rather than build on
+something unverified.
 
-Last updated: 2026-10-13.
+## What happened when
 
-## Status right now
+| Date (2026) | Milestone |
+|---|---|
+| Aug 25 to Sep 22 | Reading: three annotated bibliographies, five papers each. |
+| Sep 10 | *Gate 1 and Gate 2 met*, three weeks before the Sep 29 target. Jordan-Wigner verified against the exactly solvable Ising chain; the four-site Schwinger Hamiltonian built three independent ways and checked against every analytic limit available; the Qiskit circuit layer and the first crossover numbers. |
+| Oct 1 | *SKQD chosen over VQE* for the ground state, after reading Rosanowski et al. (arXiv:2510.26951). The proposal had named VQE. |
+| Oct 9 | Introduction, Theory and Methods submitted as a partial draft. |
+| Oct 13 | *The second half of the research plan done in simulation:* gate and readout error, the symmetry diagnostics, SKQD and the four-way error budget. First headline numbers: the threshold rule, the 10 to 17 % prediction, the optimal step. |
+| Oct 14 | Thesis physics corrected and every quoted number recomputed from the scripts. |
+| Oct 16 | Sections 1 to 3 rewritten from 7,900 to about 5,500 words, to fit the whole thesis in the 8,000-word limit and to be readable by a physics undergraduate. |
+| Oct 20 | Introductory talk and research check-in. |
+| Nov 2 | Discussion, Conclusion and Abstract drafted; every statement about a paper checked against the paper, which corrected four claims. From the advisor's feedback: Fig. 2(a) of Martinez et al. reproduced, and the model solved exactly on up to 12 sites. |
+| Nov 17 | Final capstone talk. Thesis brought to full-draft form; this repository's tour, animations and state diagram added; a fresh run of the whole pipeline reproduced the Nov 2 log line for line. |
+| Late Nov, early Dec | Full draft, then the final draft. |
 
-- **Gate 1** (Jordan-Wigner verified against the Ising model) and **Gate 2**
-  (N=4 Schwinger Hamiltonian built, diagonalized, limits reproduced): done,
-  three weeks ahead of the Sep 29 target.
-- **M2/M3/M5** (Hamiltonian, verification, Qiskit circuit layer) done. 394
-  tests passing against exact diagonalization.
-- **SQD vs VQE decision: closed 2026-10-01.** Rosanowski et al.
-  (arXiv:2510.26951) read. Decision: use SKQD (Sample-Based Krylov Quantum
-  Diagonalization) for ground-state preparation, not VQE. Reasoning: SKQD
-  reuses the Trotter circuit already in `circuits.py`, needs no classical
-  optimizer loop, is noise-resilient by construction, and the paper's own N=4
-  demonstration is close to a direct template for this project's
-  ground-state step.
-- **2026-10-12/13: M6/M7, M10, M11 and a first pass at M12 done in simulation.**
-  `noise.py` (depolarizing/dephasing gate error on the compiled circuit, exact
-  density-matrix probabilities, classical readout error), `diagnostics.py`
-  (Var(Q), leakage, CP asymmetry, global-depolarizing fidelity), `skqd.py`
-  (SKQD with an exact finite-shot expectation), `budget.py` (four-way
-  decomposition, failure threshold, diagnostic prediction). 473 tests.
-  Scripts 06-08 and figures 06-08. Headline numbers: failure threshold
-  eps* x n_CX ~ 2 at 1000 shots; charge diagnostic predicts eps* to within
-  10-17 % (optimistic on exact data; a single 1000-shot run scatters by more
-  than that) but is blind to logical-frame dephasing; optimal
-  dt grows from 0.35 to 0.59 as eps_2 goes from 3e-4 to 3e-3. See
-  `docs/error-budget.md`.
-- **Writing:** Introduction (2nd draft), Theory, and Materials and Methods
-  drafted in `thesis/sections/`; `thesis/intro_methods.pdf` is the partial
-  submission. Results drafted from scripts 04-08. 2026-11-01: Discussion,
-  Conclusion and Abstract drafted (`thesis/sections/discussion.tex`), with
-  every literature claim checked against the paper; full draft is about 7,920
-  prose words excluding captions and tables (cap 8,000).
-- **Not done:** hardware run (optional);
-  coherent/correlated noise models; amplitude damping. Decide with Andresen
-  whether any of these is in scope.
+## Decisions that changed the plan
 
-## This week (Oct 1 - Oct 6)
+*SKQD instead of VQE (Oct 1).* SKQD reuses the Trotter circuits already
+built, needs no classical optimiser loop, and only cares which bitstrings are
+sampled, not their exact amplitudes, so it tolerates noise by design.
+Rosanowski et al.'s own four-qubit demonstration was close to a template for
+this project. Reasoning in [`LEARNING.md`](LEARNING.md), topic 9.
 
-- Introduction, 1st draft, due **Oct 6**. The skeleton already exists in
-  `thesis/main.tex` (Introduction section with a "what this thesis
-  contributes" stub) — this is filling it in, not starting from zero. Needs
-  roughly half of the eventual 30+ references.
+*No Gauss's-law diagnostic.* The proposal planned to measure Gauss's-law
+violation as the warning light. In this encoding Gauss's law is solved and
+substituted, so it holds on every state and cannot be violated. The charge
+variance and a CP symmetry replaced it. See [`derivation.md`](derivation.md)
+section 8.2 and [tour chapter 6](tour/06-warning-light.md).
 
-## Merged calendar
+*Klco et al. is not the reference for this encoding.* They keep the
+electric field as qubits with a cutoff; this project follows Martinez et al.,
+who eliminate it. [`derivation.md`](derivation.md) section 8.1.
 
-| Date | Course deliverable | Research milestone | Notes |
-|---|---|---|---|
-| Sep 8 | Annotated bibliography 1 | Pauli string machinery, 4-site Ising diagonalized | done |
-| Sep 15 | Annotated bibliography 2 | Gate 1: Jordan-Wigner vs analytic spectrum | done |
-| Sep 22 | Annotated bibliography 3 | Lattice theory reading, no code (GRE week) | done |
-| Sep 29 | Career exercises | Gate 2: Schwinger Hamiltonian built & verified | done 3 weeks early |
-| **Oct 6** | **Introduction, 1st draft** | Buffer; SQD/VQE decision | decision closed today |
-| Oct 13 | Introduction, 2nd draft | SKQD on a known system (replaces "VQE on known system") | |
-| Oct 20 | Research check-in, intro talk | SKQD on the N=4 Schwinger Hamiltonian (replaces "VQE on Schwinger model") | this is M6/M7 |
-| Oct 27 | Theory and Methods draft | Trotter evolution, scaling exponent matches prediction | M8 |
-| Nov 3 | Practice talks | Physics observables measured, figures produced | |
-| Nov 10 | Results and Discussion draft | Shot noise propagated onto every observable | |
-| Nov 17 | Capstone talks | Hardware noise; M11 gate/readout error models, three sources separated | |
-| Nov 21 | **Full draft** | Gauss's law / symmetry diagnostic tested against the failure threshold; M10-M12 synthesis | |
-| Dec 1 | Colloquium talk | Analysis closed, repository cleaned | |
-| Dec 8 | **Final draft** | — | |
-| ~Dec 11 | Colloquium | — | per CLAUDE.md status |
+*Phase noise on the gates turned out to be visible (Oct 13).* The first
+version of the noise code assumed dephasing on the compiled gates would be
+invisible to the charge check. The simulation showed otherwise; only dephasing
+between time steps is invisible. That blind spot became one of the results.
 
-## If a gate is missed
+*Scope held fixed.* Four sites, open boundaries. Larger lattices, periodic
+boundaries and two space dimensions were named in the proposal as temptations
+to resist until the error budget worked. The only extension, the exact
+twelve-site check, was added to answer whether four sites are enough.
 
-The proposal has a named fallback (Section 9): pivot to testing whether
-published quantum hardware calibration data predicts measured circuit
-performance, using the same statistical machinery already built for the error
-budget. Not needed yet — flagged here so it isn't forgotten under deadline
-pressure.
+## Not done
+
+Coherent and correlated noise, amplitude damping, and a run on real hardware.
+[Tour chapter 9](tour/09-where-this-stops.md) says what each would change.
