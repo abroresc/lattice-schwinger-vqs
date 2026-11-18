@@ -1,11 +1,11 @@
 VERIFICATION LOG
-schwinger-n4  |  generated 2026-11-18 18:18 UTC  |  commit e4f2578-dirty
+schwinger-n4  |  generated 2026-11-18 19:13 UTC  |  commit 5136621
 python 3.11.7  numpy 2.4.6  scipy 1.17.1  qiskit 2.5.2  qiskit-aer 0.17.2  matplotlib 3.11.1
 
 ############ TEST SUITE ############
 ........................................................................ [ 87%]
 ................................................................         [100%]
-496 passed in 13.34s
+496 passed in 13.68s
 
 ############ scripts/01_tfim_phase_transition.py ############
 wrote figures/01_tfim.png
