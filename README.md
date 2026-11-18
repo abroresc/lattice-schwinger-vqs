@@ -203,18 +203,35 @@ script updates the thesis on the next compile (`cd thesis && make`).
 
 ## Statement on AI assistance
 
-AI tooling was used for implementation scaffolding, debugging (particularly
-sign conventions in Jordan-Wigner strings), literature navigation and drafting.
-The physics derivations, experimental design and analysis are mine, and every
-claim an AI tool made about the literature was checked against the source
-before it entered this repository.
+I used AI tools to write the scaffolding of the code, to debug it
+(particularly the sign conventions in the Jordan-Wigner strings), to find my
+way through the literature and to draft text. The derivations, the design of
+the numerical experiments and the analysis are mine. Every claim an AI tool
+made about a paper was checked against that paper before it entered this
+repository.
 
-Errors in AI-drafted material were caught by the verification design and are
-recorded rather than quietly corrected: a wrong guess about Qiskit's qubit
-order, an ill-conditioned step in the Ising-chain check, and a physics claim
-that dephasing on the compiled gates is invisible to the charge diagnostic.
-The thesis's own statement lists the rest, including statements in the draft
-text that the numbers contradicted.
+The checks built into the project caught errors in what the tools drafted, all
+corrected in this version. Two were in the code: a wrong guess about Qiskit's
+qubit order and an ill-conditioned step in the Ising-chain check. The third was
+a physics claim, that dephasing on the compiled gates is invisible to the
+charge diagnostic. Simulation showed this holds only for dephasing on the
+logical state (thesis Section 3.6).
+
+A review of the draft then found statements that the numbers contradicted. Two
+test tolerances were quoted as measured residuals. The symmetry argument for
+CP (thesis Eq. 8) claimed more than it proved, and the two components of ψ were
+described wrongly. The Hellmann-Feynman check was presented as stronger than it
+is, and the account of where the energy of the produced pairs comes from had it
+backwards.
+
+Checking every literature claim against its paper, before the Discussion was
+written, found four errors in the Introduction and Methods. Shaw et al.'s bound
+adds the Trotter and gate biases linearly, not in quadrature. Rosanowski et al.
+report energies on up to 20 qubits, not 30, and quote their gate fidelity
+rather than measure it. Halimeh and Hauke's penalty result had been quoted
+without its restriction to coherent errors. Reproducing the curves of Martinez
+et al. found the last one: Methods had written the first-order step in reverse
+order.
 
 ---
 

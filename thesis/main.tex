@@ -59,31 +59,34 @@ with 12 shots per circuit, or 15 with gate error.
 
 \section*{Statement on AI assistance}
 
-AI tooling was used for implementation scaffolding, debugging (particularly
-sign conventions in Jordan--Wigner strings), literature navigation and drafting.
-The physics derivations, experimental design and analysis are mine, and every
-claim an AI tool made about the literature has been checked against the source.
+I used AI tools to write the scaffolding of the code, to debug it
+(particularly the sign conventions in the Jordan--Wigner strings), to find my
+way through the literature and to draft text. The derivations, the design of
+the numerical experiments and the analysis are mine. Every claim an AI tool
+made about a paper was checked against that paper.
 
-Errors in AI-drafted material were caught by the verification design and are
-listed here rather than quietly corrected. The first two were in the code: a
-wrong guess about Qiskit's qubit order and an ill-conditioned step in the
-Ising-chain check. The
-third was a physics claim, that dephasing on the compiled gates is invisible to
-the charge diagnostic; simulation showed this holds only for dephasing on the
-logical state (Section~\ref{sec:diagnostics}). A review of the draft text then
-caught statements that the numbers contradicted: two test tolerances quoted as
-measured residuals, a symmetry argument for Eq.~\eqref{eq:cp} that claimed more
-than it proved, a wrong description of the two components of $\psi$, the
-Hellmann--Feynman check presented as stronger than it is, and an account of
-where the energy of the produced pairs comes from that had it backwards.
-Checking every literature claim against the papers before the Discussion was
-written caught four more in the Introduction and Methods: Shaw \emph{et al.}'s
-bound adds the Trotter and gate biases linearly, not in quadrature; Rosanowski
-\emph{et al.}\ report energies on up to 20 qubits, not 30, and quote rather than
-measure their gate fidelity; and the penalty result of Halimeh and Hauke was
+The checks built into the project caught errors in what the tools drafted, all
+corrected in this version. Two were in the code: a wrong guess about Qiskit's
+qubit order and an ill-conditioned step in the Ising-chain check. The third was
+a physics claim, that dephasing on the compiled gates is invisible to the
+charge diagnostic. Simulation showed this holds only for dephasing on the
+logical state (Section~\ref{sec:diagnostics}).
+
+A review of the draft then found statements that the numbers contradicted. Two
+test tolerances were quoted as measured residuals. The symmetry argument for
+Eq.~\eqref{eq:cp} claimed more than it proved, and the two components of $\psi$
+were described wrongly. The Hellmann--Feynman check was presented as stronger
+than it is, and the account of where the energy of the produced pairs comes
+from had it backwards.
+
+Checking every literature claim against its paper, before the Discussion was
+written, found four errors in the Introduction and Methods. Shaw \emph{et al.}'s
+bound adds the Trotter and gate biases linearly, not in quadrature. Rosanowski
+\emph{et al.}\ report energies on up to 20 qubits, not 30, and quote their gate
+fidelity rather than measure it. Halimeh and Hauke's penalty result had been
 quoted without its restriction to coherent errors. Reproducing the curves of
-Martinez \emph{et al.}\ then showed Methods writing the first-order step in
-reverse order.
+Martinez \emph{et al.}\ found the last one: Methods had written the first-order
+step in reverse order.
 
 \clearpage
 \bibliographystyle{apsrev4-2}
