@@ -1,20 +1,20 @@
 """
-The transverse-field Ising model: the training ground.
+The transverse-field Ising model, used as a warm-up.
 
     H = -J sum_{n} X_n X_{n+1}  -  h sum_n Z_n
 
-Two reasons this model is here, both about safety rather than content:
+It is here for two reasons:
 
  1. It is the simplest nontrivial spin Hamiltonian, so it is where the
     Pauli-string machinery gets debugged.
  2. It is exactly solvable. Jordan-Wigner maps it to free fermions, which
     diagonalise by Bogoliubov transformation. So the transformation can be
-    learned somewhere an analytic answer exists, and verified, BEFORE it is
+    learned somewhere an analytic answer exists, and verified, before it is
     pointed at the Schwinger model where no analytic answer exists.
 
 The model has a quantum phase transition at h/J = 1 in the thermodynamic
 limit. At N = 4 it is a smooth crossover, not a sharp transition, and the
-code says so rather than pretending otherwise.
+code treats it as one.
 
 Note on convention: this file uses the XX + Z form, not ZZ + X. The two are
 related by a global Hadamard rotation and describe the same physics, but only
@@ -63,7 +63,7 @@ def tfim_AB(n_sites: int, J: float, h: float) -> tuple[np.ndarray, np.ndarray, f
     """
     The (A, B) matrices and constant for the open-boundary TFIM after Jordan-Wigner.
 
-    Derivation, which you should reproduce on paper:
+    Derivation:
 
       X_n X_{n+1} = -( c_n^dag - c_n )( c_{n+1}^dag + c_{n+1} )
       Z_n         = 2 c_n^dag c_n - 1
@@ -82,7 +82,7 @@ def tfim_AB(n_sites: int, J: float, h: float) -> tuple[np.ndarray, np.ndarray, f
       const = h N
 
     Returns (A, B, const). `verify_tfim_jordan_wigner` checks this numerically,
-    so you never have to take the algebra above on trust.
+    so the algebra above is not taken on trust.
     """
     A = np.zeros((n_sites, n_sites))
     B = np.zeros((n_sites, n_sites))
@@ -100,7 +100,7 @@ def verify_tfim_jordan_wigner(n_sites: int, J: float, h: float) -> float:
     """
     Check that the hand-derived (A, B) really do rebuild the spin Hamiltonian.
 
-    This is the tightest possible test of the derivation: it compares two
+    This tests the derivation directly: it compares two
     2^N x 2^N matrices entry by entry, so a single wrong sign anywhere shows
     up immediately and localised, instead of as a wrong energy later.
 
@@ -120,7 +120,7 @@ def tfim_exact_spectrum(n_sites: int, J: float, h: float) -> np.ndarray:
     Route: (A, B) -> Bogoliubov single-particle energies Lambda_k -> every
     subset of occupied modes. This never touches the 2^N Hilbert space
     except to enumerate occupations, so agreeing with brute-force
-    diagonalisation is a genuine check and not a tautology.
+    diagonalisation is an independent check.
     """
     from .jordan_wigner import bogoliubov_spectrum, many_body_spectrum_from_modes
 
@@ -131,35 +131,33 @@ def tfim_exact_spectrum(n_sites: int, J: float, h: float) -> np.ndarray:
 
 def tfim_periodic_spectrum(n_sites: int, J: float, h: float) -> np.ndarray:
     """
-    Full many-body spectrum of the PERIODIC TFIM in closed form, done properly.
+    Full many-body spectrum of the periodic TFIM in closed form.
 
-    This is the classic Jordan-Wigner trap, and it is worth doing once because
-    getting it right is what separates owning the technique from owning the
-    formula.
+    Periodic boundaries hide two traps for Jordan-Wigner.
 
     Trap 1: the wrapped string. On a ring the JW string closes on itself, and
     the boundary bond X_N X_1 picks up a factor of -P with P = prod_n Z_n the
     total fermion parity. So this is not one fermion problem but two:
 
-        P = +1 (even parity): ANTIperiodic fermions, k = (2j+1) pi / N
+        P = +1 (even parity): antiperiodic fermions, k = (2j+1) pi / N
         P = -1 (odd parity):  periodic fermions,     k = 2 pi j / N
 
     and in each sector only the states with matching parity are physical.
 
-    Trap 2, the one that actually bites. The textbook dispersion
+    Trap 2. The textbook dispersion
 
         eps(k) = 2 sqrt( J^2 + h^2 - 2 J h cos k )
 
     comes from a Bogoliubov rotation that mixes the modes k and -k. At k = 0
     and k = pi we have sin k = 0, the pairing term vanishes, and those modes
-    are ALREADY diagonal. Their energy is the SIGNED
+    are already diagonal. Their energy is the signed
 
         eps(k) = 2 ( h - J cos k )
 
     which is negative at k = 0 whenever h < J. Taking the positive square root
     there silently flips that one mode, shifting the whole ordered-phase
     spectrum by exactly |2(h - J)|. The disordered phase h > J looks fine,
-    which is what makes the bug so easy to ship.
+    so the bug is easy to miss.
 
     `scripts/02_jw_verification.py` reproduces both the broken and the fixed
     version side by side.
@@ -194,7 +192,7 @@ def tfim_periodic_spectrum(n_sites: int, J: float, h: float) -> np.ndarray:
 
 def tfim_periodic_spectrum_naive(n_sites: int, J: float, h: float) -> np.ndarray:
     """
-    The WRONG version, kept deliberately so the failure can be shown, not asserted.
+    The wrong version, kept so the failure can be shown rather than asserted.
 
     Identical to `tfim_periodic_spectrum` except that it uses the positive
     square root for every k, including the unpaired k = 0 and k = pi modes.

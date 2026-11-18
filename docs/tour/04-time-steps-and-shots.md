@@ -104,10 +104,9 @@ for it: reaching $t = 3$ takes 320 CX gates at $\delta t = 0.3$ and 6400 at
 $\delta t = 0.015$. At the first trough, $t = 1.76$, where the signal lives,
 the crossover at 1000 shots is a step of 0.36.
 
-That is the first of the two numbers the project set out to find. On a
-perfect machine the advice would be: go down to the crossover and stop. On a
-real machine, where every extra CX is another chance to fail, the trade-off
-gets sharper. That is the next chapter.
+On a perfect machine the advice would be to go down to the crossover and
+stop. On a real machine every extra CX is another chance to fail, and chapter 5
+adds that.
 
 > [!TIP]
 > *Check it yourself.* `python scripts/05_qiskit_trotter.py` fits the two

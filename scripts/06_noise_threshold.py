@@ -1,12 +1,12 @@
 """
-M11 / M12: gate error, the failure threshold, and whether the symmetry
-diagnostic predicts it.
+Gate error, the failure threshold, and whether the symmetry diagnostic
+predicts it.
 
   A. Validation residuals for the noise layer, printed as numbers.
   B. The recombination dip D = nu(t_peak) - nu(t_trough) against the two-qubit
      gate error, for three Trotter step sizes, and the failure threshold eps*
      where D falls to twice its shot-noise uncertainty.
-  C. The prediction of eps* from charge-conservation data taken at ONE lower
+  C. The prediction of eps* from charge-conservation data taken at one lower
      noise level, under the global-depolarizing model.
   D. The control: noise the charge diagnostic cannot see.
   E. The prediction repeated on shot-sampled data at eps0, for its scatter.

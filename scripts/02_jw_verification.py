@@ -1,10 +1,10 @@
 """
-M3 / Gate 1: Jordan-Wigner, verified two ways, plus the trap that catches people.
+Jordan-Wigner checked two ways, plus a trap in periodic boundaries.
 
 Panel A: the fermionic algebra itself, checked as matrices.
 Panel B: the periodic-boundary spectrum, done naively and done correctly. The
 naive version is wrong by exactly |2(h - J)| in the ordered phase and right in
-the disordered phase, which is what makes it so easy to ship.
+the disordered phase, so the error is easy to miss.
 
 Run:  python scripts/02_jw_verification.py
 """
@@ -44,13 +44,12 @@ def main() -> None:
 
     print()
     print("=" * 66)
-    print("HOPPING SIGN, settled numerically instead of argued about")
+    print("HOPPING SIGN, checked numerically")
     print("=" * 66)
     for k, v in hopping_sign_demo(4).items():
         print(f"  {k:<40s} residual {v:.3e}")
-    print("  Reading: the plain Z string really does produce a minus sign; the")
-    print("  alternating (-Z) string removes it; the two give identical spectra,")
-    print("  so the sign is a relabelling and not physics.")
+    print("  The plain Z string gives a minus sign and the alternating (-Z) string")
+    print("  removes it. The spectra are identical, so the sign is a relabelling.")
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9.5, 3.6))
 

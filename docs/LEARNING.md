@@ -1,191 +1,163 @@
-# Learning guide: topic by topic, with references back into this project
+# Reading guide, topic by topic
 
-Why this file exists: you can get any of these topics explained well by
-Gemini or another general tool, but a general explanation doesn't know which
-section of `derivation.md` it feeds into, which paper in `papers/` backs it
-with a citable result, or which test in `tests/` checks it against a known
-answer. This file is the connective tissue: a short "why this matters here"
-per topic, plus exact pointers. Read the explanation anywhere you like; come
-back here to see where it plugs in.
+Each topic below is something the project uses. For each one: why it is
+needed here, where it appears in this repository, and the paper or book to
+read for it. The [tour](tour/README.md) tells the story in order;
+[`derivation.md`](derivation.md) does the full derivation. This file is the
+index between them and the literature.
 
-Not a substitute for `derivation.md`. That document *is* the derivation, in
-the order the thesis needs it, written so you can defend it on a whiteboard.
-This file is the index that sits one level above it: what to learn before
-each section, and what in the literature backs it up.
+## 1. Second-quantised fermion operators
 
-## 1. Second-quantized fermion operators
+The project represents "a particle is present at this site" as an operator
+algebra, not a wavefunction. Staggering, Jordan-Wigner and the Hamiltonian are
+all built from creation and annihilation operators and their anticommutation
+relations.
 
-**Why it's here:** the whole project starts by representing "a particle is
-present at this site" as an operator algebra, not a wavefunction. Everything
-downstream (staggering, Jordan-Wigner, the Hamiltonian itself) is built on
-creation/annihilation operators and their anticommutation relations.
+- In this repository: `derivation.md` section 2; `jordan_wigner.py`.
+- Any graduate quantum mechanics text covers the algebra.
 
-- `derivation.md` section 2 (the fermion-doubling problem) assumes this.
-- Proposal section 6, item 1: the two-site Hamiltonian by hand is the
-  concrete check for this topic specifically.
+## 2. Lattice discretisation and fermion doubling
 
-## 2. Lattice discretization and fermion doubling
+Putting a relativistic fermion on a grid naively creates extra particle
+species that are not physical. Staggering (topic 3) is the fix, and the
+problem has to be seen first for the fix to make sense.
 
-**Why it's here:** naively putting a relativistic fermion on a grid conjures
-extra particle species that aren't physical. Staggering (next topic) is the
-fix, but you have to see the problem first to believe the fix is necessary.
+- In this repository: `derivation.md` section 2.1; thesis Section 2.2.
+- Nielsen and Ninomiya, Nucl. Phys. B 185, 20 (1981),
+  [doi:10.1016/0550-3213(81)90361-8](https://doi.org/10.1016/0550-3213(81)90361-8),
+  for why doublers cannot be removed for free.
 
-- `derivation.md` section 2.1.
-- Proposal section 4.2.
+## 3. Staggered fermions
 
-## 3. Staggered fermions (Kogut-Susskind)
+The trick that fixes doubling here: the components of one fermion are spread
+across even and odd sites. It is also where the picture of the vacuum as
+"odd sites filled" comes from, and that state is where every circuit starts.
 
-**Why it's here:** this is the specific trick that fixes doubling for this
-project: spreading the components of one fermion across even/odd sites. It
-is also where the "vacuum = odd sites filled" picture comes from, which is
-the reference state every later circuit starts from.
-
-- `derivation.md` sections 2.2-2.3.
-- `papers/hamiltonian-formulations-lqcd.pdf` for general background.
-- Primary citation: Kogut and Susskind, PRD 11, 395 (1975). Not on arXiv,
-  so get it through the library (see `papers/README.md`).
+- In this repository: `derivation.md` sections 2.2 and 2.3;
+  [tour chapter 2](tour/02-four-sites-four-qubits.md).
+- Kogut and Susskind, Phys. Rev. D 11, 395 (1975),
+  [doi:10.1103/PhysRevD.11.395](https://doi.org/10.1103/PhysRevD.11.395).
 
 ## 4. Gauss's law and eliminating the gauge field
 
-**Why it's here:** this is the single structural decision that makes N=4 cost
-4 qubits instead of 4 qubits plus 3 link registers. Understanding *why* the
-field can be solved away in 1+1D (not just that it can) is load-bearing.
-It's also why there's no "Gauss's law violation" to measure in this encoding
-(the constraint holds identically), which is a correction CLAUDE.md flags
-explicitly.
+In one dimension Gauss's law fixes the electric field completely, so four
+sites cost four qubits rather than four qubits plus three field registers.
+The same fact means there is no Gauss's-law violation to measure in this
+encoding, because the constraint holds on every state.
 
-- `derivation.md` section 3.
-- `papers/martinez-2016-realtime-dynamics.pdf`: the primary encoding
-  reference, Methods Eq. (3) in arXiv:1605.04570v1.
+- In this repository: `derivation.md` section 3; `schwinger.py`;
+  `analytics.gauss_law_residual`.
+- Martinez et al., Nature 534, 516 (2016),
+  [doi:10.1038/nature18318](https://doi.org/10.1038/nature18318), the encoding
+  this project follows (Methods Eq. (3) in arXiv:1605.04570v1).
+- Hamer et al., Phys. Rev. D 56, 55 (1997),
+  [doi:10.1103/PhysRevD.56.55](https://doi.org/10.1103/PhysRevD.56.55), for
+  eliminating the field.
 
 ## 5. Jordan-Wigner transformation
 
-**Why it's here:** the known failure mode for this entire class of project
-(per the proposal's own risk section) is a sign error here. The project
-deliberately learns this on the transverse-field Ising model first, where a
-closed-form answer exists, before touching the unsolved Schwinger case.
+A sign error here is the classic way projects like this go wrong. The project
+learns the transformation on the transverse-field Ising model first, where a
+closed-form answer exists, before applying it to the Schwinger model.
 
-- `derivation.md` section 4 and 4.1 (the Ising warm-up, which is not
-  optional).
-- CLAUDE.md's "Jordan-Wigner sign" convention note: the minus sign in
-  `c_j^dag c_{j+1} = -sigma^+_j sigma^-_{j+1}` is real, not a bug. Run
-  `hopping_sign_demo()` before touching any coefficient to make a sign work
-  out.
+- In this repository: `derivation.md` sections 4 and 4.1; `jordan_wigner.py`
+  (`hopping_sign_demo` settles the hopping sign numerically); `ising.py`;
+  [`CONVENTIONS.md`](../CONVENTIONS.md) section 4.
+- Jordan and Wigner, Z. Phys. 47, 631 (1928),
+  [doi:10.1007/BF01331938](https://doi.org/10.1007/BF01331938).
+- Sachdev, *Quantum Phase Transitions*, 2nd ed. (2011), which treats
+  Jordan-Wigner and the Ising chain together.
 
-## 6. Building the N=4 Hamiltonian as a Pauli string
+## 6. The four-site Hamiltonian as Pauli strings
 
-**Why it's here:** this is where sections 1-5 combine into the actual object
-the rest of the project operates on: a 16x16 matrix, sum of Pauli strings.
+Topics 1 to 5 combine into the object the rest of the project works on: a
+16-by-16 matrix written as a sum of 14 Pauli strings.
 
-- `derivation.md` section 5 (5.1 expanding the electric term, 5.2 the
-  result).
-- `derivation.md` section 6 for what each check on this Hamiltonian actually
-  proves (strong-coupling limit, mass limits).
+- In this repository: `derivation.md` sections 5 and 6;
+  `scripts/03_schwinger_spectrum.py` prints the table; thesis Table 1.
 
-## 7. Trotterization / product formulas
+## 7. Trotter product formulas
 
-**Why it's here:** this is how `e^{-iHt}` gets turned into a quantum circuit.
-The scaling exponent (slope 1 for first-order, slope 2 for second-order on a
-log-log error plot) is a falsifiable prediction, not a sanity check. A wrong
-slope means the circuit is built wrong even if the numbers look plausible.
+This is how `e^{-iHt}` becomes a circuit. The scaling exponent (slope 1 for
+first order, 2 for second order on a log-log error plot) is a prediction that
+can fail, which makes it a real test of the circuit.
 
-- Proposal section 5.2 and 7.1.
-- `papers/childs-2021-theory-of-trotter-error.pdf`: the theory behind the
-  bound. Read before Shaw et al.
-- `papers/shaw-2020-quantum-algorithms-lattice-schwinger.pdf`: Trotter and
-  shot-noise bounds on the same system, with published numbers to compare
-  against.
+- In this repository: `circuits.py`; `scripts/05_qiskit_trotter.py`;
+  [tour chapter 4](tour/04-time-steps-and-shots.md).
+- Childs et al., Phys. Rev. X 11, 011020 (2021),
+  [doi:10.1103/PhysRevX.11.011020](https://doi.org/10.1103/PhysRevX.11.011020),
+  for Trotter error bounds.
+- Shaw et al., Quantum 4, 306 (2020),
+  [doi:10.22331/q-2020-08-10-306](https://doi.org/10.22331/q-2020-08-10-306),
+  for Trotter and shot-noise bounds on this model.
 
 ## 8. The variational principle and VQE
 
-**Why it's here:** VQE was the originally proposed method for ground-state
-prep (proposal section 5.1, schedule weeks of Oct 13/20). As of 2026-10-01
-this project uses SKQD instead (see topic 9). But the variational principle
-itself is still worth understanding, partly because its free correctness
-check (`<H> >= E0` always, so underestimating the ground energy is a bug, not
-a discovery) is a good model for what a *cheap* check looks like, and partly
-because the Methods section should explain why VQE was considered and set
-aside.
+The project proposal planned to use VQE for the ground state. SKQD replaced
+it (topic 9), but the variational principle still matters: `<H> >= E_0` for
+every state, so an energy below the true ground energy is a bug, not a
+discovery. That is the kind of cheap check the project relies on.
 
-- Proposal section 5.1.
-- `papers/kokail-2019-self-verifying-variational.pdf`: variational
-  simulation on trapped ions; closest published relative of the Gauss's-law
-  diagnostic idea.
+- Peruzzo et al., Nat. Commun. 5, 4213 (2014),
+  [doi:10.1038/ncomms5213](https://doi.org/10.1038/ncomms5213), the original
+  VQE.
+- Kokail et al., Nature 569, 355 (2019),
+  [doi:10.1038/s41586-019-1177-4](https://doi.org/10.1038/s41586-019-1177-4),
+  variational ground states of this model on up to 20 trapped-ion qubits.
+- Wang et al., Nat. Commun. 12, 6961 (2021),
+  [doi:10.1038/s41467-021-27045-6](https://doi.org/10.1038/s41467-021-27045-6),
+  on how noise flattens the cost function until its gradients vanish.
 
 ## 9. Krylov subspace methods and SKQD
 
-**Why it's here:** this is the method actually adopted for ground-state prep,
-decided 2026-10-01 after reading Rosanowski et al. The core idea is to sample
-bitstrings from a time-evolved reference state, build a subspace from them,
-and diagonalize the Hamiltonian classically inside that subspace. This reuses
-the same Trotter circuit infrastructure from topic 7, rather than requiring a
-separate classical optimization loop like VQE does.
+The method used for the ground state, chosen on 1 October 2026. Sample
+bitstrings from time-evolved states, build a subspace from them, and
+diagonalise the Hamiltonian inside it on a classical computer. It reuses the
+Trotter circuits from topic 7 and needs no optimiser loop.
 
-- `papers/rosanowski-2025-sample-based-krylov.pdf`: read in full
-  2026-10-01. Section III A is the SKQD protocol itself; Section IV A is an
-  N=4 demonstration on a trapped-ion processor that is close to a direct
-  template for this project (same zero-charge-sector postselection, same
-  kinetic-only Trotter circuit, validated against exact diagonalization).
-- `papers/miura-2026-active-sampling-sample-based.pdf`: shot count as a
-  *structural bias* source in sample-based diagonalization, distinct from
-  ordinary shot noise. Relevant once SKQD's own shot count becomes part of
-  the error budget (M10).
+- In this repository: `skqd.py`; `scripts/07_skqd_ground_state.py`;
+  [tour chapter 7](tour/07-ground-state-from-bitstrings.md).
+- Yu et al., arXiv:2501.09702 (2025), the method.
+- Rosanowski et al., arXiv:2510.26951 (2025), the method applied to the
+  Schwinger model. Its four-qubit demonstration (Section IV A) was close to a
+  template for this project.
+- Miura (2026), [doi:10.1109/QCNC69040.2026.00163](https://doi.org/10.1109/QCNC69040.2026.00163),
+  on unsampled bitstrings as a source of bias.
 
-## 10. The error budget: Trotter error, shot noise, gate/readout error
+## 10. The error budget
 
-**Why it's here:** this is the actual thesis, not a supporting topic. The
-three sources scale differently (Trotter error is systematic and
-step-size-dependent; shot noise falls as 1/sqrt(shots); gate/readout error is
-a hardware noise-model parameter) and have to be separated, not lumped,
-because the headline results (the crossover point and the failure threshold)
-are statements about where one source overtakes another.
+The three error sources scale differently. Trotter error is systematic and
+depends on the step size; shot noise falls as one over the square root of the
+number of shots; gate and readout error are properties of the hardware. The
+main results, the crossover and the failure threshold, are statements about
+where one source overtakes another, so the sources have to be separated.
 
-- Proposal section 7, all subsections. This is the most important single
-  section of the proposal to re-read before M10-M12.
-- `papers/shaw-2020-quantum-algorithms-lattice-schwinger.pdf` and
-  `papers/childs-2021-theory-of-trotter-error.pdf` for Trotter error.
-  `papers/miura-2026-active-sampling-sample-based.pdf` for shot-count bias.
-- Noise channels for M11, now done in simulation in `noise.py`: Nielsen and
-  Chuang (2010) for the depolarizing channel and how its strength converts
-  to average gate infidelity; Magesan et al., PRL 106, 180504 (2011) for
-  infidelity as the randomized-benchmarking number on hardware data sheets;
-  McKay et al., PRA 96, 022330 (2017) for why RZ gates carry no error;
-  Bravyi et al., PRA 103, 042605 (2021) for correcting readout error by
-  inverting the confusion matrix. All four are in `thesis/refs.bib` and
-  cited in Methods. None is in `papers/` yet, so check each claim against
-  the source before the Discussion leans on it.
+- In this repository: `noise.py`, `diagnostics.py`, `budget.py`;
+  `scripts/06` and `scripts/08`; [`error-budget.md`](error-budget.md);
+  [tour chapter 5](tour/05-gate-errors.md).
+- Nielsen and Chuang, *Quantum Computation and Quantum Information* (2010),
+  for the depolarising channel and its link to average gate infidelity.
+- Magesan et al., Phys. Rev. Lett. 106, 180504 (2011),
+  [doi:10.1103/PhysRevLett.106.180504](https://doi.org/10.1103/PhysRevLett.106.180504),
+  for infidelity as the randomised-benchmarking number hardware quotes.
+- McKay et al., Phys. Rev. A 96, 022330 (2017),
+  [doi:10.1103/PhysRevA.96.022330](https://doi.org/10.1103/PhysRevA.96.022330),
+  for why RZ gates carry no error on superconducting hardware.
+- Bravyi et al., Phys. Rev. A 103, 042605 (2021),
+  [doi:10.1103/PhysRevA.103.042605](https://doi.org/10.1103/PhysRevA.103.042605),
+  for correcting readout error by inverting the confusion matrix.
 
-## 10b. Where this is implemented
+## 11. Symmetries as diagnostics
 
-- `docs/error-budget.md` is the explanation of everything in this topic, with a
-  twelve-question self-test, written 2026-10-13. Read it before the
-  Results/Discussion draft.
-- Code: `noise.py`, `diagnostics.py`, `budget.py`, `skqd.py`; figures 06-08.
+With no Gauss's-law violation to measure, the noise diagnostics are the
+variance of the total charge (`[H, Q] = 0` exactly) and a CP symmetry that
+commutes with `H` only inside the neutral sector. Most noise breaks both.
+Dephasing on the logical state between Trotter steps breaks neither, which is
+the blind spot.
 
-## 11. Symmetries as diagnostics (charge conservation, CP)
-
-**Why it's here:** in this encoding there is no Gauss's-law violation to
-measure (the constraint is substituted, not imposed, so it holds identically).
-The actual noise diagnostics are total charge variance (`[H,Q] = 0` exactly
-in the clean theory) and a CP symmetry that only commutes with H inside the
-neutral sector. Both are exact on paper and most real noise breaks them,
-which is what makes them useful probes. Not all noise does: dephasing on the
-logical state between Trotter steps breaks neither (the blind spot in
-`docs/error-budget.md`).
-
-- `derivation.md` section 7 ("a symmetry that was not in the plan") and
-  section 8.2 (a correction to the proposal's own text: why the Gauss's-law
-  diagnostic doesn't exist in this encoding).
-- `papers/nguyen-2022-symmetry-protection-trapped-ions.pdf`: the model for
-  this diagnostic.
-
-## How to use this with an external tool (Gemini, etc.)
-
-Fine to get the conceptual explanation anywhere. Before trusting it into the
-thesis, check it against the specific section and paper listed above. If a
-general explanation of, say, Jordan-Wigner doesn't mention the string-of-Z
-nonlocality or match the sign convention in CLAUDE.md, it's explaining the
-textbook version, not this project's version. The self-test in
-`derivation.md` section 9 is the twelve-question check for whether you can
-actually trace the whole chain, which is the standard that matters by
-December.
+- In this repository: `derivation.md` sections 7 and 8.2;
+  `diagnostics.py`; [tour chapter 6](tour/06-warning-light.md).
+- Nguyen et al., PRX Quantum 3, 020324 (2022),
+  [doi:10.1103/PRXQuantum.3.020324](https://doi.org/10.1103/PRXQuantum.3.020324),
+  the same encoding on trapped ions, where keeping only zero-charge outcomes
+  helped more than their symmetry-protection scheme.

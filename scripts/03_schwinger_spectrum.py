@@ -1,7 +1,7 @@
 """
-M5 / Gate 2: the N = 4 Schwinger Hamiltonian, built, diagonalised, and checked.
+The N = 4 Schwinger Hamiltonian, built, diagonalised and checked.
 
-Prints the Pauli-string table (the Gate 2 deliverable) and every verification
+Prints the Pauli-string table (thesis Table 1) and every verification
 residual, then draws the spectrum and the chiral condensate against the
 fermion mass.
 
@@ -57,7 +57,7 @@ def main() -> None:
     use_report_style()
 
     print("=" * 60)
-    print(f"GATE 2 ARTIFACT: N = {N} SCHWINGER HAMILTONIAN")
+    print(f"THE N = {N} SCHWINGER HAMILTONIAN")
     print("=" * 60)
     print(symbolic_table(N))
     print()

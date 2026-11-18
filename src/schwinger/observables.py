@@ -2,8 +2,8 @@
 Physical observables for the lattice Schwinger model.
 
 Every observable here is an explicit Hermitian matrix, so its expectation
-value is exact for a given state. When shot noise and gate error arrive in
-M10-M12, these become the quantities whose uncertainties get propagated.
+value is exact for a given state. diagnostics.py computes the same quantities
+from measured outcome distributions, with their shot-noise errors.
 """
 
 from __future__ import annotations
@@ -19,12 +19,12 @@ def particle_number_op(n_sites: int) -> np.ndarray:
     Total number of particles plus antiparticles, counted from the bare vacuum.
 
     An even physics site holds a particle when occupied; an odd site holds an
-    antiparticle when EMPTY (a hole in the Dirac sea). Adding both:
+    antiparticle when empty (a hole in the Dirac sea). Adding both:
 
         N_part = (1/2) sum_n [ I + (-1)^n Z_n ]
 
     which is zero on the bare vacuum by construction, and rises as pairs are
-    created. This is the observable in the headline pair-production figure.
+    created. It is the observable in the pair-production figures.
     """
     dim = 2 ** n_sites
     out = np.zeros((dim, dim), dtype=complex)
@@ -45,18 +45,16 @@ def chiral_condensate_op(n_sites: int) -> np.ndarray:
         psi-bar psi = (1/N) sum_n (-1)^n c_n^dag c_n
                     = (1/2N) sum_n (-1)^n Z_n          (the constant drops for even N)
 
-    It is an order parameter for the vacuum: it tells you which phase the
-    vacuum is in, the same job an order parameter does in any condensed-matter
-    problem.
+    It is an order parameter: it tells you which phase the vacuum is in.
 
-    Useful identity, and a free correctness check: the staggered mass term of H
+    It also gives a free correctness check: the staggered mass term of H
     is exactly  m * N * (psi-bar psi), so by the Hellmann-Feynman theorem
 
         <psi-bar psi>  =  (1/N) dE_0/dm
 
     `analytics.hellmann_feynman_residual` checks the operator expectation
-    against a numerical derivative of the ground energy. Know what that proves
-    and what it does not: the theorem holds for ANY Hamiltonian H0 + m V, so
+    against a numerical derivative of the ground energy. What that proves
+    is narrow: the theorem holds for any Hamiltonian H0 + m V, so
     agreement shows that this operator is exactly (1/N) dH/dm, i.e. that the
     observable and the mass term of H match in sign and normalisation. It says
     nothing about the hopping or electric terms; other checks cover those.
@@ -90,8 +88,8 @@ def charge_variance(state: np.ndarray, n_sites: int) -> float:
     """
     Var(Q) = <Q^2> - <Q>^2.
 
-    THE DIAGNOSTIC OBSERVABLE, and read the note in docs/derivation.md before
-    using it. In this encoding Gauss's law is solved and substituted away, so
+    The main noise diagnostic. docs/derivation.md section 8.2 explains why it
+    replaces a Gauss's-law check. In this encoding Gauss's law is solved and substituted away, so
     it holds identically on every state in the Hilbert space and there is no
     Gauss's law violation left to measure. What survives as a symmetry
     constraint is total charge: [H, Q] = 0, so physical evolution stays in one
@@ -111,7 +109,7 @@ def evolve(state: np.ndarray, ham: np.ndarray, times: np.ndarray) -> np.ndarray:
 
     Done through the spectral decomposition rather than scipy.expm, so the cost
     is one diagonalisation regardless of how many time points are requested.
-    This is the ground truth that Trotterisation will be compared against in M8.
+    The Trotter circuits are compared against this.
     """
     from .paulis import eigh_sorted
 

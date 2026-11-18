@@ -1,14 +1,13 @@
 # The N = 4 lattice Schwinger model, derived from scratch
 
-Abror Niyazmetov, PHY 420, Fall 2026. Last revised 2026-09-10.
+Abror Niyazmetov, PHY 420, Fall 2026. Last revised 2026-11-18.
 
 This document does one thing: it gets you from "quantum electrodynamics in one
 space dimension" to an explicit list of fourteen Pauli strings on four qubits,
 with every step reproducible on a whiteboard and every claim checkable against
 a number. It assumes one quantum mechanics course and no field theory.
 
-Read section 0 first even if you skip everything else. It is the reason the
-project is safe.
+Section 0 explains why this is less work than it sounds.
 
 ---
 
@@ -47,14 +46,13 @@ with it.
 
 - `psi` is the matter field, a two-component spinor. Two components because in
   1+1 dimensions the gamma matrices are 2x2, so the Dirac equation needs only
-  two. There is no spin here. Careful with the next step, because it is the
-  one most often said wrong: the two components are NOT "one for the particle
-  and one for the antiparticle". Each component contains both particle and
+  two. There is no spin here. The two components are not "one for the particle
+  and one for the antiparticle", a common misreading. Each component contains both particle and
   antiparticle modes; particle and antiparticle come from the positive- and
   negative-frequency solutions of the whole field. In the chiral basis the two
   components are the right- and left-movers. The field describes a particle
   and its antiparticle, each with a single internal state. Sites that hold
-  particles versus holes are a feature of the staggered LATTICE (section 2),
+  particles versus holes are a feature of the staggered lattice (section 2),
   not of the continuum components.
 - `D_mu = partial_mu + i g A_mu` is the covariant derivative. The gauge field
   `A_mu` is there because the theory is required to be unchanged under a local
@@ -62,12 +60,12 @@ with it.
   exist. This is the only thing you need from gauge invariance.
 - `F_mu-nu` is the field strength, the photon's kinetic term.
 
-**The simplification that makes everything work.** The magnetic field is
+*The simplification that makes everything work.* The magnetic field is
 `F_12`, and there is no second spatial direction, so there is no `F_12`. The
 electromagnetic field has exactly one component, the scalar electric field `E`.
 No polarisation, no propagating photon, one number per point.
 
-**What survives.** In one dimension the electric field between two opposite
+*What survives.* In one dimension the electric field between two opposite
 charges cannot spread out. Field lines have nowhere to go. So the field
 between them is constant, independent of separation, and the potential energy
 grows linearly with distance:
@@ -85,13 +83,12 @@ making a fresh particle-antiparticle pair out of nothing. At that point the
 vacuum makes one, the new pair screens the original charges, and the flux
 string snaps. That is string breaking.
 
-**Why anyone simulates this on a quantum computer.** The workhorse of lattice
-gauge theory is Monte Carlo sampling in imaginary time. Continue those results
+*Why anyone simulates this on a quantum computer.* The standard method of
+lattice gauge theory is Monte Carlo sampling in imaginary time. Continue those results
 to real time and the sampling weights become complex, so the statistical error
 grows exponentially with the time you want to reach. That is the sign problem.
 A quantum processor evolves in real time natively and never forms those
-weights. This is one of the few places where the argument for quantum
-simulation is a physics argument rather than a sales pitch.
+weights.
 
 ---
 
@@ -104,14 +101,13 @@ immediately.
 ### 2.1 Fermion doubling
 
 The naive symmetric difference `(psi_{n+1} - psi_{n-1}) / 2a` has momentum
-space representation `(i/a) sin(pa)`, which vanishes **twice** in the Brillouin
+space representation `(i/a) sin(pa)`, which vanishes twice in the Brillouin
 zone: at `p = 0`, which is the physical particle, and at `p = pi/a`, which is
 not. You asked for one fermion species and the lattice gave you two. In `d`
 dimensions it gives you `2^d`. These extra species are called doublers and
 they are an artifact of the discretisation, not physics.
 
-This is not a small technical annoyance. It is a theorem (Nielsen and
-Ninomiya) that you cannot remove doublers while keeping locality, chiral
+A theorem of Nielsen and Ninomiya says you cannot remove doublers while keeping locality, chiral
 symmetry and the correct continuum limit all at once. Something has to give.
 
 ### 2.2 Kogut and Susskind's answer: stagger the components
@@ -121,10 +117,10 @@ component on even sites and the other on odd sites. The two-component spinor
 becomes a single-component field on a lattice of twice the spacing, and the
 doubling is absorbed into the staggering rather than added on top of it.
 
-The consequence you will actually use:
+The consequence used everywhere below:
 
-> **Even physics sites hold particles. Odd physics sites hold antiparticles,
-> and an antiparticle is a HOLE, not an occupation.**
+> Even physics sites hold particles. Odd physics sites hold antiparticles,
+> and an antiparticle is a hole, not an occupation.
 
 So the vacuum is not "everything empty". It is the filled Dirac sea: every odd
 site occupied, every even site empty. That is why the charge density is
@@ -136,13 +132,11 @@ site occupied, every even site empty. That is why the charge density is
 The subtracted term is the reference occupation: 1 on odd sites, 0 on even
 sites. Subtracting it is exactly what makes the Dirac sea neutral.
 
-**Attribution, since your bibliography annotation depends on it.** Kogut and
-Susskind, Phys. Rev. D 11, 395 (1975) is the correct citation for the
-Hamiltonian lattice formulation and the staggered construction you are using.
-Susskind, Phys. Rev. D 16, 3031 (1977) is the later extension to higher
-dimensions. For a 1+1 dimensional Hamiltonian project, cite the 1975 paper.
-Your existing annotation is right; the flag in the corrections file can be
-closed.
+*Attribution.* Kogut and Susskind, Phys. Rev. D 11, 395 (1975) is the
+citation for the Hamiltonian lattice formulation and the staggered
+construction used here. Susskind, Phys. Rev. D 16, 3031 (1977) is the later
+extension to higher dimensions, so a 1+1 dimensional Hamiltonian project cites
+the 1975 paper.
 
 ### 2.3 The Kogut-Susskind Hamiltonian
 
@@ -159,19 +153,16 @@ conjugate electric field `E_n`. The Hamiltonian is
 The staggered `(-1)^n` on the mass is the price of staggering: the two spinor
 components enter the mass term with opposite sign.
 
-**Where pair production comes from, mechanically.** The hopping term moves a
+*Where pair production comes from, mechanically.* The hopping term moves a
 fermion from site `n+1` to site `n`. If `n` is even and `n+1` is odd, that
 takes an occupied odd site (part of the sea) and an empty even site, and
 produces an occupied even site and an empty odd site. In the language of
 particles: it has created a particle on the even site and an antiparticle
-(a hole) on the odd site. **The hopping term IS the pair creation operator.**
-That is the single most useful thing to notice in this section.
+(a hole) on the odd site. So the hopping term is the pair creation operator.
 
 ---
 
 ## 3. Gauss's law, and why there is no gauge field left
-
-This is the structural heart of the project.
 
 Gauss's law in the continuum is `dE/dx = rho`. On the lattice it becomes a
 difference equation:
@@ -184,7 +175,7 @@ In three dimensions this is a constraint: it restricts which states are
 physical, but it does not tell you what `E` is, because the field can circulate.
 
 In one dimension there is nowhere to circulate. With open boundaries and no
-background field, `E_0 = 0`, and the equation can be **solved**:
+background field, `E_0 = 0`, and the equation can be solved:
 
 ```
     E_n  =  L_n  =  sum_{k <= n} rho_k
@@ -195,28 +186,27 @@ The gauge field is not an independent degree of freedom at all. So instead of
 imposing Gauss's law on a bigger Hilbert space, substitute it in and delete
 the gauge field entirely.
 
-**What this buys.** Four sites need four qubits. Not four qubits plus a
+*What this buys.* Four sites need four qubits. Not four qubits plus a
 truncated bosonic register on every link. No cutoff on the field, no
 truncation error, no unphysical sector to project out.
 
-**What it costs.** `L_n` is a sum over everything to the left, so `L_n^2` is
+*What it costs.* `L_n` is a sum over everything to the left, so `L_n^2` is
 long-ranged in the spins. Expanding the square gives `Z_m Z_m'` couplings
 between every pair of sites. You have traded locality for qubits.
 
-**And that long-range coupling is the confinement.** Work out the coefficient
-(section 5) and you get `(J/2)(N - m')` for the pair `(m, m')`: it depends only
-on the right-hand site, and it grows linearly with distance from the right
-edge. A pair separated by more links costs more energy, linearly, because the
-flux between them is stored on every link in between. The linear potential of
-section 1 is sitting in the coefficient table.
+*Where confinement shows up.* A neutral pair whose charges sit `r` links
+apart has field `+1` or `-1` on each of those `r` links, so its field energy is
+`r J`: the linear potential of section 1, on the lattice. The `Z_m Z_m'`
+coefficients themselves, `(J/2)(N - m')`, depend only on the right-hand site
+because the field is counted from the left end; section 5.2 explains the
+pattern.
 
-**A consequence that catches people out, and it affects your proposal.**
-Because Gauss's law is substituted rather than imposed, it holds identically
-on **every** state in the Hilbert space, physical or not. There is no Gauss's
+*A consequence for the diagnostics.* Because Gauss's law is substituted
+rather than imposed, it holds identically on every state in the Hilbert space, physical or not. There is no Gauss's
 law violation left to measure. `analytics.gauss_law_residual` confirms this:
 it is exactly zero on the whole space, not just on physical states.
 
-The proposal's diagnostic has to change. What survives as a symmetry is total
+So the diagnostic planned in the project proposal had to change. What survives as a symmetry is total
 charge, `Q = sum_n rho_n`, which commutes with `H` exactly, so physical
 evolution never leaves its charge sector. A noisy device does not respect that.
 So the charge diagnostics, `Var(Q)` and the leakage `1 - P(Q = 0)`, take over
@@ -228,16 +218,16 @@ described in section 7.
 
 ---
 
-## 4. Jordan-Wigner, the crux
+## 4. Jordan-Wigner
 
 Now turn a fermion problem into a qubit problem.
 
-**The problem.** Fermion operators on different sites anticommute. Spin
+*The problem.* Fermion operators on different sites anticommute. Spin
 operators on different sites commute, because they act on different tensor
 factors. So "spin up equals occupied" cannot be right on its own: it gets the
 statistics wrong.
 
-**The fix.** Attach a string of `Z` operators:
+*The fix.* Attach a string of `Z` operators:
 
 ```
     c_j  =  ( Z_1 Z_2 ... Z_{j-1} )  sigma^-_j
@@ -247,7 +237,7 @@ Each `Z` contributes `-1` for every occupied site to the left of `j`. That is
 exactly the minus sign fermionic statistics demands. The price is that the
 operator is nonlocal: an operator on site 5 touches sites 1 through 4.
 
-**Check it, do not believe it.** Take `c_1 = sigma^-_1` and
+*Checking it.* Take `c_1 = sigma^-_1` and
 `c_2^dag = Z_1 sigma^+_2`. Using `sigma^- Z = sigma^-` and
 `Z sigma^- = -sigma^-`:
 
@@ -260,7 +250,7 @@ They sum to zero. The operators anticommute, which is what was wanted.
 `jordan_wigner.anticommutation_residuals` does this for every pair on the full
 Hilbert space and returns exactly zero.
 
-**Two useful consequences.**
+Two consequences follow.
 
 The number operator is local, because the string cancels against itself:
 
@@ -268,7 +258,7 @@ The number operator is local, because the string cancels against itself:
     n_j  =  c_j^dag c_j  =  sigma^+_j sigma^-_j  =  ( I + Z_j ) / 2
 ```
 
-With `sigma^+ = |0><1|` this means `|0>` is the OCCUPIED state. Combined with
+With `sigma^+ = |0><1|` this means `|0>` is the occupied state. Combined with
 the staggered reference occupation from section 2, that gives
 
 ```
@@ -278,7 +268,7 @@ the staggered reference occupation from section 2, that gives
 and the bare vacuum is `Z_n = -(-1)^n`, which for N = 4 is the bit string
 `0101`.
 
-**The sign that will cost you an afternoon.** For nearest neighbours the
+*The hopping sign.* For nearest neighbours the
 strings almost cancel, leaving one `Z`:
 
 ```
@@ -291,9 +281,9 @@ which changes no spectrum. `hopping_sign_demo()` verifies all three claims
 numerically: that the plain string gives a minus, that the alternating string
 `prod (-Z_i)` gives a plus, and that the spectra are identical.
 
-**Do not adjust a coefficient to make a sign come out. Run that function.**
+Do not adjust a coefficient to make a sign come out; run that function first.
 
-### 4.1 Why the warm-up on the Ising model is not optional
+### 4.1 The warm-up on the Ising model
 
 The transverse-field Ising model, `H = -J sum X_n X_{n+1} - h sum Z_n`, is
 exactly solvable. Jordan-Wigner maps it to free fermions, a Bogoliubov
@@ -304,17 +294,17 @@ Schwinger model, where no analytic answer exists.
 
 Two things were found by doing this rather than reading about it.
 
-**The ring trap.** On a periodic chain the string wraps and the boundary bond
+*The ring trap.* On a periodic chain the string wraps and the boundary bond
 picks up a factor `-P`, with `P` the total fermion parity. So the problem
 splits into two sectors, antiperiodic momenta for even parity and periodic for
 odd. Worse, at `k = 0` and `k = pi` the pairing term vanishes, so those modes
-are already diagonal and their energy is the **signed** `2(h - J cos k)`, not
+are already diagonal and their energy is the signed `2(h - J cos k)`, not
 the positive square root. Using the square root there is wrong by exactly
 `|2(h - J)|`, and only in the ordered phase `h < J`. The disordered phase looks
-perfect, which is what makes the bug shippable. `figures/02_jordan_wigner.png`
+perfect, so the bug is easy to miss. `figures/02_jordan_wigner.png`
 shows both versions against exact diagonalisation.
 
-**A conditioning trap that is not about physics at all.** The textbook route
+*A numerical trap.* The textbook route
 to the Bogoliubov energies is to form `(A - B)(A + B)`, take its eigenvalues
 and square-root them. Since `A` is symmetric and `B` antisymmetric,
 `(A + B)^T = A - B`, so that product is `M^T M`. Forming it squares the
@@ -344,14 +334,12 @@ eliminated, and everything collapses to a spin chain:
 
 with `w = 1/(2a)` and `J = g^2 a / 2`.
 
-**This is the spin Hamiltonian of Martinez et al., Nature 534, 516 (2016)**
+This is the spin Hamiltonian of Martinez et al., Nature 534, 516 (2016)
 (Methods Eq. (3) in arXiv:1605.04570v1; Eq. (2) there is Gauss's law), who run
 exactly this system at N = 4 with four qubits on a trapped-ion device, open
-boundaries, zero background field. It is the reference to check your
-derivation against, and it is a printed peer-reviewed equation for precisely
-the object Gate 2 asks for.
-
-**It is not Klco et al. (2018).** See section 8.
+boundaries, zero background field. It is the reference to check the
+derivation against: a published equation for exactly this object. It is not
+Klco et al. (2018); see section 8.
 
 ### 5.1 Expanding the electric term
 
@@ -376,12 +364,12 @@ The hopping term in Pauli form is
 
 `schwinger.hamiltonian_terms` implements this expansion and
 `schwinger.hamiltonian_direct` builds the same operator without it, by
-squaring `L_n` as a matrix. They agree to 1e-16, so the algebra above is
+squaring `L_n` as a matrix. They agree to 9e-16, so the algebra above is
 verified rather than asserted.
 
 ### 5.2 The result
 
-**N = 4, the Gate 2 artifact.**
+At N = 4:
 
 | Pauli string | coefficient | origin |
 |---|---|---|
@@ -400,30 +388,27 @@ verified rather than asserted.
 | `ZIZI` | `+0.5 J` | electric |
 | `ZZII` | `+1 J` | electric |
 
-Fourteen terms on four qubits. Three things in that table are worth being able
-to explain without notes.
+Fourteen terms on four qubits. Three things in the table need explaining.
 
-1. **Site 4 has no `ZZ` coupling.** With four sites there are three links, and
+1. *Site 4 has no `ZZ` coupling.* With four sites there are three links, and
    `L_3` involves sites 1, 2, 3 only. The rightmost site never enters the
    electric term. That is a direct consequence of open boundaries and the
    left-counting definition of `L_n`.
-2. **`ZZII` has twice the coefficient of `ZIZI` and `IZZI`.** From
+2. *`ZZII` has twice the coefficient of `ZIZI` and `IZZI`.* From
    `(J/2)(N - m')`: the pair (1,2) has `m' = 2` and gets `J`, the pairs (1,3)
    and (2,3) have `m' = 3` and get `J/2`. Put plainly: sites 1 and 2 appear
    together in two of the three link fields (`L_2` and `L_3`), while sites 1
    and 3, and 2 and 3, share only `L_3`. The pattern comes from counting the
    field from the left end. The physics underneath it does not depend on that
    choice: a neutral pair costs `J` for every link between its charges.
-   (Corrected 2026-11-17; this line used to say the left-edge pairs are
-   "separated by more links", which is false: sites 1 and 2 are neighbours.)
-3. **At `m = J` the `IZII` coefficient vanishes.** An accidental cancellation
+3. *At `m = J` the `IZII` coefficient vanishes.* An accidental cancellation
    between mass and electric contributions at that one parameter point, which
    is why the printed list at `m = w = J = 1` has thirteen terms rather than
-   fourteen. Worth knowing before someone asks why the count changed.
+   fourteen.
 
 ---
 
-## 6. The checks, and what each one actually proves
+## 6. The checks, and what each one proves
 
 Every number below is produced by `scripts/03_schwinger_spectrum.py`, which
 takes the worst case over several parameter sets, except the row marked
@@ -434,8 +419,8 @@ is left.
 | Check | Residual | What it proves |
 |---|---|---|
 | Pauli expansion vs direct matrix construction | 9e-16 | The algebra in 5.1 is right |
-| Fermion construction vs spin form | 9e-16 | **Jordan-Wigner was applied correctly. This is Gate 2.** |
-| Gauss's law is an identity | 0 | The gauge field really was eliminated, not just constrained |
+| Fermion construction vs spin form | 9e-16 | Jordan-Wigner was applied correctly |
+| Gauss's law is an identity | 0 | The gauge field was eliminated, not just constrained |
 | `[H, Q] = 0` | 0 | Charge bookkeeping is consistent |
 | Strong coupling `E0 = -mN/2` at `w = 0` | 0 | Mass and electric terms |
 | Free fermion limit, all 16 levels | 9e-16 | Hopping term and the JW string |
@@ -445,31 +430,30 @@ is left.
 
 Three of these deserve a sentence.
 
-**Strong coupling, `w = 0`.** With no hopping, `H` is diagonal. The electric
+*Strong coupling, `w = 0`.* With no hopping, `H` is diagonal. The electric
 term is a sum of squares so it is at least zero, and it vanishes only when
 every `L_n = 0`, which forces the bare vacuum. That same configuration also
 minimises the mass term, since `(m/2) sum (-1)^n Z_n >= -mN/2` with equality
 exactly when `Z_n = -(-1)^n`. One configuration minimises both terms at once,
 so there is no competition and `E0 = -mN/2` exactly, for any `J`.
 
-**Free fermions, `m = J = 0`.** Only the hopping survives, which is a
+*Free fermions, `m = J = 0`.* Only the hopping survives, which is a
 tight-binding chain on `N` sites with open ends. Standing waves give
 `eps_k = 2w cos( k pi / (N+1) )` for `k = 1..N`, and the many-body spectrum is
 every subset sum. All 16 levels, not just the ground state.
 
-**Hellmann-Feynman.** The staggered mass term is exactly `m N` times the
+*Hellmann-Feynman.* The staggered mass term is exactly `m N` times the
 chiral condensate operator, so `<psi-bar psi> = (1/N) dE0/dm`. Computing the
 condensate from the ground-state vector and from a finite difference of
 eigenvalues are different calculations, and they agree to 4e-12 at m = 0.5w and
 3e-11 at m = 1.5w, the size of
-the finite-difference error. Be precise about what that proves. The theorem
-`dE0/dm = <dH/dm>` holds for ANY Hamiltonian of the form `H0 + m V`, whatever
+the finite-difference error. What that proves is narrow. The theorem
+`dE0/dm = <dH/dm>` holds for any Hamiltonian of the form `H0 + m V`, whatever
 `H0` is. So agreement shows that the condensate operator is exactly
 `(1/N) dH/dm`: the observable and the mass term cannot disagree in sign or
 normalisation. A wrong hopping or electric term would pass it. It is a narrow
 consistency check, not the strongest one; the three constructions and the two
-limits are what cover the other terms. (An earlier draft called it "the
-check that would catch a wrong Hamiltonian". It would not.)
+limits are what cover the other terms.
 
 ---
 
@@ -480,8 +464,8 @@ While checking the electric field profile it turned out that `<L_1>` and
 
 Define `CP = R . X^(x)N`, where `R` reflects `n -> N+1-n` and `X^(x)N` flips
 every spin (charge conjugation, since it exchanges occupied and empty).
-Neither factor alone commutes with `H`. The product does, but **only inside
-the neutral sector**, and the reason is the same asymmetry that made the
+Neither factor alone commutes with `H`. The product does, but only inside
+the neutral sector, and the reason is the same asymmetry that made the
 electric term long-ranged. Under CP the charge density maps as
 
 ```
@@ -503,21 +487,20 @@ broken. Both maps are tested as operator identities
 (`test_cp_maps_densities_and_links_as_derived`). Measured at m = 0.5w, J = w:
 the commutator is 0 inside `Q = 0` and 5 on the full space.
 
-Two payoffs.
+Two uses.
 
-- **A free correctness check.** On a neutral state that CP leaves unchanged,
+- *A free correctness check.* On a neutral state that CP leaves unchanged,
   `<L_n> = <L_{N-n}>`. Neutrality alone is not enough: `|0110>` is neutral
-  and has links `(0, 0, -1)`. But the bare vacuum IS CP-symmetric, `H` keeps
+  and has links `(0, 0, -1)`. But the bare vacuum is CP-symmetric, `H` keeps
   it so, and the ground state is too. So at N = 4 the two outer links of
   every state this project evolves must carry equal flux. A simulation that
   violates this is wrong, and it costs nothing to measure.
-- **A second noise diagnostic.** CP joins total charge as a symmetry that most
-  device noise breaks, which matters for M11 and M12 now that Gauss's law is
-  unavailable for that job. Not all noise breaks it: dephasing on the logical
+- *A second noise diagnostic.* CP joins total charge as a symmetry that most
+  device noise breaks, which matters because Gauss's law is unavailable for
+  that job. Not all noise breaks it: dephasing on the logical
   state respects both symmetries (`docs/error-budget.md`).
 
-This is a small result, but it is the project's own, it was found by checking
-rather than reading.
+It is a small result, found by checking rather than by reading.
 
 ---
 
@@ -525,49 +508,41 @@ rather than reading.
 
 ### 8.1 Klco et al. (2018) is not the reference for this encoding
 
-The proposal and the study map both treat Klco et al., Phys. Rev. A 98, 032331
-(2018) as the primary methodological reference and imply the four-site
-Hamiltonian can follow their construction. It cannot, and the reason is more
+The project proposal treated Klco et al., Phys. Rev. A 98, 032331 (2018) as
+the primary methodological reference and implied the four-site Hamiltonian
+could follow their construction. It cannot, and the reason is more
 fundamental than a site count.
 
-Klco et al. do **not** eliminate the gauge field. They keep explicit flux-link
+Klco et al. do not eliminate the gauge field. They keep explicit flux-link
 registers with an energy cutoff `|l_n| < 1`, and then reduce the qubit count
 with symmetry projections. Their two-spatial-site system is 4 fermion sites
 plus 4 flux links, 1296 states in 12 qubits, cut to 2 or 3 qubits by Gauss's
-law, momentum and parity projections. That is a different encoding with a
-truncation error your project does not have.
-
-The correction file already noted the two-site versus four-site issue and
-already identified Martinez et al. as the cleaner reference for gauge
-elimination. Both are right, and the second point is the important one. Promote
-Martinez et al. (2016) to primary encoding reference. Keep Klco et al. for the
-symmetry-projection method and as an early hardware precedent, and rewrite any
-sentence that implies you are following their construction.
+law, momentum and parity projections. That is a different encoding, with a
+truncation error this project does not have. Martinez et al. (2016) is the
+encoding reference here; Klco et al. are cited for the symmetry-projection
+method and as an early hardware precedent.
 
 ### 8.2 The Gauss's law diagnostic does not exist in this encoding
 
-Section 3 above. The proposal calls this "the piece of the design I most want
-scrutinised", so it is worth catching now rather than in November. The
-replacement is total charge variance, plus the CP check from section 7. Both
+See section 3. The proposal called this "the piece of the design I most want
+scrutinised". The replacement is total charge variance, plus the CP check from section 7. Both
 are exact and both are cheap. Most noise breaks both, as it would have broken
 Gauss's law, but logical-frame dephasing breaks neither; that blind spot is a
 result in its own right (`docs/error-budget.md`).
 
-This is a strengthening rather than a loss: `Var(Q)` and the CP asymmetry are
-two independent diagnostics instead of one.
+The replacement gives two independent diagnostics, `Var(Q)` and the CP
+asymmetry, instead of one.
 
 ### 8.3 Staggered fermion attribution
 
-Kogut and Susskind (1975) is correct for what you are using. Susskind (1977)
-is the higher-dimensional extension. The flag in the corrections file can be
-closed. Section 2.2 has the wording to defend it.
+Kogut and Susskind (1975) is the right citation for what is used here;
+Susskind (1977) is the higher-dimensional extension (section 2.2).
 
 ---
 
 ## 9. Self-test
 
-If you cannot answer these without notes, the corresponding section did not
-land.
+Twelve questions to answer without notes. Each one maps to a section above.
 
 1. Why does the Schwinger model confine, in one sentence, without writing a
    formula?
@@ -581,18 +556,17 @@ land.
    minus. Which is wrong?
 8. The bare vacuum has zero particles and zero electric field. Pairs appear
    under time evolution. Where does the energy come from?
-9. Why is `ZZII` twice `ZIZI`, and what physical statement is that?
+9. Why is `ZZII` twice `ZIZI`, and is that physics or bookkeeping?
 10. Why is there no Gauss's law violation to measure here, and what replaces it?
 11. You claim your Hamiltonian is right. Name three independent checks and say
     what each would fail to catch on its own.
 12. Why is the transverse-field Ising warm-up worth the time it costs?
 
-Answer to 8, since it is the one most often got wrong and the proposal has it
-framed loosely: nothing is injected and no external agent pulls charges apart.
+Answer to 8: nothing is injected and no external agent pulls charges apart.
 The simulation starts in the bare vacuum, which is not an eigenstate of the
 full Hamiltonian once `w` is nonzero. Total energy is conserved exactly. On
 the bare vacuum the mass term (`-mN/2`) and the electric term (0) are both at
-their minimum, so making pairs raises BOTH. The hopping term, zero on the bare
+their minimum, so making pairs raises both. The hopping term, zero on the bare
 vacuum, goes negative and pays for them. At m = 0.5w, t = 0.89: mass -0.07
 (up 0.93), electric +0.97, hopping -1.90, total -1.00 throughout
 (`scripts/09_verification_table.py`). Do not say the energy "moves between the
@@ -607,7 +581,7 @@ and the true ground state energy, which
 
 Martinez, E. A. et al., *Real-time dynamics of lattice gauge theories with a
 few-qubit quantum computer*, Nature **534**, 516 (2016).
-**Primary encoding reference.** N = 4, four qubits, open boundaries, gauge
+Primary encoding reference. N = 4, four qubits, open boundaries, gauge
 field eliminated. Their Methods Eq. (3) (arXiv v1 numbering) is the Hamiltonian in section 5.
 
 Kogut, J. and Susskind, L., *Hamiltonian formulation of Wilson's lattice gauge
@@ -628,7 +602,7 @@ model*, Quantum **4**, 306 (2020). Source for the `x = 1/(ag)^2`,
 in the form `E_r - E_{r-1} - rho_r`.
 
 Sachdev, S., *Quantum Phase Transitions*, 2nd ed., ch. 4. Jordan-Wigner and
-the transverse-field Ising model together, which is the pairing you want.
+the transverse-field Ising model together.
 
 Bañuls, M. C. et al., *Simulating lattice gauge theories within quantum
 technologies*, Eur. Phys. J. D **74**, 165 (2020). Orientation review.
@@ -650,4 +624,6 @@ stood: the spinor components described as particle and antiparticle
 (section 1), Hellmann-Feynman described as the check that catches a wrong
 Hamiltonian (section 6), the link equality claimed for every neutral state
 (section 7), and the pair energy described as moving between field and mass
-(answer to question 8).
+(answer to question 8). A November 2026 review caught one more: section 5.2
+explained the `ZZII` coefficient by saying the pair is "separated by more
+links", which is false, since sites 1 and 2 are neighbours.

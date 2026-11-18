@@ -1,5 +1,5 @@
 """
-Gate 2 tests: the N = 4 Schwinger Hamiltonian, checked against every known answer.
+Tests of the N = 4 Schwinger Hamiltonian against every known answer.
 
 The Hamiltonian is built three independent ways and each analytic limit is
 checked separately, so a disagreement points at which stage is wrong rather
@@ -44,7 +44,7 @@ def test_pauli_expansion_matches_direct_construction(n, m, w, J):
 @pytest.mark.parametrize("m,w,J", COUPLINGS)
 def test_fermion_construction_matches_spin_construction(n, m, w, J):
     """
-    THE Gate 2 test. Building from lattice fermions and routing through
+    The central test. Building from lattice fermions and routing through
     Jordan-Wigner must give the same operator as the printed spin form.
     This is the step the whole derivation exists to justify.
     """
@@ -89,8 +89,8 @@ def test_term_list_has_no_duplicates_and_no_zeros():
 def test_long_range_zz_coefficients_match_derived_formula():
     """
     Expanding sum_n L_n^2 gives Z_m Z_m' coefficient (J/2)(N - m') for m < m',
-    depending only on the RIGHT site and growing with distance from the right
-    edge. That linear growth is confinement.
+    depending only on the right site: sites m and m' appear together in the
+    N - m' link fields L_n with n >= m'.
     """
     N, J = 5, 1.0
     terms = dict((l, c.real) for l, c in hamiltonian_terms(N, 0.0, 0.0, J))
@@ -169,7 +169,7 @@ def test_bare_vacuum_is_neutral_and_field_free():
 
 def test_particle_number_counts_pairs_not_occupations():
     """
-    Flipping one site of the bare vacuum creates ONE particle (or antiparticle),
+    Flipping one site of the bare vacuum creates one particle (or antiparticle),
     and moves the total charge by one unit. Flipping a neighbouring pair creates
     two and leaves the charge alone: that is a particle-antiparticle pair.
     """
@@ -236,7 +236,7 @@ def test_condensate_goes_to_minus_half_at_large_mass():
 
 
 # --------------------------------------------------------------------------
-# Real-time evolution (preview of M8/M9)
+# Real-time evolution
 # --------------------------------------------------------------------------
 
 def test_evolution_is_unitary_and_conserves_energy_and_charge():
@@ -322,8 +322,7 @@ def test_cp_maps_densities_and_links_as_derived(n):
 
 def test_link_equality_needs_cp_symmetry_not_just_neutrality():
     """
-    The counterexample to "CP forces <L_n> = <L_{N-n}> on any neutral state",
-    a claim an earlier draft made. |0110> is neutral but not CP-symmetric (CP
+    A counterexample to "CP forces <L_n> = <L_{N-n}> on any neutral state". |0110> is neutral but not CP-symmetric (CP
     maps it to |1001>), and its links are (0, 0, -1): the outer links differ.
     """
     from schwinger.paulis import basis_index

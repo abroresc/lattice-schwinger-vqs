@@ -1,7 +1,7 @@
 """
 Observables and symmetry diagnostics read from Z-basis measurements.
 
-WHY ONE MEASUREMENT BASIS IS ENOUGH
+Why one measurement basis is enough
 -----------------------------------
 Every quantity the error budget needs is diagonal in the computational basis:
 
@@ -11,7 +11,7 @@ Every quantity the error budget needs is diagonal in the computational basis:
     total charge      Q      = sum_n rho_n
 
 So each one is a function of the measured bitstring alone. One circuit, measured
-once in Z, gives the physics observable AND the diagnostics that say whether to
+once in Z, gives the physics observable and the diagnostics that say whether to
 trust it. Nothing extra has to be run to get the diagnostics, which is the
 property that makes them usable on a real device.
 
@@ -19,9 +19,9 @@ Everything here takes a probability vector over the 2^N basis states (exact,
 from a density matrix) or a vector of counts (from shots). Index b of either
 vector is the basis state whose bit string, read left to right, is site 1 ...
 site N, exactly as in paulis.basis_label. Bit '0' means Z = +1, which under
-this project's Jordan-Wigner convention is an OCCUPIED site.
+this project's Jordan-Wigner convention is an occupied site.
 
-THE DIAGNOSTICS
+The diagnostics
 ---------------
 Gauss's law cannot be a diagnostic here: it was solved and substituted, so it
 holds on every bitstring (see analytics.gauss_law_residual). Two exact
@@ -35,11 +35,11 @@ blind spot below.
 2. CP. On a neutral state that CP leaves unchanged, <L_n> = <L_{N-n}>; the
    bare vacuum is such a state (see schwinger.cp_operator for why neutrality
    alone is not enough). The noiseless Trotter circuit keeps the state
-   CP-symmetric EXACTLY (each Trotter factor maps the neutral sector to itself
+   CP-symmetric exactly (each Trotter factor maps the neutral sector to itself
    and commutes with CP there), so any measured <L_1> - <L_3> is hardware
    error, not Trotter error.
 
-THE GLOBAL-DEPOLARIZING READING
+The global-depolarizing reading
 -------------------------------
 If noise acted as one global depolarizing channel,
 
@@ -52,23 +52,22 @@ Var(Q) = 0 and P(Q=0) = 1, F can be read off either diagnostic:
     F_Q   = 1 - Var(Q) / Var_mixed(Q),             Var_mixed(Q) = N / 4
     F_P0  = ( P(Q=0) - f_mixed ) / ( 1 - f_mixed ), f_mixed = C(N, N/2) / 2^N
 
-Real gate noise is local, not global, so these are MODELS whose accuracy is the
-thing the thesis tests. They are exact for the global channel, which is what the
+Real gate noise is local, not global, so these are models, and their accuracy is
+what the thesis tests. They are exact for the global channel, which is what the
 tests in tests/test_diagnostics.py check.
 
-THE BLIND SPOT, STATED CAREFULLY (found by checking, 2026-10-12)
-----------------------------------------------------------------
-Z errors commute with Q, so dephasing that acts on the LOGICAL state, between
+The blind spot
+--------------
+Z errors commute with Q, so dephasing that acts on the logical state, between
 Trotter steps (the error model Martinez et al. fitted to their data), leaves
 Var(Q) exactly zero while the physics decays. The charge diagnostic cannot see
 it at all. noise.step_channel_probabilities implements that model and the tests
 confirm Var(Q) = 0 to machine precision.
 
-The first draft of this note said the same of dephasing on the CX gates. That
-is wrong, and the simulation said so (Var(Q) = 0.88 at 3e-3 per gate). Inside a
-compiled RXX or RYY the qubits sit in a rotated basis between the CXs, so a Z
+Dephasing on the CX gates is different: it is visible (Var(Q) = 0.88 at 3e-3
+per gate). Inside a compiled RXX or RYY the qubits sit in a rotated basis between the CXs, so a Z
 error there is an X or Y error in the logical frame, and it does break charge
-conservation. Whether a dephasing error is visible depends on WHERE in the
+conservation. Whether a dephasing error is visible depends on where in the
 compiled circuit it happens, not only on its type.
 """
 
@@ -230,7 +229,7 @@ def observables_from_counts(counts: np.ndarray, n_sites: int) -> dict[str, float
 def shot_noise_sigma(probs: np.ndarray, n_sites: int, shots: int,
                      observable: str = "particle_density") -> float:
     """
-    The standard error an M-shot measurement WILL have, computed exactly from
+    The standard error an M-shot measurement will have, computed exactly from
     the probability distribution rather than estimated from one sample.
 
     This is what makes the error budget clean: shot noise is a number computed

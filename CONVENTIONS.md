@@ -1,8 +1,8 @@
 # Conventions
 
 Every convention this project depends on, in one place, with the date it was
-fixed. Half of all "my spectrum is wrong" bugs are a convention that drifted
-between two files. When you adopt a new one, write it here first.
+fixed. A "my spectrum is wrong" bug is often a convention that drifted between
+two files. When you adopt a new one, write it here first.
 
 Last reviewed: 2026-09-10
 
@@ -21,7 +21,7 @@ Last reviewed: 2026-09-10
 
 - A Pauli string `"XZIY"` means X on site 1, Z on site 2, I on site 3, Y on site 4.
 - The matrix is built as `op(site 1) kron op(site 2) kron ... kron op(site N)`,
-  so **site 1 is the most significant tensor factor**.
+  so site 1 is the most significant tensor factor.
 - Basis index: `b = sum_j s_j 2^(N-1-j)`. The bit string read left to right is
   site 1, site 2, ..., site N. `basis_label(5, 4) == "0101"`.
 
@@ -29,7 +29,7 @@ Last reviewed: 2026-09-10
 
 - `|0>` is the `Z = +1` eigenstate ("spin up").
 - `sigma^+ = |0><1|`, `sigma^- = |1><0|`, so `sigma^+ sigma^- = (I + Z)/2`.
-- Under the Jordan-Wigner convention below this means **`|0>` is OCCUPIED**.
+- Under the Jordan-Wigner convention below this means `|0>` is occupied.
 - Charge density: `rho_n = (Z_n + (-1)^n)/2`. On an odd physics site the
   reference occupation is 1 (the Dirac sea is full there); on an even site it
   is 0.
@@ -39,10 +39,10 @@ Last reviewed: 2026-09-10
 ## 4. Jordan-Wigner
 
 - Default: `c_j = ( Z_1 Z_2 ... Z_{j-1} ) sigma^-_j`.
-- Consequence: `c_j^dag c_{j+1} = - sigma^+_j sigma^-_{j+1}`. **There is a
-  minus sign.** It is removable by `c_j -> (-1)^j c_j`, and
+- Consequence: `c_j^dag c_{j+1} = - sigma^+_j sigma^-_{j+1}`. There is a
+  minus sign. It is removable by `c_j -> (-1)^j c_j`, and
   `jw_annihilation(..., alternating_string=True)` implements that version.
-- Both conventions give identical spectra. `hopping_sign_demo()` proves all
+- Both conventions give identical spectra. `hopping_sign_demo()` checks all
   three claims numerically. Do not "fix" a coefficient until you have run it.
 - `hamiltonian_from_fermions` uses the alternating string so the printed spin
   Hamiltonian carries a plus sign on `w`, matching the published form.
@@ -51,11 +51,11 @@ Last reviewed: 2026-09-10
 
 Established by numerical check on 2026-09-10, not by reading documentation.
 
-- **Pauli label strings coincide.** `SparsePauliOp("ZIZI").to_matrix()` equals
-  `pauli_string("ZIZI")` entry for entry. Do **not** reverse the string.
+- Pauli label strings coincide. `SparsePauliOp("ZIZI").to_matrix()` equals
+  `pauli_string("ZIZI")` entry for entry. Do not reverse the string.
   Reversing it reflects the Hamiltonian through the middle of the chain, which
   here swaps particles and antiparticles.
-- **Qubit numbering is reversed.** Our site `j` is Qiskit qubit `N-1-j`. Use
+- Qubit numbering is reversed. Our site `j` is Qiskit qubit `N-1-j`. Use
   `site_to_qiskit_qubit(j, N)` for every circuit index. Never pass a site
   index to a Qiskit gate directly.
 - Measurement bitstrings come back in Qiskit's order; convert with
@@ -81,17 +81,17 @@ as a Jordan-Wigner exercise.
 
 ## 8. Noise conventions (fixed 2026-10-12)
 
-- **Gate error is quoted as average gate infidelity** epsilon, the number from
+- Gate error is quoted as average gate infidelity epsilon, the number from
   randomized benchmarking. Aer's depolarizing parameter is
   `lambda = epsilon d / (d - 1)`, so `lambda = 4 epsilon / 3` for a CX. Always
   go through `noise.depolarizing_lambda`; never pass epsilon to Aer directly.
-- **Noise attaches to the compiled circuit.** Compile with
+- Noise attaches to the compiled circuit. Compile with
   `circuits.to_hardware_basis` to {RZ, SX, X, CX} first. RZ carries no error.
   The same compiled circuit is used for `circuit_metrics`.
-- **Default single-qubit error** is `epsilon_1 = epsilon_2 / 10`. It is an
+- The default single-qubit error is `epsilon_1 = epsilon_2 / 10`. It is an
   assumption; state it whenever a threshold is quoted.
-- **Readout error** is applied classically with `noise.apply_readout_error`,
+- Readout error is applied classically with `noise.apply_readout_error`,
   never inside the density-matrix run, so its bias stays separable.
-- **Probabilities from Aer** are indexed like our basis (site N-1 least
+- Probabilities from Aer are indexed like our basis (site N-1 least
   significant), the same coincidence `circuits.statevector` relies on. Checked
   in `tests/test_noise.py`.

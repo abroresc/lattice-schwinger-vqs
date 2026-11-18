@@ -1,7 +1,7 @@
 """
-Ground-state preparation by Sample-based Krylov Quantum Diagonalization (M6/M7).
+Ground-state preparation by sample-based Krylov quantum diagonalization (SKQD).
 
-WHAT SKQD DOES
+What SKQD does
 --------------
 Following Yu et al. (arXiv:2501.09702) and its Schwinger-model application by
 Rosanowski et al. (arXiv:2510.26951, Section III A):
@@ -9,28 +9,28 @@ Rosanowski et al. (arXiv:2510.26951, Section III A):
   1. Prepare a reference state |psi_0> on the quantum computer.
   2. Evolve it: |psi_k> = U(dt)^k |psi_0>, for k = 1 .. K.
   3. Measure each |psi_k> in the computational basis, many shots each, and keep
-     the SET of distinct bitstrings seen. Amplitudes are thrown away.
+     the set of distinct bitstrings seen. Amplitudes are thrown away.
   4. Discard every bitstring with nonzero total charge (classical postselection
      onto the physical sector; it costs nothing because Q is diagonal).
   5. On a classical computer, write H as a matrix in the span of the kept
      bitstrings and diagonalise it. The lowest eigenvalue is the estimate.
 
-WHY THE ANSWER IS SAFE TO TRUST, AND WHERE IT IS NOT
-----------------------------------------------------
+Why the answer can be trusted, and where it cannot
+--------------------------------------------------
 Step 5 is an exact diagonalisation inside a subspace, so the estimate obeys the
-variational bound E_SKQD >= E_0 for ANY set of bitstrings, however noisy the
+variational bound E_SKQD >= E_0 for any set of bitstrings, however noisy the
 device was. Noise can only waste shots or add bitstrings; it cannot push the
 energy below the truth. That is the noise resilience Rosanowski et al. describe.
 
 The weakness is coverage. A bitstring that is never sampled cannot be in the
-subspace, so the estimate is biased UPWARD whenever an important bitstring is
+subspace, so the estimate is biased upward whenever an important bitstring is
 missed (Miura, arXiv:2603.13536). At N = 4 and m/w = 0.5 the ground state puts
 71 % of its weight on the bare vacuum |0101> and only 6.5e-4 on |1100>, the
 configuration with the longest flux string. Confinement suppresses exactly the
 bitstrings SKQD is most likely to miss.
 
-THE EXACT EXPECTATION, WHICH IS THE CHECK
-------------------------------------------
+The exact expectation
+---------------------
 Because the neutral sector at N = 4 has only six bitstrings, the probability of
 every possible sampled set can be computed exactly from the outcome
 distributions, with no sampling at all. For a set T of sector bitstrings,

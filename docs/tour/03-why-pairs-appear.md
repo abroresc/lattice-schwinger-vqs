@@ -118,8 +118,7 @@ D = \nu(t_{\mathrm{p}}) - \nu(t_{\mathrm{t}}),\qquad t_{\mathrm{p}} = 0.89,\; t_
 the drop from the first peak to the first trough, $D = 0.33$ in the exact
 evolution. A dip can only come from pairs forming and then recombining, which
 is the physics the simulation exists to show. Noise flattens it, as
-[chapter 5](05-gate-errors.md) shows. The question for the rest of the tour
-is how much error the dip can survive.
+[chapter 5](05-gate-errors.md) shows.
 
 ## Are four sites enough?
 

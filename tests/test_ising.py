@@ -42,7 +42,7 @@ def test_jordan_wigner_rebuilds_spin_hamiltonian(n, J, h):
 @pytest.mark.parametrize("J,h", PARAMS)
 def test_free_fermion_spectrum_matches_exact_diagonalisation(n, J, h):
     """
-    THE Gate 1 test. The full 2^N many-body spectrum, rebuilt from N
+    The main Jordan-Wigner test. The full 2^N many-body spectrum, rebuilt from N
     single-particle Bogoliubov energies, against brute-force diagonalisation.
     """
     ed, _ = eigh_sorted(tfim_hamiltonian(n, J, h))

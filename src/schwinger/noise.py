@@ -1,10 +1,10 @@
 """
-Gate and readout error (milestone M11), kept separate from shot noise.
+Gate and readout error, kept separate from shot noise.
 
-THE DESIGN DECISION THAT MAKES THE ERROR BUDGET CLEAN
-------------------------------------------------------
+Exact probabilities instead of samples
+--------------------------------------
 A noisy shot-sampled simulation mixes two errors in every number it returns:
-the BIAS that gate noise puts into the state, and the random SCATTER from a
+the bias that gate noise puts into the state, and the random scatter from a
 finite number of shots. Averaging many runs to separate them is slow and never
 exact. So this module never samples to get a bias. It runs the circuit on Aer's
 density-matrix simulator, which evolves the full 16 x 16 density matrix through
@@ -16,7 +16,7 @@ is wanted. The two error sources never contaminate each other.
 
 At N = 4 the density matrix has 256 entries, so this costs milliseconds.
 
-THE ERROR MODELS
+The error models
 ----------------
 Errors attach to the physical gates of circuits.HARDWARE_BASIS:
 
@@ -28,11 +28,11 @@ Errors attach to the physical gates of circuits.HARDWARE_BASIS:
 - symmetric readout error q, applied classically to the outcome probabilities.
 
 A second, independent route (step_channel_probabilities) applies noise to the
-LOGICAL state once per Trotter step, using plain NumPy density matrices. It
+logical state once per Trotter step, using plain NumPy density matrices. It
 reproduces the error model Martinez et al. fitted to their data (dephasing per
 qubit per step) and it is the control for the charge diagnostic: logical-frame
 dephasing commutes with Q, so Var(Q) stays exactly zero. Gate-level dephasing
-does NOT, because a Z error between the CXs of a compiled RXX is an X or Y
+does not, because a Z error between the CXs of a compiled RXX is an X or Y
 error in the logical frame. See the note in diagnostics.py.
 
 Conversion between the depolarizing parameter lambda used by Aer,
@@ -70,8 +70,8 @@ def gate_noise_model(eps2: float, eps1: float | None = None, kind: str = "depola
     """
     Aer NoiseModel with errors on CX (eps2) and on SX, X (eps1).
 
-    eps1 defaults to eps2 / 10, roughly the ratio on current superconducting
-    devices. kind = "dephasing" replaces the CX error by independent phase
+    eps1 defaults to eps2 / 10, an assumed ratio; scripts/06 tests how much
+    the threshold depends on it. kind = "dephasing" replaces the CX error by independent phase
     flips with probability eps2 on each of the two qubits, the control channel
     that charge conservation cannot see. Returns None when there is no error,
     so callers can pass the result straight to the simulator.

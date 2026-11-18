@@ -1,11 +1,10 @@
 """
-M10 / M12: the error budget itself. Trotter, gate, readout and shot noise,
-separated, against step size, with the optimum step size it implies.
+The error budget: Trotter, gate, readout and shot noise, separated, against step size, with the optimum step size it implies.
 
   A. The crossover: Trotter bias against shot noise, no hardware error.
   B. Total root-mean-square error of an M-shot measurement of nu(t_trough)
      against dt, for several two-qubit error rates. The minimum is the optimum
-     step size, and it moves to LARGER dt as the hardware gets worse.
+     step size, and it moves to larger dt as the hardware gets worse.
   C. The decomposition at the optimum for three observables: the particle
      density and the flux on the outer and middle links.
 

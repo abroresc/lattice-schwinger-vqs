@@ -1,12 +1,12 @@
 """
-M6 / M7: the ground state by Sample-based Krylov Quantum Diagonalization.
+The ground state by sample-based Krylov quantum diagonalization (SKQD).
 
   A. Validation: full-sector SKQD against exact diagonalisation; the
      variational bound on every possible subspace; the exact finite-shot
      expectation against brute-force Monte Carlo.
   B. Which bitstrings matter: ground-state weight of each neutral bitstring.
   C. The SKQD energy and condensate bias against shots per Krylov step,
-     computed EXACTLY (no sampling) for noiseless and noisy circuits, for the
+     computed exactly (no sampling) for noiseless and noisy circuits, for the
      project's full Trotter step and for a hopping-only step of the kind
      Rosanowski et al. use (see the note above CONFIGS on what that means).
 
@@ -34,11 +34,11 @@ import matplotlib.pyplot as plt
 FIG = pathlib.Path(__file__).resolve().parents[1] / "figures"
 N, M, W, J = 4, 0.5, 1.0, 1.0
 SHOTS = np.array([2, 3, 5, 8, 12, 20, 30, 50, 80, 120, 200, 300, 500])
-# The two kinetic rows are a hopping-only step OF THE KIND Rosanowski et al.
+# The two kinetic rows are a hopping-only step of the kind Rosanowski et al.
 # use, not a reproduction of their run. Their step is exp[i (dt/4) sum(XX+YY)]
 # per bond (their Eq. 15); ours is RXX(w dt) RYY(w dt) = exp[-i (w dt/2)(XX+YY)],
-# twice the angle. So w dt = 0.77 here is the NUMBER they chose, and
-# w dt = 0.385 is the ROTATION they chose. Their run also started from |0011>
+# twice the angle. So w dt = 0.77 here is the number they quote, and
+# w dt = 0.385 is the rotation they applied. Their run also started from |0011>
 # at m_lat/g = 10 with a background field, none of which is copied here.
 CONFIGS = [  # label, dt, Krylov steps, evolution, eps2
     ("full step, dt=0.3, K=4", 0.3, 4, "full", 0.0),
@@ -101,9 +101,9 @@ def main():
                                  - chiral_condensate(gs, N))
             cond.append(c)
         curves[label] = (np.array(bias), np.array(pfull), np.array(cond))
-        # The smallest INTEGER shot count with relative bias below 1e-3, found by
+        # The smallest integer shot count with relative bias below 1e-3, found by
         # searching every count rather than reading the next point of the
-        # plotting grid (which overstated it: 20 instead of 15, for example).
+        # plotting grid (the grid would overstate it, e.g. 20 instead of 15).
         # The expected bias falls monotonically with shots, so the first hit is it.
         need = next((s for s in range(1, 2001)
                      if expected_skqd_energy(dd, s, N, M, W, J).mean_bias / abs(e0) < 1e-3), None)

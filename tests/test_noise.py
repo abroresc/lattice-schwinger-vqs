@@ -1,5 +1,5 @@
 """
-Tests for the gate and readout error layer (M11).
+Tests for the gate and readout error layer.
 
 Known answers used here, none of them produced by the code under test:
   - noise-free density-matrix probabilities equal |statevector|^2;
@@ -46,7 +46,7 @@ def test_numpy_step_route_matches_aer_route_without_noise():
 @pytest.mark.parametrize("n_qubits", [1, 2])
 @pytest.mark.parametrize("eps", [1e-4, 3e-3, 2e-2])
 def test_infidelity_convention_against_qiskit(n_qubits, eps):
-    """eps is the AVERAGE gate infidelity, the number a data sheet quotes."""
+    """eps is the average gate infidelity, the number a data sheet quotes."""
     from qiskit.quantum_info import average_gate_fidelity
     from qiskit_aer.noise import depolarizing_error
 
@@ -137,9 +137,9 @@ def test_logical_dephasing_is_invisible_to_charge_but_not_to_physics(p):
 
 def test_gate_level_dephasing_is_visible_to_charge():
     """
-    The correction to the blind-spot claim. A Z error between the CXs of a
-    compiled RXX is an X or Y error in the logical frame, so gate-level
-    dephasing DOES break charge conservation.
+    Dephasing on the gates is outside the blind spot. A Z error between the
+    CXs of a compiled RXX is an X or Y error in the logical frame, so
+    gate-level dephasing does break charge conservation.
     """
     qc = trotter_circuit(N, M, W, J, 1.76, 18, 2)
     p = noisy_probabilities(qc, gate_noise_model(eps2=3e-3, kind="dephasing"))

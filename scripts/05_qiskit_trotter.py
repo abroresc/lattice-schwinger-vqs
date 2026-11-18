@@ -1,16 +1,16 @@
 """
-M7 / M8 prototype: the model as actual quantum circuits, simulated with Qiskit.
+The model as quantum circuits, simulated with Qiskit.
 
-Three things, in the order a referee would want them:
+Three parts:
 
-  A. Trotter error against step size, log-log, with the SLOPE fitted. The slope
-     is the test. An implementation can be accurate and still scale wrongly,
-     which means it is wrong for a reason that will bite at larger t.
+  A. Trotter error against step size, log-log, with the slope fitted. The slope
+     is the test: an implementation can be accurate at one step size and still
+     scale wrongly, which shows up at larger t.
   B. Particle density measured from finite shots, with shot-noise error bars,
      against the exact curve. This is the first appearance of statistical error.
   C. The crossover: at what step size does Trotter error drop below shot noise?
-     That is headline result number one from the proposal, and this is a first
-     pass at it with no gate error yet.
+     This is the first of the two numbers the project set out to find. There
+     is no gate error here; scripts/08 adds it.
 
 Run:  python scripts/05_qiskit_trotter.py
 """
@@ -92,9 +92,8 @@ def main() -> None:
     print("B. PARTICLE DENSITY FROM FINITE SHOTS")
     print("=" * 66)
     times = np.linspace(0.0, 8.0, 33)
-    # The exact line is drawn on its own fine grid: through the 33 points above
-    # it showed corners the evolution does not have. The sampled points below
-    # still use times[::4], so every printed number and seed is unchanged.
+    # The exact line is drawn on its own fine grid so it is smooth; the sampled
+    # points below use times[::4].
     fine = np.linspace(0.0, 8.0, 801)
     exact_curve = np.array([particle_density(s, N)
                             for s in evolve(v0, H, fine)])
@@ -129,10 +128,10 @@ def main() -> None:
     print("=" * 66)
     print("C. CROSSOVER: WHERE DOES TROTTER ERROR FALL BELOW SHOT NOISE?")
     print("=" * 66)
-    # The noise floor is the EXACT standard error of Eq. (sigma), computed from the
-    # exact outcome distribution at t = 3, not estimated from one sampled run (an
-    # earlier version did that, and its single-sample sigma was 7 % low at 256
-    # shots). The step grid is dense and the crossing is interpolated in log dt,
+    # The noise floor is the exact standard error of Eq. (sigma), computed from the
+    # exact outcome distribution at t = 3, not estimated from one sampled run (one
+    # such estimate came out 7 % low at 256 shots). The step grid is dense and the
+    # crossing is interpolated in log dt,
     # so the quoted crossover is not just the nearest point of a coarse grid.
     steps_c = np.array(list(range(2, 33)) + [40, 48, 64, 96, 128, 192, 256])
     dts_c = T / steps_c

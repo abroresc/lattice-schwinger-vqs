@@ -3,7 +3,7 @@ Two short animations for the front page of the repository.
 
 The thesis figures are built to be read slowly on paper. A visitor to the
 GitHub page gives the first screen a few seconds, so these two GIFs each show
-ONE thing moving, and loop:
+one thing moving, and loop:
 
   figures/readme/pairs_from_empty_space.gif
       The four sites after the quench from the bare vacuum, computed exactly.
@@ -12,8 +12,7 @@ ONE thing moving, and loop:
       darkens with the field energy on it, <L_n^2>. Beside it the particle
       density nu(t) draws itself, and four bars keep the energy books: the
       mass and field terms rise, the hopping term falls by the same amount,
-      and the total never moves. That answers "where do the pairs get their
-      energy?" without a word of text.
+      and the total never moves.
 
   figures/readme/signal_dies.gif
       The same density measured through the second-order Trotter circuit at

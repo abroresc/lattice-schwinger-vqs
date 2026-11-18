@@ -1,8 +1,8 @@
 """
 The lattice Schwinger model on N staggered sites, open boundaries, gauge field
-eliminated. This is the Gate 2 object.
+eliminated.
 
-THE HAMILTONIAN
+The Hamiltonian
 ---------------
 After Kogut-Susskind staggering, solving Gauss's law with open boundary
 conditions and zero background field, and applying Jordan-Wigner, the model
@@ -17,28 +17,28 @@ becomes a pure spin chain on N qubits with no gauge register at all:
 This is the spin Hamiltonian of Martinez et al., Nature 534, 516 (2016)
 (Methods Eq. (3) in arXiv:1605.04570v1; Eq. (2) there is Gauss's law), which runs
 exactly this system at N = 4 on a trapped-ion device. That paper is the
-reference to check the derivation against. Klco et al. (2018) is NOT: they
+reference to check the derivation against. Klco et al. (2018) is not: they
 keep explicit flux-link registers with an energy cutoff and reduce with
 symmetry projections, which is a different encoding.
 
-WHY THERE IS NO GAUGE FIELD
+Why there is no gauge field
 ---------------------------
 Gauss's law in 1+1 dimensions is the difference equation
 
     E_n - E_{n-1} = rho_n,      rho_n = ( Z_n + (-1)^n ) / 2
 
 With open boundaries and no background field, E_0 = 0, so the equation does
-not merely constrain the electric field, it DETERMINES it:
+not merely constrain the electric field, it determines it:
 
     E_n = L_n = sum_{m<=n} rho_m
 
 Every link value is fixed by the charges to its left. So the gauge field can
 be substituted away rather than stored. The price is that the electric energy
-sum_n L_n^2 becomes LONG-RANGE in the spins: expanding the square produces
-Z_m Z_m' couplings between every pair of sites. That trade, locality for
-qubits, is the single most important structural fact in this project.
+sum_n L_n^2 becomes long-range in the spins: expanding the square produces
+Z_m Z_m' couplings between every pair of sites. The encoding trades locality
+for qubits.
 
-PARAMETERS
+Parameters
 ----------
 m : fermion mass
 w : hopping strength, w = 1/(2a) in Martinez et al.
@@ -84,7 +84,7 @@ def charge_density_op(j: int, n_sites: int) -> np.ndarray:
 
 def electric_field_op(j: int, n_sites: int) -> np.ndarray:
     """
-    L_n on the link to the RIGHT of 0-indexed site j, i.e. L_n = sum_{m<=n} rho_m.
+    L_n on the link to the right of 0-indexed site j, i.e. L_n = sum_{m<=n} rho_m.
 
     This is the solved Gauss's law, not an independent degree of freedom.
     """
@@ -139,8 +139,8 @@ def hamiltonian_terms(n_sites: int, m: float, w: float, J: float) -> list[tuple[
     """
     Build H as an explicit list of (Pauli string, coefficient).
 
-    This is the Gate 2 deliverable: the form you print in the report, the form
-    a referee can check, and the form a quantum computer accepts.
+    This is the form printed in the thesis (Table 1) and the form Qiskit
+    accepts.
 
     The electric term is expanded by hand here. Writing L_n = (S_n + s_n)/2
     with S_n = sum_{m<=n} Z_m and s_n = sum_{m<=n} (-1)^m,
@@ -154,11 +154,11 @@ def hamiltonian_terms(n_sites: int, m: float, w: float, J: float) -> list[tuple[
         Z_m      coefficient  =  (J/2) sum_{n=m}^{N-1} s_n   plus the mass term
         identity coefficient  =  (J/4) sum_{n=1}^{N-1} ( n + s_n^2 )
 
-    Note the shape of the ZZ coefficient: it depends only on the RIGHT-hand
-    site and grows linearly with how far that site sits from the right edge.
-    That is confinement, sitting in plain sight. A pair separated by more links
-    costs more energy, linearly, because the electric flux between them is
-    stored on every link in between.
+    The ZZ coefficient depends only on the right-hand site m', because sites m
+    and m' appear together in every L_n with n >= m', and there are N - m' such
+    links. That pattern comes from counting the field from the left end. The
+    physics does not depend on the choice: a neutral pair costs J for every link
+    between its charges, which is the linear potential.
 
     `hamiltonian_terms` and `hamiltonian_direct` are checked against each other
     in the test suite, so the algebra above is never taken on trust.
@@ -243,11 +243,11 @@ def bare_vacuum(n_sites: int) -> np.ndarray:
     Z_n = -(-1)^n, i.e. odd physics sites occupied and even sites empty. In
     bit-string form with |0> = occupied that is |0101...>.
 
-    This is the state the real-time simulation starts from. It is NOT the true
-    ground state of H at finite w, which is the entire reason pairs appear.
+    This is the state the real-time simulation starts from. It is not the true
+    ground state of H at finite w, which is why pairs appear.
     Nothing is injected and the total energy stays at -mN/2. On this state the
     mass term sits at its minimum (-mN/2) and the electric term at its minimum
-    (0), so making pairs RAISES both. The hopping term, zero here, goes negative
+    (0), so making pairs raises both. The hopping term, zero here, goes negative
     and pays for both (scripts/09 prints the split: at t = 0.89, the first
     maximum of the density, mass -0.07, electric +0.97, hopping -1.90).
     """
@@ -262,7 +262,7 @@ def bare_vacuum_label(n_sites: int) -> str:
 
 
 def ground_state(n_sites: int, m: float, w: float, J: float) -> tuple[float, np.ndarray]:
-    """Exact ground state by dense diagonalisation. The ground truth for everything."""
+    """Exact ground state by dense diagonalisation; every other method is checked against it."""
     vals, vecs = eigh_sorted(hamiltonian(n_sites, m, w, J))
     return float(vals[0]), vecs[:, 0]
 
@@ -290,11 +290,11 @@ def format_terms(terms: list[tuple[str, complex]], m: str = "m", w: str = "w", J
 
 def hamiltonian_from_fermions(n_sites: int, m: float, w: float, J: float) -> np.ndarray:
     """
-    Build the SAME Hamiltonian from the fermionic Kogut-Susskind form, routed
-    through Jordan-Wigner. A genuinely independent construction.
+    Build the same Hamiltonian from the fermionic Kogut-Susskind form, routed
+    through Jordan-Wigner, as an independent construction.
 
     The lattice fermion Hamiltonian, after Gauss's law has been solved but
-    BEFORE anything is written in spins, is
+    before anything is written in spins, is
 
         H = w sum_n ( c_n^dag c_{n+1} + h.c. )
           + m sum_n (-1)^n c_n^dag c_n
@@ -305,14 +305,14 @@ def hamiltonian_from_fermions(n_sites: int, m: float, w: float, J: float) -> np.
     (the Dirac sea is full there), on an even site it is 0. Subtracting it is
     what makes the bare vacuum neutral.
 
-    This routine uses the ALTERNATING Jordan-Wigner string, prod_{i<j} (-Z_i),
+    This routine uses the alternating Jordan-Wigner string, prod_{i<j} (-Z_i),
     so that c_n^dag c_{n+1} maps to +sig^+_n sig^-_{n+1} and the printed spin
     Hamiltonian comes out with a plus sign on w. With the plain Z string the
     hopping picks up a minus, which is a relabelling and not physics; see
     jordan_wigner.hopping_sign_demo.
 
     Agreement between this and `hamiltonian` means the spin form was derived
-    correctly from the fermion form, which is the actual content of Gate 2.
+    correctly from the fermion form.
     """
     from .jordan_wigner import jw_annihilation, jw_number
 
@@ -343,7 +343,7 @@ def fermion_construction_residual(n_sites: int, m: float, w: float, J: float) ->
     """
     Difference between the spin-form Hamiltonian and the fermion-form one.
 
-    For even N these agree exactly. For ODD N the mass terms differ by the
+    For even N these agree exactly. For odd N the mass terms differ by the
     constant (m/2) sum_n (-1)^n = -m/2, because the spin form drops a constant
     that only vanishes when N is even. The constant shifts every level equally
     and changes no physics, so it is subtracted here rather than hidden.
@@ -371,10 +371,9 @@ def cp_operator(n_sites: int) -> np.ndarray:
     """
     CP: spatial reflection composed with charge conjugation, CP = R . X^(x)N.
 
-    Reflection alone is not a symmetry, and charge conjugation alone is not a
-    symmetry. Their product is, but ONLY inside the neutral sector, and the
-    reason is worth understanding because it is the same reason the electric
-    term is long-range.
+    Neither reflection nor charge conjugation is a symmetry on its own. Their
+    product is, but only inside the neutral sector, for the same reason the
+    electric term is long-range.
 
     Under CP the charge density maps as
 
@@ -383,7 +382,7 @@ def cp_operator(n_sites: int) -> np.ndarray:
     Reflection moves it to the mirror site and charge conjugation flips its
     sign. (Reflection alone does not even map rho_n to a density, because at
     even N it swaps the staggering; X^(x)N swaps it back.) L_n counts the
-    charge to the LEFT of link n only, so summing the mapped densities gives
+    charge to the left of link n only, so summing the mapped densities gives
 
         L_n  ->  L_{N-n} - Q
 
@@ -393,15 +392,15 @@ def cp_operator(n_sites: int) -> np.ndarray:
     The mass and hopping terms are invariant in every sector. Both maps are
     checked as operator identities in tests/test_schwinger.py.
 
-    Consequences, both useful:
+    Two consequences:
       - On a neutral state that CP leaves unchanged, <L_n> = <L_{N-n}>. The
         bare vacuum is one, so is every state evolved from it by H (H and CP
         commute in that sector), and so is the ground state. At N = 4 the two
         outer links of these states carry equal flux, visible in
-        figures/04_pair_production.png. A neutral state WITHOUT the symmetry
+        figures/04_pair_production.png. A neutral state without the symmetry
         need not: |0110> has links (0, 0, -1).
       - CP joins total charge as a symmetry that most hardware noise breaks,
-        so <L_1> - <L_3> is a second diagnostic for M11 and M12. Not all noise
+        so <L_1> - <L_3> is a second noise diagnostic. Not all noise
         breaks it: logical-frame dephasing respects both (see noise.py).
     """
     from .paulis import pauli_string

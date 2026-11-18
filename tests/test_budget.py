@@ -50,7 +50,7 @@ def test_biases_telescope_to_total(trough):
 
 def test_trotter_bias_scales_as_dt_squared():
     """
-    The bias on the DENSITY, not the state error, so this is a separate check
+    The bias on the density, not the state error, so this is a separate check
     from the one in test_circuits.py. Small dt only, to stay in the asymptotic
     regime where the leading power dominates.
     """
@@ -65,7 +65,7 @@ def test_trotter_bias_scales_as_dt_squared():
 def test_mean_squared_error_of_real_runs_matches_budget(trough):
     """
     Simulate 600 independent 500-shot experiments at a fixed noise level and
-    check that their mean squared deviation from the EXACT answer equals
+    check that their mean squared deviation from the exact answer equals
     total_bias^2 + sigma^2. This is the statement that the budget is complete:
     nothing is left over once the four pieces are accounted for.
     """

@@ -111,8 +111,8 @@ experiment, so the results line up with real data. And the noisy simulations
 are cheap enough to repeat across dozens of error rates and step sizes.
 
 At four sites a laptop beats any quantum computer, so nothing here is a claim
-of quantum advantage. The point is the method: these are the checks you would
-want once the problem is too big to check. [Chapter 3](03-why-pairs-appear.md)
+of quantum advantage. The checks are the ones you would want once a problem is
+too big to solve exactly. [Chapter 3](03-why-pairs-appear.md)
 shows that four sites already get the first swing of pair production right,
 by solving the same model exactly on up to twelve sites.
 

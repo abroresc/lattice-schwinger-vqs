@@ -1,24 +1,22 @@
 """
 Pauli-string machinery: build any N-qubit operator as an explicit matrix.
 
-This is the workhorse for the whole project. Everything downstream (TFIM,
-Jordan-Wigner, the Schwinger Hamiltonian) is a sum of Pauli strings built
-with `pauli_string`.
+Everything downstream (the Ising warm-up, Jordan-Wigner, the Schwinger
+Hamiltonian) is a sum of Pauli strings built with `pauli_string`.
 
-CONVENTION (see CONVENTIONS.md; do not change without changing that file):
+Conventions (see CONVENTIONS.md; change both together or neither):
 
   - Sites are labelled 1..N in the physics text, 0..N-1 in code.
   - A string "XZIY" means X on site 1, Z on site 2, I on site 3, Y on site 4.
   - The matrix is built as  op(site 1) kron op(site 2) kron ... kron op(site N).
-    So site 1 is the MOST significant factor. This is the physics convention
-    used by Martinez et al. (2016) and Kogut-Susskind papers generally.
+    So site 1 is the most significant factor, as in Martinez et al. (2016).
   - Basis index b of a computational basis state is
         b = sum_j s_j * 2^(N-1-j),  s_j in {0,1}, j = 0..N-1
     i.e. the bit string read left to right is site 1, site 2, ..., site N.
   - |0> is the sigma^z = +1 eigenstate ("spin up"). Under the Jordan-Wigner
-    convention in jordan_wigner.py this means |0> = SITE OCCUPIED.
-  - Qiskit's Pauli LABELS coincide with ours (verified numerically, see
-    `site_to_qiskit_qubit`), but its QUBIT NUMBERING is reversed: our site j
+    convention in jordan_wigner.py this means |0> is an occupied site.
+  - Qiskit's Pauli labels coincide with ours (checked numerically, see
+    `site_to_qiskit_qubit`), but its qubit numbering is reversed: our site j
     is Qiskit qubit N-1-j. Convert every circuit index with
     `site_to_qiskit_qubit`; never pass a site index to a Qiskit gate.
 """
@@ -36,7 +34,7 @@ X = np.array([[0, 1], [1, 0]], dtype=complex)
 Y = np.array([[0, -1j], [1j, 0]], dtype=complex)
 Z = np.array([[1, 0], [0, -1]], dtype=complex)
 
-# sigma^+ = |0><1| raises sigma^z (it CREATES an occupation, see convention above)
+# sigma^+ = |0><1| raises sigma^z, which creates an occupation (convention above)
 SP = np.array([[0, 1], [0, 0]], dtype=complex)
 # sigma^- = |1><0|
 SM = np.array([[0, 0], [1, 0]], dtype=complex)
@@ -107,9 +105,8 @@ def from_terms(terms: Sequence[tuple[str, complex]], n_sites: int | None = None)
     """
     Build a Hamiltonian from a list of (pauli_string, coefficient) pairs.
 
-    This is the canonical representation of a Hamiltonian in this project:
-    a printed list of strings and coefficients is what you hand to a referee,
-    and it is what a quantum computer accepts.
+    Every Hamiltonian in the project is stored this way: the list can be
+    printed, checked by hand, and passed to Qiskit unchanged.
     """
     if not terms:
         raise ValueError("empty term list")
@@ -139,23 +136,23 @@ def site_to_qiskit_qubit(site: int, n_sites: int) -> int:
     """
     Translate our site index to a Qiskit qubit number.
 
-    THIS IS THE CONVENTION TRAP, and it is not the one most people expect.
-    It was found here by numerical check, not by reading documentation.
+    The two libraries agree on one thing and differ on another, and the
+    difference was found by a numerical check, not from the documentation.
 
-    What is NOT different: the Pauli LABEL STRING. Qiskit's Pauli and
+    What agrees: the Pauli label string. Qiskit's Pauli and
     SparsePauliOp read a label left to right as most significant tensor factor
     first, exactly as `pauli_string` does. So
 
         SparsePauliOp("ZIZI").to_matrix()  ==  pauli_string("ZIZI")
 
-    entry for entry, with no reversal. Reversing the string is WRONG and
+    entry for entry, with no reversal. Reversing the string is wrong: it
     produces a Hamiltonian reflected through the middle of the chain, which
     for the Schwinger model swaps particles and antiparticles.
 
-    What IS different: the qubit NUMBER. Qiskit calls the rightmost character
+    What differs: the qubit number. Qiskit calls the rightmost character
     qubit 0, so our site j (0-indexed from the left) is Qiskit qubit
     n_sites - 1 - j. That matters the moment you build a circuit, because
-    qc.cx(0, 1) acts on the RIGHT end of our chain, not the left. It also
+    qc.cx(0, 1) acts on the right end of our chain, not the left. It also
     matters when reading measurement bitstrings back, which Qiskit prints in
     the reverse of our site order.
 
@@ -171,7 +168,7 @@ def qiskit_bitstring_to_sites(bits: str) -> str:
     """
     Convert a Qiskit measurement bitstring to our site ordering.
 
-    Qiskit prints qubit 0 last... which, combined with the numbering above,
+    Qiskit prints qubit 0 last, which, combined with the numbering above,
     means its bitstring runs from our site N-1 down to site 0. Reverse it.
     """
     return bits[::-1]

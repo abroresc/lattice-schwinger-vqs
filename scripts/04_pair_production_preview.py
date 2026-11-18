@@ -1,21 +1,19 @@
 """
-Past Gate 2, and cheap: real-time pair production out of the vacuum.
+Real-time pair production out of the bare vacuum, computed exactly.
 
-This is the headline physics of the whole project, and at N = 4 it costs one
-diagonalisation. It is exact, so it is also the ground truth that Trotterised
-evolution gets compared against in M8.
+At N = 4 this costs one diagonalisation. Being exact, it is also the reference
+the Trotter circuits are compared against.
 
-WHERE THE ENERGY COMES FROM, since this is the question you will be asked.
-Nothing is injected and no external agent pulls charges apart. The simulation
-starts in the BARE vacuum, which is an eigenstate of the mass and electric
+Where the energy comes from. Nothing is injected and no external agent pulls charges apart. The simulation
+starts in the bare vacuum, which is an eigenstate of the mass and electric
 terms but not of the full Hamiltonian once w is nonzero. Total energy is
 conserved exactly (checked below). On the bare vacuum the mass term and the
-electric term are BOTH at their minimum, so making pairs raises both. The
+electric term are both at their minimum, so making pairs raises both. The
 hopping term, zero on the bare vacuum, goes negative and pays for the two of
 them. At t = 0.89 (m = 0.5 w) the split is mass -0.07, electric +0.97,
-hopping -1.90, total -1.00; scripts/09_verification_table.py prints it. An
-earlier draft said the energy "moves between field and rest mass". It cannot:
-both start at their floor.
+hopping -1.90, total -1.00; scripts/09_verification_table.py prints it. So the
+energy does not trade between field and rest mass: both start at their floor
+and rise together.
 
 Run:  python scripts/04_pair_production_preview.py
 """
@@ -118,8 +116,8 @@ def main() -> None:
         peak = max(particle_density(s, N) for s in evolve(v, H, times))
         print(f"{m:>5} {e_bare:>16.6f} {e0:>12.6f} {e_bare - e0:>10.6f} {peak:>14.6f}")
     print()
-    print("  The gap column is the whole story. A larger mismatch between the state")
-    print("  you prepare and the state the Hamiltonian wants gives more pair production.")
+    print("  The larger the gap between the bare vacuum and the true ground state,")
+    print("  the more pairs appear.")
 
 
 if __name__ == "__main__":

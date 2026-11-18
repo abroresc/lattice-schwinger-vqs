@@ -1,8 +1,7 @@
 """
-The dictionary of the model: what each four-qubit bit string means.
+What each four-qubit bit string means, as a figure (thesis Figure 1).
 
-A reader meets "|0101> is empty space" and "|1001> is one pair" before they
-have a picture of either. This figure is that picture. It shows the six
+It shows the six
 arrangements with zero total charge (the only ones the dynamics ever visits
 from the bare vacuum), and for each one:
 

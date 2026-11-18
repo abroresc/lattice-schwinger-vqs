@@ -1,9 +1,9 @@
 """
-Figures for the 20-minute capstone talk. One message per figure.
+Figures for the capstone talk. One message per figure.
 
 The thesis figures (scripts 04 to 08) are built to be read on paper: three
 panels, a legend, a caption. A slide gets a few seconds from the back of a
-room, so each figure here keeps ONE idea from one of those panels, labels the
+room, so each figure here keeps one idea from one of those panels, labels the
 lines directly instead of using a legend, and drops everything else.
 
 Nothing new is computed. Every curve comes from the same tested functions the
@@ -55,9 +55,8 @@ SHOTS = 1000
 
 # The deck's palette. Kept here rather than in plotstyle.py because it belongs
 # to the slides, not the thesis; the thesis figures keep their own palette.
-# Nov 11: the "Clean modern" theme Abror picked from three mockups: white
-# slides, a dark title slide, Avenir Next, a vivid blue and orange. Blue still
-# means the exact answer / what works; orange still means error or cost.
+# The deck has white slides, a dark title slide, Avenir Next, and a vivid blue
+# and orange: blue means the exact answer, orange means error or cost.
 INK = "#111827"
 SOFT = "#4B5563"
 BLUE = "#2563EB"
@@ -135,13 +134,13 @@ def fig_pairs():
     it = int(np.argmin(np.abs(times - T_TROUGH)))
     check("dip D = nu(t_peak) - nu(t_trough), exact", nu[ip] - nu[it], 0.33)
 
-    # Nov 3: every canvas is now the size of its box on the slide (100 px an
-    # inch), so px() is exact; earlier canvases were shrunk to fit, to ~11 pt.
+    # Every canvas is the size of its box on the slide (100 px an inch), so px()
+    # is exact.
     fig, ax = slide_fig(1213, 495)
     fig.subplots_adjust(left=0.1, right=0.83, bottom=0.2, top=0.95)
     ax.plot(times, nu, color=INK)
-    # Nov 9: the signal is the thing we want to keep, so it is blue, the deck's
-    # colour for the exact answer; orange is kept for errors.
+    # The signal is blue, the deck's colour for the exact answer; orange is kept
+    # for errors.
     ax.plot([times[ip], times[it]], [nu[ip], nu[it]], "o", color=BLUE, markersize=16, zorder=5)
     # The arrow stands just past t = 4, so it crosses no part of the curve: after
     # the peak the curve stays below 0.46, and after the trough above 0.20.
@@ -166,7 +165,7 @@ def fig_pairs():
 def fig_revival():
     """Backup: the same exact curve run ten times longer, to t = 40.
 
-    Why it exists: on slide 11 the swings shrink between t = 0 and 4, and the
+    Why it exists: on the main signal slide the swings shrink between t = 0 and 4, and the
     natural question is "if pairs recombine, why does it damp?". It does not.
     The vacuum overlaps five energy eigenstates, so nu(t) is a constant plus ten
     cosines at their energy differences. They start in phase (nu = 0 exactly)
@@ -181,7 +180,7 @@ def fig_revival():
     i2 = int(np.argmax(np.where(times > 3.0, nu, -1)))
     # The long-time average is the diagonal-ensemble value: the sum over
     # eigenstates of |overlap|^2 times <n|nu|n>, 0.258 from the spectral
-    # decomposition (Nov 11). The mean over [0, 40] sits near it, not on it,
+    # decomposition. The mean over [0, 40] sits near it, not on it,
     # because 40 is a finite window.
     check("first peak of nu(t), exact", nu[i1], 0.4631)
     check("highest point after t = 3, exact", nu[i2], 0.476)
@@ -190,10 +189,10 @@ def fig_revival():
 
     fig, ax = slide_fig(730, 500)
     fig.subplots_adjust(left=0.14, right=0.85, bottom=0.2, top=0.95)
-    # The window the main slide shows, so the audience can find slide 11 in it.
+    # The window the main slide shows, so the audience can find it here.
     ax.axvspan(0, 4, color=FAINT, zorder=0)
     ax.text(0.4, 0.6, "slide 11", ha="left", va="center", color=SOFT, fontsize=px(22))
-    # A thinner line than slide 11: ten times more time in a narrower box.
+    # A thinner line than on the main slide: ten times more time in a narrower box.
     ax.plot(times, nu, color=INK, linewidth=2.2, zorder=3)
     ax.axhline(0.258, color=GREY, linewidth=1.6, linestyle=(0, (2, 3)), zorder=2)
     # The label sits in the right margin: the curve crosses the line everywhere
@@ -337,8 +336,8 @@ def fig_noise():
     exact = [particle_density(s, N) for s in evolve(bare_vacuum(N), hamiltonian(N, M, W, J), fine)]
     preps = [prepare_for_probabilities(trotter_circuit(N, M, W, J, t, steps_for(t, 0.1), 2))
              if t > 0 else None for t in times]
-    # Nov 3: narrower, to sit beside the gate grid on the Error 3 slide, so the
-    # labels moved to the line ends, where there is room.
+    # Narrow, to sit beside the gate grid on the Error 3 slide, with the labels
+    # at the line ends, where there is room.
     fig, ax = slide_fig(840, 500)
     fig.subplots_adjust(left=0.13, right=0.73, bottom=0.17, top=0.95)
     ax.axhline(0.5, color=GREY, linewidth=2.0, linestyle=(0, (5, 4)))
@@ -346,7 +345,7 @@ def fig_noise():
     ax.plot(fine, exact, color=INK)
     ax.set_xticks(np.arange(0, 4.01, 0.5))
     ax.text(4.1, exact[-1], "no gate error", color=INK, fontsize=px(28), va="center", clip_on=False)
-    # Nov 9: both noisy curves in the orange ramp, darker = more gate error, as on
+    # Both noisy curves in the orange ramp, darker = more gate error, as on
     # the budget plot; blue stays for the exact answer.
     for eps, color, label, dy in ((1e-3, RAMP[0], "0.1 % per gate", -0.015),
                                   (1e-2, RAMP[2], "1 % per gate", 0.04)):
@@ -371,7 +370,7 @@ def fig_noise():
 
 
 def fig_crossover():
-    # Nov 5: measured at the dip's trough (time 1.76), where every other talk result
+    # Measured at the dip's trough (time 1.76), where every other talk result
     # lives; the abstract's time-3 crossover (step 0.182, about 17 steps) is in the notes.
     T = T_TROUGH
     exact_state = evolve(bare_vacuum(N), hamiltonian(N, M, W, J), np.array([T]))[0]
@@ -391,7 +390,7 @@ def fig_crossover():
     fig, ax = slide_fig(1213, 485)
     fig.subplots_adjust(left=0.13, right=0.97, bottom=0.2, top=0.95)
     ax.axvspan(s_x, 160, color=FAINT, alpha=0.55, linewidth=0)
-    ax.loglog(steps, np.maximum(bias, 1e-12), color=INK)    # Nov 9: an error, so not blue
+    ax.loglog(steps, np.maximum(bias, 1e-12), color=INK)    # an error, so not blue
     ax.axhline(sigma, color=ORANGE, linewidth=3.2, linestyle=(0, (6, 4)))
     ax.text(22.0, sigma * 1.4, "shot noise, 1,000 shots", color=ORANGE, fontsize=px(28))
     ax.text(22.0, 1.3e-3, "time-step error", color=INK, fontsize=px(28))
@@ -444,7 +443,7 @@ def fig_collapse(eps, sweeps):
     """
     fig, (a, b) = plt.subplots(1, 2, figsize=(12.13, 4.85), sharey=True)
     fig.subplots_adjust(left=0.08, right=0.98, bottom=0.2, top=0.9, wspace=0.12)
-    colors = (RAMP[2], RAMP[1], RAMP[0])   # Nov 9: darker = more gates, so more damage
+    colors = (RAMP[2], RAMP[1], RAMP[0])   # darker = more gates, so more damage
     floor = np.mean([sw["sigma_D"] for (_, _, sw, _) in sweeps.values()], axis=0) * 2
     for (dt, (pk, tr, sw, star)), color in zip(sweeps.items(), colors):
         n = tr.two_qubit_gates
@@ -505,8 +504,8 @@ def fig_budget():
         if eps > 0:
             ax.plot(steps[k], rms[k], marker="*", markersize=34, color=color,
                     markeredgecolor=INK, markeredgewidth=1.5, zorder=5)
-        # Labels in ink at each line's end (dataviz skill: text wears text tokens, and
-        # the light-orange "0.03 %" was 2.2:1 on white); the line beside it carries the color.
+        # Labels in ink at each line's end (the light-orange "0.03 %" was 2.2:1 on
+        # white, too faint to read); the line beside it carries the colour.
         ax.text(steps[-1] * 1.08, y_label or rms[-1], label, color=SOFT if eps else INK, fontsize=px(28),
                 va="center")
     for eps, thesis in ((3e-4, 0.35), (1e-3, 0.44), (3e-3, 0.59)):
@@ -562,17 +561,13 @@ def fig_charge(sweeps):
 
 def fig_blind(eps, sweeps):
     """
-    Nov 16: the blind spot in two panels the audience already knows: the dip
-    (slide 15) and the share of shots that read the wrong total charge (the
-    bars on slide 30). Left, gate noise that flips qubits: as the dip shrinks,
+    The blind spot in two panels the audience already knows: the dip and the
+    share of shots that read the wrong total charge. Left, gate noise that flips qubits: as the dip shrinks,
     more shots read the wrong charge, so the warning light comes on. Right,
     phase noise between steps: the dip shrinks the same way, but every shot
     still reads charge 0, so the light never comes on.
 
-    Replaces the Nov 3 calibration plot (the check's own estimate of the
-    signal left, 1 - Var(Q)/(N/4), against the signal really left), which
-    was right but took too long to read. Both use the same data: the 1,000-
-    shot sweep at dt = 0.1 and the "dephasing" step channel.
+    Data: the 1,000-shot sweep at dt = 0.1 and the "dephasing" step channel.
     """
     pk, tr, sw, star = sweeps[0.1]
     table = z_basis_table(N)
@@ -590,10 +585,10 @@ def fig_blind(eps, sweeps):
                       - observables_from_distribution(b, N)["particle_density"])
         wrong_ph.append(1 - b[zero].sum())
     dip_ph, wrong_ph = np.array(dip_ph), np.array(wrong_ph)
-    # Checks: slide 30's noisy bars (0.3 % per gate) say 44 % of shots read 0;
+    # Checks: the talk's noisy charge bars (0.3 % per gate) say 44 % of shots read 0;
     # phase noise never moves a shot off charge 0.
     p3 = probabilities(tr.prepared, gate_noise_model(3e-3))
-    print(f"  gate noise 0.3 %: shots reading charge 0 = {p3[zero].sum():.4f} (slide 30 bar: 44 %)")
+    print(f"  gate noise 0.3 %: shots reading charge 0 = {p3[zero].sum():.4f} (talk's charge bar: 44 %)")
     print(f"  phase noise: largest share of shots with charge != 0 = {wrong_ph.max():.1e}, "
           f"dip {dip_ph[0] / d0:.3f} -> {dip_ph[-1] / d0:+.3f} of its noiseless size")
     print(f"  gate noise: wrong-charge share {wrong_gate[0]:.1e} -> {wrong_gate[-1]:.3f}, "

@@ -1,11 +1,11 @@
 VERIFICATION LOG
-schwinger-n4  |  generated 2026-11-18 00:07 UTC  |  commit 994d7b6-dirty
+schwinger-n4  |  generated 2026-11-18 18:18 UTC  |  commit e4f2578-dirty
 python 3.11.7  numpy 2.4.6  scipy 1.17.1  qiskit 2.5.2  qiskit-aer 0.17.2  matplotlib 3.11.1
 
 ############ TEST SUITE ############
 ........................................................................ [ 87%]
 ................................................................         [100%]
-496 passed in 12.89s
+496 passed in 13.34s
 
 ############ scripts/01_tfim_phase_transition.py ############
 wrote figures/01_tfim.png
@@ -22,14 +22,13 @@ FERMIONIC ALGEBRA, checked as matrices on the full Hilbert space
   N = 6:  worst anticommutator residual = 0.000e+00   c^dag c^dag = 0.000e+00
 
 ==================================================================
-HOPPING SIGN, settled numerically instead of argued about
+HOPPING SIGN, checked numerically
 ==================================================================
   plain string gives minus sign            residual 0.000e+00
   alternating string gives plus sign       residual 0.000e+00
   spectra agree                            residual 1.110e-15
-  Reading: the plain Z string really does produce a minus sign; the
-  alternating (-Z) string removes it; the two give identical spectra,
-  so the sign is a relabelling and not physics.
+  The plain Z string gives a minus sign and the alternating (-Z) string
+  removes it. The spectra are identical, so the sign is a relabelling.
 
   periodic TFIM, N = 6, full spectrum: parity-sector formula residual 1.8e-14; naive formula 1.90
 
@@ -37,7 +36,7 @@ wrote figures/02_jordan_wigner.png
 
 ############ scripts/03_schwinger_spectrum.py ############
 ============================================================
-GATE 2 ARTIFACT: N = 4 SCHWINGER HAMILTONIAN
+THE N = 4 SCHWINGER HAMILTONIAN
 ============================================================
 string     coefficient                origin
 ------------------------------------------------------------
@@ -114,8 +113,8 @@ WHY PAIRS APPEAR AT ALL: bare vacuum is not the ground state
   1.0        -2.000000    -2.828162   0.828162       0.334990
   2.0        -4.000000    -4.553129   0.553129       0.175162
 
-  The gap column is the whole story. A larger mismatch between the state
-  you prepare and the state the Hamiltonian wants gives more pair production.
+  The larger the gap between the bare vacuum and the true ground state,
+  the more pairs appear.
 
 ############ scripts/05_qiskit_trotter.py ############
 ==================================================================

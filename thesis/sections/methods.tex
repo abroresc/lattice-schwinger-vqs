@@ -69,8 +69,8 @@ Qiskit Aer~0.17 and Matplotlib~3.11~\cite{hunter2007}, with exact versions
 pinned in a lock file. Sampling uses fixed seeds,
 \texttt{scripts/09\_verification\_table.py} prints every row of
 Table~\ref{tab:checks}, and 496 tests compare every module against
-independently known answers. The repository is private at the time of writing
-and available from the author on request.
+independently known answers. The code, tests and figures are public at
+\url{https://github.com/abroresc/lattice-schwinger-vqs}.
 
 \subsection{Exact reference and verification}
 \label{sec:verification}
@@ -452,7 +452,7 @@ with $b_{\mathrm{Trot}} = \langle x\rangle^{\mathrm{Trot}} - \langle x\rangle^{\
 $b_{\mathrm{gate}} = \langle x\rangle^{\mathrm{gate}} - \langle x\rangle^{\mathrm{Trot}}$
 and $b_{\mathrm{read}} = \langle x\rangle^{\mathrm{meas}} - \langle x\rangle^{\mathrm{gate}}$,
 summing to the total by construction. Defining $b_{\mathrm{gate}}$ on the
-Trotterised circuit, as an experiment would, counts any interplay as gate
+Trotterised circuit, as an experiment would, counts any cross effect as gate
 error. One $M$-shot measurement has root-mean-square error
 $\sqrt{b^2 + \sigma^2}$, squared bias plus variance~\cite{cai2023}, with $b$
 the total bias and $\sigma$ from $p^{\mathrm{meas}}$ through

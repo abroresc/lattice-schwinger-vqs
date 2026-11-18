@@ -98,7 +98,7 @@ def test_eigh_sorted_rejects_non_hermitian():
 def test_qiskit_labels_coincide_and_qubit_numbering_reverses():
     """
     The convention trap, pinned down. Labels agree; qubit numbers reverse.
-    Skipped if Qiskit is not installed, since Gate 2 does not require it.
+    Skipped if Qiskit is not installed, since the core package does not need it.
     """
     qi = pytest.importorskip("qiskit.quantum_info")
     N = 4

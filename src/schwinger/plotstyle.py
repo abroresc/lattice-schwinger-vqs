@@ -61,8 +61,7 @@ def save(fig, path) -> None:
     Save a figure as PNG and PDF side by side.
 
     PNG for the README and for pasting into slides. PDF because it is vector,
-    so it stays sharp at any zoom when included in the LaTeX thesis. Producing
-    both now costs nothing and saves regenerating every figure in December.
+    so it stays sharp at any zoom when included in the LaTeX thesis.
     """
     import pathlib
 

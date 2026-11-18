@@ -2,7 +2,7 @@
 
 # 9. Where this stops
 
-A result is only useful if you know its edges. Here they are.
+What the results cover, and what they do not.
 
 ## What was found
 
@@ -69,7 +69,7 @@ checked against.
 
 ---
 
-That is the whole project. For the full argument with every reference, read
+For the full argument with every reference, read
 the [thesis](../../thesis/main.pdf). For the derivation of the Hamiltonian
 from the continuum, read [`docs/derivation.md`](../derivation.md). To check a
 number, run the script named next to it.

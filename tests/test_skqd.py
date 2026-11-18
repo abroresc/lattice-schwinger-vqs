@@ -78,11 +78,10 @@ def test_exact_expectation_matches_monte_carlo(krylov_dists, shots):
     energy, and the frequency of every sampled subspace that is common enough
     to test (expected count >= 10), each within four binomial standard errors.
 
-    The SPREAD of the energy is deliberately not compared. It is dominated by
+    The spread of the energy is deliberately not compared. It is dominated by
     subspaces with probability ~1e-4 (both long-string bitstrings missed), so
     its sample estimate swings by a factor of four between 3000-run batches.
-    That was found when an earlier version of this test compared it and failed
-    on a correct formula.
+    A test of it would fail on a correct formula.
     """
     ex = expected_skqd_energy(krylov_dists, shots, N, M, W, J)
     basis = [int(b) for b in ex.basis]
@@ -108,7 +107,7 @@ def test_many_shots_converge_to_exact_energy(krylov_dists):
 
 
 def test_noise_cannot_push_energy_below_truth():
-    """Noisy samples only change WHICH bitstrings appear; the bound still holds."""
+    """Noisy samples only change which bitstrings appear; the bound still holds."""
     dists = [noisy_probabilities(c, gate_noise_model(5e-3))
              for c in krylov_circuits(N, M, W, J, 0.3, 3)]
     e0, _ = ground_state(N, M, W, J)

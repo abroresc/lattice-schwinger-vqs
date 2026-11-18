@@ -1,10 +1,10 @@
 """
-The error budget (M10 to M12): every source separated, on every observable.
+The error budget: every source separated, on every observable.
 
-THE DECOMPOSITION
+The decomposition
 -----------------
 For a diagonal observable O at time t, four outcome distributions are computed
-EXACTLY (no sampling), each differing from the previous one by one source:
+exactly (no sampling), each differing from the previous one by one source:
 
     exact     |<b| e^{-iHt} |vac>|^2           exact diagonalisation
     trotter   |<b| U_trotter |vac>|^2           noiseless circuit
@@ -27,22 +27,25 @@ circuit, so it is "the extra error from noise, given this circuit". That is the
 operationally relevant split: an experimentalist chooses dt first and then
 lives with the hardware.
 
-THE FAILURE THRESHOLD
+The failure threshold
 ---------------------
 Pair production from the bare vacuum shows a rise and then a fall of the
 particle density (Martinez et al.: "an initial phase of rapid pair creation is
-followed by a reduction ... due to recombination"). Incoherent noise can only
-drive the density monotonically toward the maximally mixed value 1/2, so the
-FALL, the recombination dip
+followed by a reduction ... due to recombination"). The fall is the signal,
+measured as the recombination dip
 
-    D = nu(t_peak) - nu(t_trough),
+    D = nu(t_peak) - nu(t_trough).
 
-is a signature noise cannot fake. The signal is lost when D is no longer
+Depolarizing noise drives the density toward the maximally mixed value 1/2,
+where D = 0. Under the four noise channels used here D shrinks as noise grows
+and never exceeds its noiseless value (scripts/09 checks this), so a surviving
+dip was not made by the noise. That is an observation about these channels,
+not a theorem: a coherent error could shift or imitate the dip. The signal is lost when D is no longer
 resolvable from shot noise, D <= z sigma_D with sigma_D = sqrt(s_peak^2 +
 s_trough^2), z = 2. The failure threshold eps* is the two-qubit gate error at
 which that first happens.
 
-PREDICTING THE THRESHOLD FROM THE DIAGNOSTIC
+Predicting the threshold from the diagnostic
 --------------------------------------------
 Given measured distributions at one noise level eps0 (all an experiment has),
 read the fidelity at each time from charge conservation, F = 1 - Var(Q)/(N/4),
@@ -210,7 +213,7 @@ def sweep_dip(peak: PointCircuit, trough: PointCircuit, n_sites: int, eps_grid: 
 def predicted_dip(p_peak_meas: np.ndarray, p_trough_meas: np.ndarray, eps0: float,
                   eps_grid: np.ndarray, n_sites: int, shots: int) -> dict[str, np.ndarray]:
     """
-    Predict D(eps) and sigma_D(eps) everywhere from data taken at ONE noise level
+    Predict D(eps) and sigma_D(eps) everywhere from data taken at one noise level
     eps0, using only the charge diagnostic and the global-depolarizing model.
     See the module docstring. Works on exact or shot-sampled distributions.
 

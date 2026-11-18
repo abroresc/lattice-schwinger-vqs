@@ -9,7 +9,7 @@ five minutes.
 You need Python 3.11 or newer and git.
 
 ```bash
-git clone <this repository's URL>
+git clone https://github.com/abroresc/lattice-schwinger-vqs.git
 cd lattice-schwinger-vqs
 python3 -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate

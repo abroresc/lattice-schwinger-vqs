@@ -102,8 +102,7 @@ shrinks to nothing at a phase-flip probability of 0.036 per qubit per step.
 The warning light reads "all fine" the whole way down. In panel (c) these
 points form a vertical line at $F_Q = 1$.
 
-This is not an exotic case. It is the noise model Martinez et al. fitted to
-their own 2016 data: a phase flip on each qubit with probability 0.038 per
+It is also the noise model Martinez et al. fitted to their own 2016 data: a phase flip on each qubit with probability 0.038 per
 time step ([Martinez et al. 2016](https://doi.org/10.1038/nature18318); their
 steps were longer than here, so the two numbers are not directly comparable).
 They had already thrown away the shots with the wrong total charge (14 % after

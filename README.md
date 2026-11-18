@@ -214,8 +214,7 @@ recorded rather than quietly corrected: a wrong guess about Qiskit's qubit
 order, an ill-conditioned step in the Ising-chain check, and a physics claim
 that dephasing on the compiled gates is invisible to the charge diagnostic.
 The thesis's own statement lists the rest, including statements in the draft
-text that the numbers contradicted. That is the verification structure
-working as intended, and it is the reason the structure exists.
+text that the numbers contradicted.
 
 ---
 

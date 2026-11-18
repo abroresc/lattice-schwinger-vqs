@@ -89,14 +89,14 @@ def hellmann_feynman_residual(n_sites: int, m: float, w: float, J: float, dm: fl
 
 def gauss_law_residual(n_sites: int) -> float:
     """
-    Confirm that Gauss's law is an IDENTITY in this encoding, not a constraint.
+    Confirm that Gauss's law is an identity in this encoding, not a constraint.
 
     Checks  L_n - L_{n-1} - rho_n = 0  as a matrix, on the whole Hilbert space,
     with L_0 = 0. It should be exactly zero everywhere, because the gauge field
     was eliminated by substituting the solved constraint rather than by
     imposing it.
 
-    Read that consequence carefully. It means there is no Gauss's law violation
+    So there is no Gauss's law violation
     to measure in this encoding, and the diagnostic in the proposal has to be
     total charge conservation instead. See observables.charge_variance.
     """

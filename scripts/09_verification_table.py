@@ -2,11 +2,10 @@
 Every row of the thesis verification table (Table 2), recomputed and printed.
 
 Why this script exists. The tests in tests/ check each of these quantities
-against a TOLERANCE. That is right for a test and wrong for a table: a tolerance
-says how much disagreement would be accepted, not how much there is. An earlier
-draft of the thesis quoted two tolerances (1e-5 and 1e-12) as if they were
-measured residuals. This script prints the measured disagreement for every row,
-so each number in the table has exactly one source.
+against a tolerance. That is right for a test and wrong for a table: a tolerance
+says how much disagreement would be accepted, not how much there is. This script
+prints the measured disagreement for every row, so each number in the table has
+one source.
 
 All rows are at the thesis parameters N = 4, m = 0.5 w, J = w unless the label
 says otherwise. The experiment behind each row is the same one the matching

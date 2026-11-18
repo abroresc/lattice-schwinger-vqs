@@ -68,7 +68,7 @@ def test_trotter_converges_to_exact(order, m, w, J):
 @pytest.mark.parametrize("order,expected_slope", [(1, 1.0), (2, 2.0)])
 def test_trotter_error_scaling_exponent(order, expected_slope):
     """
-    THE M8 test. Fit the slope of log(error) against log(1/steps) and check it
+    The main circuit test. Fit the slope of log(error) against log(1/steps) and check it
     matches the predicted exponent. The slope is the test, not the size of the
     error: a wrong implementation can be accurate and still scale wrongly.
     """
@@ -102,7 +102,7 @@ def test_first_order_step_applies_the_diagonal_terms_first():
     """
     The circuit applies the diagonal layer first, so as an operator it is
     e^{-i H_o dt} e^{-i H_e dt} e^{-i H_Z dt}. The reverse product is a
-    different operator; an earlier docstring and the thesis Methods wrote it.
+    different operator, and an easy one to write down by mistake.
     """
     from qiskit.quantum_info import Operator
     n, m, w, J, dt = 4, 0.5, 1.0, 1.0, 0.3
@@ -161,7 +161,7 @@ def test_shot_sampling_agrees_with_exact_within_error_bars():
     """
     Sample the simulator and check the estimate sits within a few sigma of the
     exact value. This is the first appearance of shot noise, which is the
-    statistical half of the M10 error budget.
+    statistical half of the error budget.
     """
     n, m, w, J, t = 4, 0.5, 1.0, 1.0, 3.0
     exact_state = evolve(bare_vacuum(n), hamiltonian(n, m, w, J), np.array([t]))[0]

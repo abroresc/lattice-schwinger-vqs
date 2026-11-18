@@ -105,9 +105,8 @@ all were caught by the checks rather than by reading.
 
 ## Break it yourself
 
-The tests are only worth something if they catch real mistakes. Plant one and
-see. Each of these is a one-line change, and each was tried in a scratch copy
-of the code:
+Each of these one-line mistakes was planted in a scratch copy of the code to
+see whether the tests catch it:
 
 | Plant this mistake | Where | Tests that fail |
 |---|---|---|

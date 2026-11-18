@@ -2,14 +2,14 @@
 Qiskit layer: build the Schwinger Hamiltonian as circuits and simulate them.
 
 This is the bridge from exact linear algebra (everything else in this package)
-to something a quantum computer could actually run. It covers M7 state
-preparation and M8 Trotterised evolution at prototype level.
+to something a quantum computer could run: state preparation, Trotter
+evolution, compilation and shots.
 
-EVERY function here is checked against the exact NumPy result in
+Every function here is checked against the exact NumPy result in
 tests/test_circuits.py. The circuit layer is not trusted just because Qiskit
 ran without an error.
 
-THE INDEX TRAP, restated because this is where it bites.
+The index trap, restated because circuits are where it matters.
 Our site j (0-indexed, leftmost in a Pauli string) is Qiskit qubit N-1-j.
 Every gate index below goes through `site_to_qiskit_qubit`. Pass a site index
 straight to a Qiskit gate and the chain silently reverses, which for this model
@@ -45,8 +45,7 @@ def bare_vacuum_circuit(n_sites: int) -> QuantumCircuit:
     The target is Z_n = -(-1)^n, which is |0101...> in our site order: odd
     physics sites occupied, even sites empty. Preparing it costs N/2 X gates
     and no entanglement, which is exactly why it is the natural starting state
-    for a real-time simulation. The TRUE ground state is entangled and is what
-    M6/M7 will have to work for.
+    for a real-time simulation. The true ground state is entangled; skqd.py finds it.
     """
     qc = QuantumCircuit(n_sites, name="bare_vacuum")
     for j, bit in enumerate(bare_vacuum_label(n_sites)):
@@ -67,7 +66,7 @@ def bare_vacuum_circuit(n_sites: int) -> QuantumCircuit:
 #   H_odd   hopping on bonds (1,2), (3,4), ...   disjoint, so they commute.
 #
 # Splitting the hopping into even and odd bonds is the standard move: adjacent
-# bonds share a site and do NOT commute, so they cannot go in one group.
+# bonds share a site and do not commute, so they cannot go in one group.
 # ---------------------------------------------------------------------------
 
 
@@ -124,7 +123,7 @@ def trotter_step(n_sites: int, m: float, w: float, J: float, dt: float,
     One Trotter step of exp(-i H dt).
 
     order = 1:  e^{-i H_odd dt} e^{-i H_even dt} e^{-i H_Z dt}
-                as an operator: the diagonal layer is applied FIRST in time, so
+                as an operator: the diagonal layer is applied first in time, so
                 it is the rightmost factor (checked in tests/test_circuits.py).
                 Error per step O(dt^2), so total error over fixed time O(dt).
 
@@ -172,7 +171,7 @@ def trotter_circuit(n_sites: int, m: float, w: float, J: float, time: float,
 
 def statevector(qc: QuantumCircuit) -> np.ndarray:
     """
-    Circuit output as a plain NumPy vector in THIS package's basis ordering.
+    Circuit output as a plain NumPy vector in this package's basis ordering.
 
     Qiskit's Statevector indexes with qubit 0 as the least significant bit.
     Since our site j maps to qubit N-1-j, site N-1 is also least significant
@@ -191,14 +190,13 @@ def particle_density_from_counts(counts: dict[str, int], n_sites: int
 
         N_part = (1/2) sum_n [ I + (-1)^n Z_n ]
 
-    is DIAGONAL in the computational basis, so a single Z-basis measurement
-    gives it. No basis rotations, no separate circuits per term. That is a real
-    convenience and worth saying out loud in the report, because most VQE-style
-    observables do not have it.
+    is diagonal in the computational basis, so a single Z-basis measurement
+    gives it. No basis rotations, no separate circuits per term. Energies, as VQE measures them,
+    need several measurement bases; this observable needs one.
 
     The uncertainty is the standard error of the mean over shots, computed from
-    the sample variance of the per-shot particle number. That is the honest
-    estimator: the per-shot value is an integer 0..N, not a Bernoulli variable,
+    the sample variance of the per-shot particle number. That is the right
+    estimator here: the per-shot value is an integer 0..N, not a Bernoulli variable,
     so a naive sqrt(p(1-p)/n) would be wrong.
 
     Qiskit bitstrings come back with qubit 0 last, which is our site N-1 last,
@@ -231,8 +229,8 @@ def run_with_shots(qc: QuantumCircuit, shots: int, seed: int | None = None,
     """
     Sample the circuit on the Aer simulator and return measurement counts.
 
-    `noise_model` is accepted now and unused by default, so that M11 can inject
-    a gate/readout error model here without changing any call site.
+    `noise_model` is None by default; pass one from noise.gate_noise_model to
+    sample a noisy circuit.
     """
     from qiskit_aer import AerSimulator
 
@@ -248,7 +246,7 @@ def run_with_shots(qc: QuantumCircuit, shots: int, seed: int | None = None,
 # software (a frame change) and is error-free on such hardware; SX and X are
 # physical single-qubit pulses; CX is the only entangling gate. Noise models in
 # noise.py attach errors to exactly these gates, so the circuit has to be
-# compiled into this basis BEFORE noise is applied. Otherwise Aer would run
+# compiled into this basis before noise is applied. Otherwise Aer would run
 # RXX/RYY/RZZ natively and the noise model would never fire.
 HARDWARE_BASIS: tuple[str, ...] = ("rz", "sx", "x", "cx")
 
@@ -257,7 +255,7 @@ def to_hardware_basis(qc: QuantumCircuit, basis: tuple[str, ...] = HARDWARE_BASI
                       ) -> QuantumCircuit:
     """
     Compile to the hardware basis. One function, so that the circuit whose gates
-    are COUNTED (circuit_metrics) is the same circuit whose gates carry NOISE
+    are counted (circuit_metrics) is the same circuit whose gates carry noise
     (noise.py). A fixed seed makes the compilation reproducible.
     """
     from qiskit import transpile
@@ -270,10 +268,9 @@ def circuit_metrics(qc: QuantumCircuit, basis: tuple[str, ...] = HARDWARE_BASIS
     """
     Depth and two-qubit gate count after transpiling to a hardware-like basis.
 
-    This is the number that matters for M11: gate error accumulates with
-    two-qubit gate count, so shrinking the Trotter step reduces Trotter error
-    and increases hardware error at the same time. That tension is one of the
-    two headline results of the thesis.
+    Gate error grows with the two-qubit gate count, so shrinking the Trotter
+    step lowers Trotter error and raises hardware error at the same time.
+    budget.py measures that trade-off.
     """
     t = to_hardware_basis(qc, basis)
     ops = t.count_ops()

@@ -1,10 +1,10 @@
 """
 The Jordan-Wigner transformation, built explicitly and verified algebraically.
 
-THE PROBLEM IT SOLVES
+The problem it solves
 ---------------------
-Fermion operators on different sites ANTIcommute: {c_i, c_j^dag} = delta_ij.
-Spin operators on different sites COMMUTE, because they act on different
+Fermion operators on different sites anticommute: {c_i, c_j^dag} = delta_ij.
+Spin operators on different sites commute, because they act on different
 tensor factors. So "spin up = occupied" cannot be right on its own; it gets
 the statistics wrong.
 
@@ -16,18 +16,18 @@ The Z string contributes exactly one factor of (-1) for every occupied site
 to the left of j. That is the minus sign fermionic statistics demands, and it
 is why the transformation is nonlocal.
 
-CONVENTION USED HERE
+Convention used here
 --------------------
     sigma^+ = |0><1|,  sigma^- = |1><0|,  Z|0> = +|0>
     n_j = c_j^dag c_j = sigma^+_j sigma^-_j = (I + Z_j)/2
 
-so |0> (spin up, Z = +1) is the OCCUPIED state and |1> is empty. This is the
+so |0> (spin up, Z = +1) is the occupied state and |1> is empty. This is the
 convention that makes the Schwinger charge come out as rho_n = (Z_n + (-1)^n)/2,
 matching Martinez et al. (2016) exactly. If you flip it you flip the sign of
 every staggered mass term and the vacuum moves.
 
-THE SIGN YOU WILL TRIP OVER
----------------------------
+The hopping sign
+----------------
 With the plain Z string above,
 
     c_j^dag c_{j+1} = - sigma^+_j sigma^-_{j+1}
@@ -84,7 +84,7 @@ def anticommutation_residuals(n_sites: int, alternating_string: bool = False) ->
         {c_i, c_j}     = 0
         {c_i^dag, c_j^dag} = 0
 
-    This is the check that catches a broken Z string DIRECTLY, rather than
+    This is the check that catches a broken Z string directly, rather than
     letting it surface later as a wrong energy that could have a dozen causes.
     """
     c = [jw_annihilation(j, n_sites, alternating_string) for j in range(n_sites)]
@@ -120,13 +120,13 @@ def hopping_sign_demo(n_sites: int = 4) -> dict[str, float]:
     """
     Demonstrate the hopping sign convention numerically instead of arguing about it.
 
-    Returns residuals for two claims:
+    Returns three residuals:
 
       "plain string: c_j^dag c_{j+1} + sigma^+_j sigma^-_{j+1}"
-          should be 0, i.e. the plain Z string gives a MINUS sign.
+          should be 0, i.e. the plain Z string gives a minus sign.
 
       "alternating string: c_j^dag c_{j+1} - sigma^+_j sigma^-_{j+1}"
-          should be 0, i.e. the (-Z) string gives a PLUS sign.
+          should be 0, i.e. the (-Z) string gives a plus sign.
 
       "spectra agree"
           largest difference between the full eigenvalue spectra of the
@@ -203,11 +203,10 @@ def bogoliubov_spectrum(A: np.ndarray, B: np.ndarray) -> tuple[np.ndarray, float
 
     and the Lambda_k^2 are the eigenvalues of (A - B)(A + B).
 
-    NUMERICS, and this is worth understanding rather than copying.
-    The textbook route is to form the product (A - B)(A + B), get its
+    Numerics. The textbook route is to form the product (A - B)(A + B), get its
     eigenvalues, and take square roots. That is a bad idea in floating point.
     Because A is symmetric and B antisymmetric, (A + B)^T = A - B, so the
-    product is exactly M^T M with M = A + B. Forming M^T M SQUARES the
+    product is exactly M^T M with M = A + B. Forming M^T M squares the
     condition number, and the square root then amplifies the relative error on
     the small eigenvalues, which are precisely the ones that matter in the
     ordered phase where modes become near-degenerate.

@@ -1,5 +1,5 @@
 """
-M2: the transverse-field Ising model.
+The transverse-field Ising model, a warm-up with an exact answer.
 
 Two things at once: the physics (a crossover near h/J = 1 that sharpens into a
 phase transition as N grows) and the verification (exact diagonalisation
